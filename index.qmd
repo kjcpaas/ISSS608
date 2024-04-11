@@ -1,11 +1,13 @@
 ---
-title: "CourseSite"
+title: "ISSS608 - Visual Analytics and Applications"
 ---
 
-This is a Quarto website.
+Welcome to ISSS608 Visual Analytics and Applications!
 
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+I am Kristine Joy Paas, or **Joy** for short.
 
-```{r}
-1 + 1
-```
+In this webpage, I am going to share with you my learning journey of geospatial analytics.
+
+Netlify link: <https://isss608-kjcpaas.netlify.app/>
+
+Github repo: <https://github.com/kjcpaas/ISSS608>
