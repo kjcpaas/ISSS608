@@ -12,5 +12,47 @@
     "title": "About",
     "section": "",
     "text": "About this site\n\n1 + 1\n\n[1] 2"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex1/Hands-on_Ex1.html",
+    "href": "Hands-on_Exs/Ex1/Hands-on_Ex1.html",
+    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics: ggplot2 methods",
+    "section": "",
+    "text": "This hands-on exercise covers Chapter 1: A Layered Grammar of Graphics: ggplot2 methods.\nI learned about the following:\n\nUseful functions and components in ggplot2 .\nGrammar of Graphics to guide how data is visualized"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#loading-the-required-libraries",
+    "href": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#loading-the-required-libraries",
+    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics: ggplot2 methods",
+    "section": "Loading the required libraries",
+    "text": "Loading the required libraries\n\n\n\n\n\n\nMark this chunk for setup so it ensures loading of required libraries when another code chunk is run\n\n\n\n\npacman::p_load(tidyverse)"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#loading-the-data",
+    "href": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#loading-the-data",
+    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics: ggplot2 methods",
+    "section": "Loading the data",
+    "text": "Loading the data\nWe first need to download the provided data set from eLearn and put it under the data folder.\n\n\n\n\n\n\nFile structure\n\n\n\n\n\n\n\n\n\nNext, read the data by using read_csv() from readr package.\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")\nglimpse(exam_data)\n\nRows: 322\nColumns: 7\n$ ID      &lt;chr&gt; \"Student321\", \"Student305\", \"Student289\", \"Student227\", \"Stude…\n$ CLASS   &lt;chr&gt; \"3I\", \"3I\", \"3H\", \"3F\", \"3I\", \"3I\", \"3I\", \"3I\", \"3I\", \"3H\", \"3…\n$ GENDER  &lt;chr&gt; \"Male\", \"Female\", \"Male\", \"Male\", \"Male\", \"Female\", \"Male\", \"M…\n$ RACE    &lt;chr&gt; \"Malay\", \"Malay\", \"Chinese\", \"Chinese\", \"Malay\", \"Malay\", \"Chi…\n$ ENGLISH &lt;dbl&gt; 21, 24, 26, 27, 27, 31, 31, 31, 33, 34, 34, 36, 36, 36, 37, 38…\n$ MATHS   &lt;dbl&gt; 9, 22, 16, 77, 11, 16, 21, 18, 19, 49, 39, 35, 23, 36, 49, 30,…\n$ SCIENCE &lt;dbl&gt; 15, 16, 16, 31, 25, 16, 25, 27, 15, 37, 42, 22, 32, 36, 35, 45…"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#data",
+    "href": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#data",
+    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics: ggplot2 methods",
+    "section": "Data",
+    "text": "Data\nThe data layer contains the dataset to be visualized.\n\nggplot(data=exam_data)\n\n\n\n\nThis generated an empty plot as no visual elements have been added to `ggplot2` call."
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#aesthetic-mappings",
+    "href": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#aesthetic-mappings",
+    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics: ggplot2 methods",
+    "section": "Aesthetic Mappings",
+    "text": "Aesthetic Mappings\nThe aesthetic mappings take attributes of the data and and use them to influence visual characteristics, such as position, colour, size, shape, or transparency. Each visual characteristic can thus encode an aspect of the data and be used to convey information.\nAll aesthetics of a plot are specified in the aes() function call.\n\nggplot(data=exam_data, \n       aes(x= MATHS))\n\n\n\n\nThis maps the MATHS column of exam_data to the x-axis of the plot. The axis range is based on the range of this dataset.\n\nmin(exam_data[\"MATHS\"])\n\n[1] 9\n\n\n\nmax(exam_data[\"MATHS\"])\n\n[1] 99"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#geometrics",
+    "href": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#geometrics",
+    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics: ggplot2 methods",
+    "section": "Geometrics",
+    "text": "Geometrics\n\nTypes\nGeometric objects are the actual marks we put on a plot. Examples include:\n\ngeom_point for drawing individual points (e.g., a scatter plot)\ngeom_line for drawing lines (e.g., for a line charts)\ngeom_smooth for drawing smoothed lines (e.g., for simple trends or approximations)\ngeom_bar for drawing bars (e.g., for bar charts)\ngeom_histogram for drawing binned values (e.g. a histogram)\ngeom_polygon for drawing arbitrary shapes\ngeom_map for drawing polygons in the shape of a map! (You can access the data to use for these maps by using the map_data() function).\n\nA plot can have multiple geometrics. Other available geometrics can be found in https://ggplot2.tidyverse.org/reference/#section-layer-geoms.\n\n\ngeom_bar()\ngeom_bar() plots a bar chart.\n\nggplot(data=exam_data, \n       aes(x=RACE)) +\n  geom_bar()\n\n\n\n\n\n\ngeom_dotplot()\ngeom_dotplot() is appropriate for binned data.\n\nggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot(dotsize = 0.5)\n\n\n\n\nVertical scale is misleading so let’s just remove it.\n\n\n\n\n\n\nNote\n\n\n\n\nscale_y_continuous() is used to turn off the y-axis, and\nbinwidth argument is used to change the binwidth to 2.5.\n\n\n\n\nggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot(binwidth=2.5,         \n               dotsize = 0.5) +      \n  scale_y_continuous(NULL,           \n                     breaks = NULL)  \n\n\n\n\n\n\ngeom_histogram()\ngeom_histogram() is for generating a histogram. (default bin = 30)\n\nggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_histogram()\n\n\n\n\nLet’s change the histogram bin and color.\n\nggplot(data=exam_data, \n       aes(x= MATHS)) +\n  geom_histogram(bins=20,            \n                 color=\"black\",      \n                 fill=\"light blue\")  \n\n\n\n\n\n\nChanging geometry by using aes()\nIn this example, we partition the data (e.g. Female vs Male) and color each bar corresponding to the partition differently.\n\nggplot(data=exam_data, \n       aes(x= MATHS, \n           fill = GENDER)) +\n  geom_histogram(bins=20, \n                 color=\"grey30\")\n\n\n\n\n\n\ngeom_density()\ngeom-density() computes and plots kernel density estimate, which is a smoothed version of the histogram.\nThis is appropriate for continuous data.\n\nggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_density()           \n\n\n\n\nIt can be used with partitioned data as well.\n\nggplot(data=exam_data, \n       aes(x = MATHS, \n           colour = GENDER)) +\n  geom_density()\n\n\n\n\n\n\ngeom_boxplot()\ngeom_boxplot() displays continuous value list. It visualises five summary statistics (the median, two hinges and two whiskers), and all “outlying” points individually.\nIt is appropriate for visualizing the distribution of a dataset.\n\nggplot(data=exam_data, \n       aes(y = MATHS,       \n           x= GENDER)) +    \n  geom_boxplot()            \n\n\n\n\nNotches are used in box plots to help visually assess whether the medians of distributions differ. If the notches do not overlap, this is evidence that the medians are different.\nNotches can be used by supplying `notches=true`.\n\nggplot(data=exam_data, \n       aes(y = MATHS, \n           x= GENDER)) +\n  geom_boxplot(notch=TRUE)\n\n\n\n\n\n\ngeom_violin()\ngeom_violin is designed for creating violin plot. Violin plots are a way of comparing multiple data distributions. With ordinary density curves, it is difficult to compare more than just a few distributions because the lines visually interfere with each other. With a violin plot, it’s easier to compare several distributions since they’re placed side by side.\n\nggplot(data=exam_data, \n       aes(y = MATHS, \n           x= GENDER)) +\n  geom_violin()\n\n\n\n\n\n\ngeom_point()\ngeom_point() is especially useful for creating scatterplot.\nThe plot below shows the plot of Maths and English grades.\n\nggplot(data=exam_data, \n       aes(x= MATHS, \n           y=ENGLISH)) +\n  geom_point()            \n\n\n\n\n\n\nCombining geom objects\nMultiple geom objects can be combined in a single plot like below, combining a boxplot and scatterplot.\n\nggplot(data=exam_data, \n       aes(y = MATHS, \n           x= GENDER)) +\n  geom_boxplot() +                    \n  geom_point(position=\"jitter\", \n             size = 0.5)"
   }
 ]

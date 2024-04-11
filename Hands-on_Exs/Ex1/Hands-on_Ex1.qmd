@@ -9,3 +9,308 @@ execute:
   eval: true
   warning: false
 ---
+
+# Overview
+
+This hands-on exercise covers [Chapter 1: A Layered Grammar of Graphics: ggplot2 methods](https://r4va.netlify.app/chap01).
+
+I learned about the following:
+
+-   Useful functions and components in `ggplot2` .
+
+-   Grammar of Graphics to guide how data is visualized
+
+# Getting Started
+
+## Loading the required libraries
+
+::: {.callout-note appearance="minimal"}
+Mark this chunk for setup so it ensures loading of required libraries when another code chunk is run
+:::
+
+```{r}
+#| label: setup
+pacman::p_load(tidyverse)
+```
+
+## Loading the data
+
+We first need to download the provided data set from eLearn and put it under the data folder.
+
+::: {.callout-note collapse="true"}
+### File structure
+
+![](images/file_structure.png)
+:::
+
+Next, read the data by using `read_csv()` from [readr](https://readr.tidyverse.org/) package.
+
+```{r}
+exam_data <- read_csv("data/Exam_data.csv")
+glimpse(exam_data)
+```
+
+# **R Graphics VS ggplot**
+
+First we will compare the basic R Graphics functions and `ggplot`.
+
+::: panel-tabset
+## R Graphics
+
+```{r}
+hist(exam_data$MATHS)
+```
+
+## ggplot2
+
+```{r}
+ggplot(data=exam_data, aes(x = MATHS)) +
+  geom_histogram(bins=10, 
+                 boundary = 100,
+                 color="black", 
+                 fill="grey") +
+  ggtitle("Distribution of Maths scores")
+```
+:::
+
+::: callout-note
+## Reflections
+
+R Graphics looks very each to use to generate a histogram. \`ggplot2\` requires more code to generate a simple histogram.
+
+However, \`ggplot2\` may offer more features to customize the plot and is not limited to just histograms.
+:::
+
+# Grammar of Graphics
+
+Building blocks for the layers of Grammar of Graphics
+
+-   **Data**: The dataset being plotted.
+
+-   **Aesthetics** take attributes of the data and use them to influence visual characteristics, such as position, colours, size, shape, or transparency.
+
+-   **Geometrics**: The visual elements used for our data, such as point, bar or line.
+
+-   **Facets** split the data into subsets to create multiple variations of the same graph (paneling, multiple plots).
+
+-   **Statistics**, statiscal transformations that summarise data (e.g. mean, confidence intervals).
+
+-   **Coordinate systems** define the plane on which data are mapped on the graphic.
+
+-   **Themes** modify all non-data components of a plot, such as main title, sub-title, y-aixs title, or legend background.
+
+# Grammatical Elements Using ggplot2
+
+## Data
+
+The data layer contains the **dataset to be visualized**.
+
+```{r}
+ggplot(data=exam_data)
+```
+
+This generated an empty plot as no visual elements have been added to \`ggplot2\` call.
+
+## Aesthetic Mappings
+
+The aesthetic mappings take attributes of the data and and use them to **influence visual characteristics**, such as position, colour, size, shape, or transparency. Each visual characteristic can thus encode an aspect of the data and be used to convey information.
+
+All aesthetics of a plot are specified in the [`aes()`](https://ggplot2.tidyverse.org/reference/aes.html) function call.
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x= MATHS))
+```
+
+This maps the `MATHS` column of `exam_data` to the x-axis of the plot. The axis range is based on the range of this dataset.
+
+```{r}
+min(exam_data["MATHS"])
+```
+
+```{r}
+max(exam_data["MATHS"])
+```
+
+## Geometrics
+
+### Types
+
+Geometric objects are the actual marks we put on a plot. Examples include:
+
+-   *geom_point* for drawing individual points (e.g., a scatter plot)
+
+-   *geom_line* for drawing lines (e.g., for a line charts)
+
+-   *geom_smooth* for drawing smoothed lines (e.g., for simple trends or approximations)
+
+-   *geom_bar* for drawing bars (e.g., for bar charts)
+
+-   *geom_histogram* for drawing binned values (e.g. a histogram)
+
+-   *geom_polygon* for drawing arbitrary shapes
+
+-   *geom_map* for drawing polygons in the shape of a map! (You can access the data to use for these maps by using the map_data() function).
+
+A plot can have multiple **geometrics**. Other available geometrics can be found in <https://ggplot2.tidyverse.org/reference/#section-layer-geoms>.
+
+### geom_bar()
+
+[geom_bar()](https://ggplot2.tidyverse.org/reference/geom_bar.html) plots a bar chart.
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x=RACE)) +
+  geom_bar()
+```
+
+### geom_dotplot()
+
+[geom_dotplot()](https://ggplot2.tidyverse.org/reference/geom_dotplot.html) is appropriate for **binned data**.
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x = MATHS)) +
+  geom_dotplot(dotsize = 0.5)
+```
+
+Vertical scale is misleading so let's just remove it.
+
+::: callout-note
+#### Note
+
+-   `scale_y_continuous()` is used to turn off the y-axis, and
+
+-   *binwidth argument* is used to change the binwidth to 2.5.
+:::
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x = MATHS)) +
+  geom_dotplot(binwidth=2.5,         
+               dotsize = 0.5) +      
+  scale_y_continuous(NULL,           
+                     breaks = NULL)  
+```
+
+### geom_histogram()
+
+[geom_histogram()](https://ggplot2.tidyverse.org/reference/geom_histogram.html) is for generating a histogram. (default bin = 30)
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x = MATHS)) +
+  geom_histogram()
+```
+
+Let's change the histogram bin and color.
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x= MATHS)) +
+  geom_histogram(bins=20,            
+                 color="black",      
+                 fill="light blue")  
+```
+
+### Changing geometry by using aes()
+
+In this example, we partition the data (e.g. Female vs Male) and color each bar corresponding to the partition differently.
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x= MATHS, 
+           fill = GENDER)) +
+  geom_histogram(bins=20, 
+                 color="grey30")
+```
+
+### geom_density()
+
+[`geom-density()`](https://ggplot2.tidyverse.org/reference/geom_density.html) computes and plots [kernel density estimate](https://en.wikipedia.org/wiki/Kernel_density_estimation), which is a smoothed version of the histogram.
+
+This is appropriate for **continuous data**.
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x = MATHS)) +
+  geom_density()           
+```
+
+It can be used with partitioned data as well.
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x = MATHS, 
+           colour = GENDER)) +
+  geom_density()
+```
+
+### geom_boxplot()
+
+[`geom_boxplot()`](https://ggplot2.tidyverse.org/reference/geom_boxplot.html) displays continuous value list. It visualises five summary statistics (the median, two hinges and two whiskers), and all “outlying” points individually.
+
+It is appropriate for visualizing the distribution of a dataset.
+
+```{r}
+ggplot(data=exam_data, 
+       aes(y = MATHS,       
+           x= GENDER)) +    
+  geom_boxplot()            
+```
+
+[**Notches**](https://sites.google.com/site/davidsstatistics/home/notched-box-plots) are used in box plots to help visually assess whether the medians of distributions differ. If the notches do not overlap, this is evidence that the medians are different.
+
+Notches can be used by supplying \`notches=true\`.
+
+```{r}
+ggplot(data=exam_data, 
+       aes(y = MATHS, 
+           x= GENDER)) +
+  geom_boxplot(notch=TRUE)
+```
+
+### geom_violin()
+
+[`geom_violin`](https://ggplot2.tidyverse.org/reference/geom_violin.html) is designed for creating violin plot. Violin plots are a way of comparing multiple data distributions. With ordinary density curves, it is difficult to compare more than just a few distributions because the lines visually interfere with each other. With a violin plot, it’s easier to compare several distributions since they’re placed **side by side**.
+
+```{r}
+ggplot(data=exam_data, 
+       aes(y = MATHS, 
+           x= GENDER)) +
+  geom_violin()
+```
+
+### geom_point()
+
+[`geom_point()`](https://ggplot2.tidyverse.org/reference/geom_point.html) is especially useful for creating scatterplot.
+
+The plot below shows the plot of Maths and English grades.
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x= MATHS, 
+           y=ENGLISH)) +
+  geom_point()            
+```
+
+### Combining geom objects
+
+Multiple geom objects can be combined in a single plot like below, combining a boxplot and scatterplot.
+
+```{r}
+ggplot(data=exam_data, 
+       aes(y = MATHS, 
+           x= GENDER)) +
+  geom_boxplot() +                    
+  geom_point(position="jitter", 
+             size = 0.5)
+```
+
+# Reflections
+
+During ISSS624, although I was using ggplot2, I didn't really understand the principles behind why it must be used in layers. The Grammar of Graphics is the answer to this and provides a framework to generate structured visualizations.
+
+\`ggplot2\` is indeed useful and multiple elements can be combined in a single plot. However, it is also important to consider how much information is presented by the plot. Too much information can also be confusing and misleading so it is more important to define the **purpose of the plot** to ensure that the elements contribute to the message.
+
+Sometimes less is more so just because `ggplot2` can accommodate multiple elements doesn't mean we have to.
