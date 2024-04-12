@@ -6,7 +6,7 @@ Welcome to ISSS608 Visual Analytics and Applications!
 
 I am Kristine Joy Paas, or **Joy** for short.
 
-In this webpage, I am going to share with you my learning journey of geospatial analytics.
+In this webpage, I am going to share with you my learning journey of visual analytics.
 
 Netlify link: <https://isss608-kjcpaas.netlify.app/>
 
