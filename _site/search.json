@@ -1,12 +1,5 @@
 [
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "ISSS608 - Visual Analytics and Applications",
-    "section": "",
-    "text": "Welcome to ISSS608 Visual Analytics and Applications!\nI am Kristine Joy Paas, or Joy for short.\nIn this webpage, I am going to share with you my learning journey of visual analytics.\nNetlify link: https://isss608-kjcpaas.netlify.app/\nGithub repo: https://github.com/kjcpaas/ISSS608"
-  },
-  {
     "objectID": "about.html",
     "href": "about.html",
     "title": "About",
@@ -82,5 +75,12 @@
     "title": "Hands-on Exercise 1: A Layered Grammar of Graphics: ggplot2 methods",
     "section": "Themes",
     "text": "Themes\nThemes control elements of the graph not related to the data. For example:\n\nbackground colour\nsize of fonts\ngridlines\ncolour of labels\n\nBuilt-in themes include: - theme_gray() (default) - theme_bw() - theme_classic()\nA list of theme can be found at this link. Each theme element can be conceived of as either a line (e.g. x-axis), a rectangle (e.g. graph background), or text (e.g. axis title).\nApplying the built-in themes is as simple as applying the theme_* functions.\n\nggplot(data=exam_data,\n       aes(x=RACE)) +\n  geom_bar() +\n  coord_flip() +\n  theme_linedraw()"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "ISSS608 - Visual Analytics and Applications",
+    "section": "",
+    "text": "Welcome to ISSS608 Visual Analytics and Applications!\nI am Kristine Joy Paas, or Joy for short.\nIn this webpage, I am going to share with you my learning journey of visual analytics.\nNetlify link: https://isss608-kjcpaas.netlify.app/\nGithub repo: https://github.com/kjcpaas/ISSS608"
   }
 ]

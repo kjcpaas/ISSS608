@@ -11,7 +11,8 @@ website:
             href: Hands-on_Exs/Ex1/Hands-on_Ex1.qmd
       - text: In-class Exercises
         menu:
-          - text: "To be filled"
+          - text: "1: Introduction to Visual Analytics"
+            href: In-class_Exs/Ex1/In-class_Ex1.qmd
       - text: Take-home Exercises
         menu:
           - text: "To be filled"

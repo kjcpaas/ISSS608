@@ -1,0 +1,11 @@
+---
+title: "In-class Exercise 1"
+author: "Kristine Joy Paas"
+date: "13 April 2024"
+date-modified: "last-modified"
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+---

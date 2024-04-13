@@ -1,7 +1,7 @@
 ---
 title: "Hands-on Exercise 1:  A Layered Grammar of Graphics: ggplot2 methods"
 author: "Kristine Joy Paas"
-date: "11 November 2024"
+date: "11 April 2024"
 date-modified: "last-modified"
 format: html
 execute: 
