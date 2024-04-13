@@ -8,4 +8,22 @@ execute:
   echo: true
   eval: true
   warning: false
+  freeze: true
 ---
+
+```{r}
+#| label: setup
+pacman::p_load(tidyverse)
+```
+
+Using `read_csv()` imports as tibble data frame
+
+```{r}
+realis <- read_csv("data/realis2019.csv")
+```
+
+Using `read.csv()` will import as `data.frame`.
+
+```{r}
+realis.csv <- read.csv("data/realis2019.csv")
+```
