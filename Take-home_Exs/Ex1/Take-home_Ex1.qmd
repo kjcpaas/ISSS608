@@ -52,39 +52,87 @@ pacman::p_load(knitr, tidyverse)
 
 First, we need to import the provided datasets. We will use `read_csv()` for each csv file to do this.
 
-::: panel-tabset
-### ResidentialTransaction20240308160536.csv
+::: {.callout-important collapse="true"}
+### Issues with column names
+
+Some of the column names have special characters that affect the data import.
+
+For example, if we read one of the files without any revisions, it results into the following:
 
 ```{r}
-res_txn1 <- read_csv('data/ResidentialTransaction20240308160536.csv')
+read_csv('data/ResidentialTransaction20240308160536.csv') %>%
+  head() %>%
+  kable()
+```
+
+As shown above, the headers for `Transacted Price ($)`,`Area (SQFT)`, `UnitPrice(PSF)` have merged and the `$` did not render properly.
+
+To prevent this, we will rename `$` in the column names to `SGD` using `rename()` function.
+:::
+
+::: panel-tabset
+### res_txn1
+
+```{r}
+res_txn1 <- read_csv('data/ResidentialTransaction20240308160536.csv') %>%
+            rename(
+              "Transacted Price (SGD)" = "Transacted Price ($)",
+              "Unit Price (SGD PSF)" = "Unit Price ($ PSF)",
+              "Unit Price (SGD PSM)" = "Unit Price ($ PSM)",
+              "Nett Price(SGD)" = "Nett Price($)"
+            )
 kable(head(res_txn1, n=10))
 ```
 
-### ResidentialTransaction20240308160736.csv
+### res_txn2
 
 ```{r}
-res_txn2 <- read_csv('data/ResidentialTransaction20240308160736.csv')
+res_txn2 <- read_csv('data/ResidentialTransaction20240308160736.csv') %>%
+            rename(
+              "Transacted Price (SGD)" = "Transacted Price ($)",
+              "Unit Price (SGD PSF)" = "Unit Price ($ PSF)",
+              "Unit Price (SGD PSM)" = "Unit Price ($ PSM)",
+              "Nett Price(SGD)" = "Nett Price($)"
+            )
 kable(head(res_txn2, n=10))
 ```
 
-### ResidentialTransaction20240308161009.csv
+### res_txn3
 
 ```{r}
-res_txn3 <- read_csv('data/ResidentialTransaction20240308161009.csv')
+res_txn3 <- read_csv('data/ResidentialTransaction20240308161009.csv') %>%
+            rename(
+              "Transacted Price (SGD)" = "Transacted Price ($)",
+              "Unit Price (SGD PSF)" = "Unit Price ($ PSF)",
+              "Unit Price (SGD PSM)" = "Unit Price ($ PSM)",
+              "Nett Price(SGD)" = "Nett Price($)"
+            )
 kable(head(res_txn3), n=10)
 ```
 
-### ResidentialTransaction20240308161109.csv
+### res_txn4
 
 ```{r}
-res_txn4 <- read_csv('data/ResidentialTransaction20240308161109.csv')
+res_txn4 <- read_csv('data/ResidentialTransaction20240308161109.csv') %>%
+            rename(
+              "Transacted Price (SGD)" = "Transacted Price ($)",
+              "Unit Price (SGD PSF)" = "Unit Price ($ PSF)",
+              "Unit Price (SGD PSM)" = "Unit Price ($ PSM)",
+              "Nett Price(SGD)" = "Nett Price($)"
+            )
 kable(head(res_txn4), n=10)
 ```
 
-### ResidentialTransaction20240414220633.csv
+### res_txn5
 
 ```{r}
-res_txn5 <- read_csv('data/ResidentialTransaction20240414220633.csv')
+res_txn5 <- read_csv('data/ResidentialTransaction20240414220633.csv') %>%
+            rename(
+              "Transacted Price (SGD)" = "Transacted Price ($)",
+              "Unit Price (SGD PSF)" = "Unit Price ($ PSF)",
+              "Unit Price (SGD PSM)" = "Unit Price ($ PSM)",
+              "Nett Price(SGD)" = "Nett Price($)"
+            )
 kable(head(res_txn5), n=10)
 ```
 :::
