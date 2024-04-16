@@ -1,0 +1,14 @@
+{
+  "hash": "1d0d236c0ed0c93aafd08a692ad2ea84",
+  "result": {
+    "markdown": "---\ntitle: \"In-class Exercise 1\"\nauthor: \"Kristine Joy Paas\"\ndate: \"13 April 2024\"\ndate-modified: \"last-modified\"\nformat: html\nexecute: \n  echo: true\n  eval: true\n  warning: false\n  freeze: true\n---\n\n::: {.cell}\n\n```{.r .cell-code}\npacman::p_load(tidyverse)\n```\n:::\n\n\nUsing `read_csv()` imports as tibble data frame\n\n\n::: {.cell}\n\n```{.r .cell-code}\nrealis <- read_csv(\"data/realis2019.csv\")\n```\n:::\n\n\nUsing `read.csv()` will import as `data.frame`.\n\n\n::: {.cell}\n\n```{.r .cell-code}\nrealis.csv <- read.csv(\"data/realis2019.csv\")\n```\n:::\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

@@ -82,5 +82,117 @@
     "title": "ISSS608 - Visual Analytics and Applications",
     "section": "",
     "text": "Welcome to ISSS608 Visual Analytics and Applications!\nI am Kristine Joy Paas, or Joy for short.\nIn this webpage, I am going to share with you my learning journey of visual analytics.\nNetlify link: https://isss608-kjcpaas.netlify.app/\nGithub repo: https://github.com/kjcpaas/ISSS608"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html",
+    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html",
+    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
+    "section": "",
+    "text": "This hands-on exercise covers Chapter 2: Beyond ggplot Fundamentals.\nI learned about the following:\n\nPackages to extend ggplot2 like\nImporting custom fonts\nComposing figures using multiple graphs"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#loading-the-required-libraries",
+    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#loading-the-required-libraries",
+    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
+    "section": "Loading the required libraries",
+    "text": "Loading the required libraries\nIn Hands-on Ex 1, we only used tidyverse and ggplot2. In this exercise, 4 other R packages will be used:\n\nggrepel: an R package provides geoms for ggplot2 to repel overlapping text labels.\nggthemes: an R package provides some extra themes, geoms, and scales for ‘ggplot2’.\nhrbrthemes: an R package provides typography-centric themes and theme components for ggplot2.\npatchwork: an R package for preparing composite figure created using ggplot2.\n\n\npacman::p_load(ggrepel, patchwork, \n               ggthemes, hrbrthemes,\n               tidyverse)"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#loading-the-data",
+    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#loading-the-data",
+    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
+    "section": "Loading the data",
+    "text": "Loading the data\nWe will use the same exam_data dataset from Hands-on Ex 1 and load it into the RStudio environment using read_csv().\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")\nglimpse(exam_data)\n\nRows: 322\nColumns: 7\n$ ID      &lt;chr&gt; \"Student321\", \"Student305\", \"Student289\", \"Student227\", \"Stude…\n$ CLASS   &lt;chr&gt; \"3I\", \"3I\", \"3H\", \"3F\", \"3I\", \"3I\", \"3I\", \"3I\", \"3I\", \"3H\", \"3…\n$ GENDER  &lt;chr&gt; \"Male\", \"Female\", \"Male\", \"Male\", \"Male\", \"Female\", \"Male\", \"M…\n$ RACE    &lt;chr&gt; \"Malay\", \"Malay\", \"Chinese\", \"Chinese\", \"Malay\", \"Malay\", \"Chi…\n$ ENGLISH &lt;dbl&gt; 21, 24, 26, 27, 27, 31, 31, 31, 33, 34, 34, 36, 36, 36, 37, 38…\n$ MATHS   &lt;dbl&gt; 9, 22, 16, 77, 11, 16, 21, 18, 19, 49, 39, 35, 23, 36, 49, 30,…\n$ SCIENCE &lt;dbl&gt; 15, 16, 16, 31, 25, 16, 25, 27, 15, 37, 42, 22, 32, 36, 35, 45…\n\n\nThere are a total of seven attributes in the exam_data tibble data frame. Four of them are categorical data type and the other three are in continuous data type.\n\nThe categorical attributes are: ID, CLASS, GENDER and RACE.\nThe continuous attributes are: MATHS, ENGLISH and SCIENCE."
+  },
+  {
+    "objectID": "In-class_Exs/Ex1/In-class_Ex1.html",
+    "href": "In-class_Exs/Ex1/In-class_Ex1.html",
+    "title": "In-class Exercise 1",
+    "section": "",
+    "text": "pacman::p_load(tidyverse)\n\nUsing read_csv() imports as tibble data frame\n\nrealis &lt;- read_csv(\"data/realis2019.csv\")\n\nUsing read.csv() will import as data.frame.\n\nrealis.csv &lt;- read.csv(\"data/realis2019.csv\")"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#working-with-ggreprel",
+    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#working-with-ggreprel",
+    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
+    "section": "Working with ggreprel",
+    "text": "Working with ggreprel\nggrepel is an extension of ggplot2 package which provides geoms for ggplot2 to repel overlapping text like below.\nWe simply replace geom_text() by geom_text_repel() and geom_label() by geom_label_repel.\n\n\nShow the code\nggplot(data=exam_data, \n       aes(x= MATHS, \n           y=ENGLISH)) +\n  geom_point() +\n  geom_smooth(method=lm, \n              linewidth=0.5) +  \n  geom_label_repel(aes(label = ID), \n             fontface=\"bold\") +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100)) +\n  ggtitle(\"English scores versus Maths scores for Primary 3\")"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#working-with-ggtheme-package",
+    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#working-with-ggtheme-package",
+    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
+    "section": "Working with ggtheme package",
+    "text": "Working with ggtheme package\nggthemes provides ‘ggplot2’ themes that replicate the look of plots by Edward Tufte, Stephen Few, Fivethirtyeight, The Economist, ‘Stata’, ‘Excel’, and The Wall Street Journal, among others.\nSome of the themes provided by the package are show below:\n\nCalcThe EconomistThe Economist (white)ExcelExcel (new)FivethirtyeightSolarizedStataThe Wall Street Journal\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_calc()\n\n\n\n\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_economist()\n\n\n\n\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_economist_white()\n\n\n\n\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_excel()\n\n\n\n\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_excel_new()\n\n\n\n\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_fivethirtyeight()\n\n\n\n\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_solarized()\n\n\n\n\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_stata()\n\n\n\n\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_wsj()"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#working-with-hbrthemes-package",
+    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#working-with-hbrthemes-package",
+    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
+    "section": "Working with hbrthemes package",
+    "text": "Working with hbrthemes package\nhrbrthemes package provides a base theme that focuses on typographic elements, including where various labels are placed as well as the fonts that are used.\n\n\n\n\n\n\nImporting required fonts\n\n\n\n\n\nSome of the themes use custom fonts. To install these fonts, the corresponding import command must be run first, e.g.\n\nimport_econ_sans()\n\nThis will show where there fonts are located.\nNext, import the font in the location to your system.\n\nMac: https://support.apple.com/en-sg/guide/font-book/fntbk1000/mac\nWindows: https://support.microsoft.com/en-us/office/add-a-font-b7c5f17c-4426-4b53-967f-455339c564c1\nLinux: https://linuxiac.com/how-to-install-fonts-on-linux\n\nIn future exercises, if these themes will be used, these steps must be added to the setup code chunk.\n\n\n\nSome of the themes provided by the package are show below:\n\nft_rcipsumipsum_esipsum_interipsum_gs\n\n\n\n\n\n\n\n\nNote\n\n\n\nImport Roboto Condensed font first:\n\nimport_roboto_condensed()\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_ft_rc()\n\n\n\n\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_ipsum()\n\n\n\n\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nThis requires the Econ Sans font to be installed and imported first:\n\nimport_econ_sans()\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_ipsum_es()\n\n\n\n\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nImport Inter font first:\n\nimport_inter()\n\nAfter installing the font, run:\n\nextrafont::font_import()\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_ipsum_inter()\n\n\n\n\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nThis requires the Goldman Sans Condensed font to be installed and imported first:\n\nimport_goldman_sans()\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_ipsum_gs()"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#base-graphs",
+    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#base-graphs",
+    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
+    "section": "Base Graphs",
+    "text": "Base Graphs\n\nDistribution of Maths scoresDistribution of English scoresEnglish vs Maths scores for Primary 3\n\n\n\n\nShow the code\np1 &lt;- ggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") + \n  coord_cartesian(xlim=c(0,100)) +\n  ggtitle(\"Distribution of Maths scores\")\np1\n\n\n\n\n\n\n\n\n\nShow the code\np2 &lt;- ggplot(data=exam_data, \n             aes(x = ENGLISH)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  coord_cartesian(xlim=c(0,100)) +\n  ggtitle(\"Distribution of English scores\")\np2\n\n\n\n\n\n\n\n\n\nShow the code\np3 &lt;- ggplot(data=exam_data, \n             aes(x= MATHS, \n                 y=ENGLISH)) +\n  geom_point() +\n  geom_smooth(method=lm, \n              size=0.5) +  \n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100)) +\n  ggtitle(\"English vs Maths scores (Primary 3)\")\np3"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#creating-composite-graphics-pathwork-methods",
+    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#creating-composite-graphics-pathwork-methods",
+    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
+    "section": "Creating Composite Graphics: pathwork methods",
+    "text": "Creating Composite Graphics: pathwork methods\nThere are several ggplot2 extension’s functions support the needs to prepare composite figure by combining several graphs such as grid.arrange() of gridExtra package and plot_grid() of cowplot package. In this section, I am going to shared with you an ggplot2 extension called patchwork which is specially designed for combining separate ggplot2 graphs into a single figure.\nPatchwork package has a very simple syntax where we can create layouts super easily. Here’s the general syntax that combines:\n\nTwo-Column Layout using the Plus Sign +.\nParenthesis () to create a subplot group.\nTwo-Row Layout using the Division Sign /"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#combining-two-ggplot2-graphs-using",
+    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#combining-two-ggplot2-graphs-using",
+    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
+    "section": "Combining two ggplot2 graphs using ‘+’",
+    "text": "Combining two ggplot2 graphs using ‘+’\nUsing + is the simplest way to combine multiple graphs. This will show them side by side\n\np1 + p2"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#combining-three-ggplot2-graphs-using-pathwork",
+    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#combining-three-ggplot2-graphs-using-pathwork",
+    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
+    "section": "Combining three ggplot2 graphs using pathwork",
+    "text": "Combining three ggplot2 graphs using pathwork\nAside from +, patchwork provides other operators we can use to compose plots:\n\n“/” operator to stack two ggplot2 graphs,\n“|” operator to place the plots beside each other,\n“()” operator the define the sequence of the plotting.\n\nFor example, if we want to stack the two bar graphs, and show the scatterplot to the right, we can do:\n\n(p1 / p2) | p3"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#tagging-composed-graphs",
+    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#tagging-composed-graphs",
+    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
+    "section": "Tagging composed graphs",
+    "text": "Tagging composed graphs\npatchwork provides auto-tagging capabilities so the individual graphs can more easily be referred in text.\n\n((p1 / p2) | p3) +\n  plot_annotation(tag_levels = '1')\n\n\n\n\nFor example, we can refer to the Distributions of Maths scores graph as Graph 1, corresponding to the annotation provided."
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#creating-figure-with-insert",
+    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#creating-figure-with-insert",
+    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
+    "section": "Creating figure with insert",
+    "text": "Creating figure with insert\nBeside providing functions to place plots next to each other based on the provided layout. With inset_element() of patchwork, we can place one or several plots or graphic elements freely on top or below another plot.\n\np3 + inset_element(p2, \n                   left = 0.02, \n                   bottom = 0.7, \n                   right = 0.5, \n                   top = 1)\n\n\n\n\nThis is useful for providing supplementary details to the main graph."
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#creating-a-composite-figure-by-using-patchwork-and-ggtheme",
+    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#creating-a-composite-figure-by-using-patchwork-and-ggtheme",
+    "title": "Hands-on Exercise 2",
+    "section": "Creating a composite figure by using patchwork and ggtheme",
+    "text": "Creating a composite figure by using patchwork and ggtheme\nWe can also add a theme to the composite figure.\n\nThe Economist (ggtheme)Ipsum_es (hrbrtheme)\n\n\n\npatchwork &lt;- (p1 / p2) | p3\npatchwork & theme_economist()\n\n\n\n\n\n\n\npatchwork &lt;- (p1 / p2) | p3\npatchwork & theme_ipsum_es()"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#applying-themes-to-the-composite-figure.",
+    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#applying-themes-to-the-composite-figure.",
+    "title": "Hands-on Exercise 2",
+    "section": "Applying themes to the composite figure.",
+    "text": "Applying themes to the composite figure.\n\nThe Economist (ggtheme)Ipsum_es (hrbrtheme)\n\n\n\npatchwork &lt;- (p1 / p2) | p3\npatchwork & theme_economist()\n\n\n\n\n\n\n\npatchwork &lt;- (p1 / p2) | p3\npatchwork & theme_ipsum_es()"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#applying-themes-to-the-composite-figure",
+    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#applying-themes-to-the-composite-figure",
+    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
+    "section": "Applying themes to the composite figure",
+    "text": "Applying themes to the composite figure\nWe can apply the theme by using & theme_() to the patchwork result.\n\nThe Economist (ggtheme)Ipsum_es (hrbrtheme)\n\n\n\npatchwork &lt;- (p1 / p2) | p3\npatchwork & theme_economist()\n\n\n\n\n\n\n\npatchwork &lt;- (p1 / p2) | p3\npatchwork & theme_ipsum_es()"
   }
 ]
