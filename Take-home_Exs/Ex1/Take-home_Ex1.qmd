@@ -10,3 +10,87 @@ execute:
   warning: false
   freeze: true
 ---
+
+# 1 Overview
+
+::: callout-note
+## TODO
+
+Revise based on narrative
+:::
+
+## 1.1 Problem Statement
+
+## 1.2 The Data
+
+For this exercise, we will use the residential real estate transaction data from [REALIS](https://www.ura.gov.sg/reis/index). This provides comprehensive and up-to-date statistics on the property market in Singapore.
+
+The dataset has been provided via eLearn and added to the `data/` folder of this exercise.
+
+![](images/file_structure.png)
+
+## 1.3 Methodology
+
+# 2 Setup
+
+## 2.1 Loading the R packages
+
+For this exercise, we will mainly use the following packages:
+
+-   tidyverse:
+
+Aside from these, we will also include other packages that will help us present the data better.
+
+-   [knitr](https://www.rdocumentation.org/packages/knitr/versions/1.45): used for dynamic report generation in R. For this exercise, we will use this package to render our tables better.
+
+```{r}
+#| label: setup
+pacman::p_load(knitr, tidyverse)
+```
+
+## 2.2 Import the datasets
+
+First, we need to import the provided datasets. We will use `read_csv()` for each csv file to do this.
+
+::: panel-tabset
+### ResidentialTransaction20240308160536.csv
+
+```{r}
+res_txn1 <- read_csv('data/ResidentialTransaction20240308160536.csv')
+kable(head(res_txn1, n=10))
+```
+
+### ResidentialTransaction20240308160736.csv
+
+```{r}
+res_txn2 <- read_csv('data/ResidentialTransaction20240308160736.csv')
+kable(head(res_txn2, n=10))
+```
+
+### ResidentialTransaction20240308161009.csv
+
+```{r}
+res_txn3 <- read_csv('data/ResidentialTransaction20240308161009.csv')
+kable(head(res_txn3), n=10)
+```
+
+### ResidentialTransaction20240308161109.csv
+
+```{r}
+res_txn4 <- read_csv('data/ResidentialTransaction20240308161109.csv')
+kable(head(res_txn4), n=10)
+```
+
+### ResidentialTransaction20240414220633.csv
+
+```{r}
+res_txn5 <- read_csv('data/ResidentialTransaction20240414220633.csv')
+kable(head(res_txn5), n=10)
+```
+:::
+
+# 3 Data Wrangling
+
+# 4 Summary
+
+# 5 References
