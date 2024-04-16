@@ -88,7 +88,7 @@
     "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html",
     "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
     "section": "",
-    "text": "This hands-on exercise covers Chapter 2: Beyond ggplot Fundamentals.\nI learned about the following:\n\nPackages to extend ggplot2 like\nImporting custom fonts\nComposing figures using multiple graphs"
+    "text": "This hands-on exercise covers Chapter 2: Beyond ggplot Fundamentals.\nI learned about the following:\n\nPackages to extend ggplot2\nImporting custom fonts\nComposing figures using multiple graphs"
   },
   {
     "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#loading-the-required-libraries",

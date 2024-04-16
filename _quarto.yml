@@ -17,7 +17,10 @@ website:
             href: In-class_Exs/Ex1/In-class_Ex1.qmd
       - text: Take-home Exercises
         menu:
-          - text: "To be filled"
+          - text: "1: Introduction to Visual Analytics"
+            href: Take-home_Exs/Ex1/Take-home_Ex1.qmd
+          - text: "2: DataVis Makeover"
+            href: Take-home_Exs/Ex2/Take-home_Ex2.qmd
     right:
       - href: index.qmd
         text: Home

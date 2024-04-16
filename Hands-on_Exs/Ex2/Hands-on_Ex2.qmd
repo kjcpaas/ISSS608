@@ -17,7 +17,7 @@ This hands-on exercise covers [Chapter 2: Beyond ggplot Fundamentals](https://r4
 
 I learned about the following:
 
--   Packages to extend `ggplot2` like
+-   Packages to extend `ggplot2`
 
 -   Importing custom fonts
 
