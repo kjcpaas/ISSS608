@@ -1,5 +1,5 @@
 ---
-title: "Take-home Exercise 1: Creating Visualization Beyond Default"
+title: "Take-home Exercise 1: Creating Visualization Beyond Default - Singapore Private Residential Property Market for 2024 Q1"
 author: "Kristine Joy Paas"
 date: "16 April 2024"
 date-modified: "last-modified"
@@ -13,23 +13,59 @@ execute:
 
 # 1 Overview
 
-::: callout-note
-## TODO
+## 1.1 Background
 
-Revise based on narrative
-:::
+Singapore has one of the highest home ownership rates in the world at 89.7%, [2nd only to Russia among the G20](https://tradingeconomics.com/country-list/home-ownership-rate?continent=g20) countries. Due to Singapore's successful public housing program, [77.8% of Singapore residents live in HDB flats](13+%20Housing%20&%20Household%20Statistics%20in%20Singapore%20(2024)), while 22% live in private properties like condos or landed properties.
 
-## 1.1 Problem Statement
+While the HDB market targets Singaporeans with household income of up to 14,000 SGD, the private housing market is Singapore is still in demand for households looking to upgrade, invest their property, and for residents not eligible for public housing (e.g. high income household, foreigners, etc.)
 
-## 1.2 The Data
+In this exercise we will look at the market trends for private residential property market for 2024 Q1 and see how the economic factors have affected it.
 
-For this exercise, we will use the residential real estate transaction data from [REALIS](https://www.ura.gov.sg/reis/index). This provides comprehensive and up-to-date statistics on the property market in Singapore.
+## 1.2 Loading the data sources
+
+For this exercise, we will use the residential real estate transaction data from [REALIS](https://www.ura.gov.sg/reis/index). This provides comprehensive and up-to-date statistics on the private property market in Singapore.
 
 The dataset has been provided via eLearn and added to the `data/` folder of this exercise.
 
+::: {.callout-note collapse="true"}
+### File Structure
+
 ![](images/file_structure.png)
+:::
+
+For the purposes of this exercise, we will refer to each data as the following:
+
+-   **2023Q1**: `ResidentialTransaction20240308160536.csv`
+
+-   **2023Q2**: `ResidentialTransaction20240308160736.csv`
+
+-   **2023Q3**: `ResidentialTransaction20240308161009.csv`
+
+-   **2023Q4**: `ResidentialTransaction20240308161109.csv`
+
+-   **2024Q1**: `ResidentialTransaction20240414220633.csv`
 
 ## 1.3 Methodology
+
+To start the data analysis, we first need to prepare the R environment for analysis. This includes loading the R packages and loading the datasets.
+
+After the setup, we need to do data wrangling where we clean and transform the data into a form that is fitting for our analysis. This will possible entail removing irrelevant data, deriving additional variables, renaming columns, etc.
+
+Next, we need to decide on what data we would like to look at closely. For the purposes of this exercise, these are the data we can look at that can potentially give valuable insights:
+
+-   Total units sold by quarter
+
+-   Units sold by submarkets such as property type (e.g. landed, strata), sale type (e.g. resale, new sale, subsale), etc.
+
+-   Transaction price by submarkets such property type (e.g. landed, strata), sale type (e.g. resale, new sale, subsale), etc.
+
+Finally, we will do data exploration and visualize the insights gained from the data. Some of the questions we would ask are:
+
+-   What is the general quarterly trend of private residential property sales prices?
+
+-   Is this trend consistent among all submarkets?
+
+-   How affordable are private residential properties for Singaporean households?
 
 # 2 Setup
 
@@ -37,7 +73,7 @@ The dataset has been provided via eLearn and added to the `data/` folder of this
 
 For this exercise, we will mainly use the following packages:
 
--   tidyverse:
+-   [tidyverse](https://www.tidyverse.org/): collection of R packages used in data science, which includes [ggplot2](https://ggplot2.tidyverse.org/), [tibble](https://tibble.tidyverse.org/), [readr](https://readr.tidyverse.org/), among others
 
 Aside from these, we will also include other packages that will help us present the data better.
 
@@ -45,100 +81,284 @@ Aside from these, we will also include other packages that will help us present 
 
 ```{r}
 #| label: setup
-pacman::p_load(knitr, tidyverse)
+pacman::p_load(ggthemes, hrbrthemes, knitr, tidyverse)
 ```
 
-## 2.2 Import the datasets
+## 2.2 Data Checkpoints
 
-First, we need to import the provided datasets. We will use `read_csv()` for each csv file to do this.
+As the analysis is expected to have a lot of intermediate steps, **Save**, **Load**, and **Data clear** points are available to make our data wrangling more efficient.
 
-::: {.callout-important collapse="true"}
-### Issues with column names
+::: callout-tip
+### Save point
 
-Some of the column names have special characters that affect the data import.
+This is where data is written as `rds` files using `write_rds()` for important data sets that will be used in later analysis. Examples are:
 
-For example, if we read one of the files without any revisions, it results into the following:
-
-```{r}
-read_csv('data/ResidentialTransaction20240308160536.csv') %>%
-  head() %>%
-  kable()
-```
-
-As shown above, the headers for `Transacted Price ($)`,`Area (SQFT)`, `UnitPrice(PSF)` have merged and the `$` did not render properly.
-
-To prevent this, we will rename `$` in the column names to `SGD` using `rename()` function.
+-   Data we need to prepare for analysis
+-   Critical outputs of expensive calculations
+-   Cleaned up data for lightweight processing
 :::
 
-::: panel-tabset
-### res_txn1
+::: callout-note
+### Load point
+
+This is where data is loaded from `rds` files using `read_rds()`. They were previously generated by the save point.
+
+**TIP**: Skip to the load points to progress without running the code above it
+:::
+
+::: callout-warning
+### Data clear point
+
+This is where data that will not be used anymore are cleared. The data in RStudio environment will pile up and will make it more difficult to check the relevant data in each part.
+
+We can set `#| eval: false` in code chunks if we want skip the clearing. For example, the code below won't be run.
 
 ```{r}
-res_txn1 <- read_csv('data/ResidentialTransaction20240308160536.csv') %>%
-            rename(
-              "Transacted Price (SGD)" = "Transacted Price ($)",
-              "Unit Price (SGD PSF)" = "Unit Price ($ PSF)",
-              "Unit Price (SGD PSM)" = "Unit Price ($ PSM)",
-              "Nett Price(SGD)" = "Nett Price($)"
-            )
-kable(head(res_txn1, n=10))
-```
-
-### res_txn2
-
-```{r}
-res_txn2 <- read_csv('data/ResidentialTransaction20240308160736.csv') %>%
-            rename(
-              "Transacted Price (SGD)" = "Transacted Price ($)",
-              "Unit Price (SGD PSF)" = "Unit Price ($ PSF)",
-              "Unit Price (SGD PSM)" = "Unit Price ($ PSM)",
-              "Nett Price(SGD)" = "Nett Price($)"
-            )
-kable(head(res_txn2, n=10))
-```
-
-### res_txn3
-
-```{r}
-res_txn3 <- read_csv('data/ResidentialTransaction20240308161009.csv') %>%
-            rename(
-              "Transacted Price (SGD)" = "Transacted Price ($)",
-              "Unit Price (SGD PSF)" = "Unit Price ($ PSF)",
-              "Unit Price (SGD PSM)" = "Unit Price ($ PSM)",
-              "Nett Price(SGD)" = "Nett Price($)"
-            )
-kable(head(res_txn3), n=10)
-```
-
-### res_txn4
-
-```{r}
-res_txn4 <- read_csv('data/ResidentialTransaction20240308161109.csv') %>%
-            rename(
-              "Transacted Price (SGD)" = "Transacted Price ($)",
-              "Unit Price (SGD PSF)" = "Unit Price ($ PSF)",
-              "Unit Price (SGD PSM)" = "Unit Price ($ PSM)",
-              "Nett Price(SGD)" = "Nett Price($)"
-            )
-kable(head(res_txn4), n=10)
-```
-
-### res_txn5
-
-```{r}
-res_txn5 <- read_csv('data/ResidentialTransaction20240414220633.csv') %>%
-            rename(
-              "Transacted Price (SGD)" = "Transacted Price ($)",
-              "Unit Price (SGD PSF)" = "Unit Price ($ PSF)",
-              "Unit Price (SGD PSM)" = "Unit Price ($ PSM)",
-              "Nett Price(SGD)" = "Nett Price($)"
-            )
-kable(head(res_txn5), n=10)
+#| eval: false
+message <- "This code chunk executed"
 ```
 :::
+
+To use these checkpoints, we need to create `data/rds` folder.
 
 # 3 Data Wrangling
 
-# 4 Summary
+## 3.1 Importing the datasets
 
-# 5 References
+First, we need to import the provided datasets.
+
+Upon inspecting the csv file, column names have human-readable titles such as "Project Name", "Transacted Price (\$)", etc. While good for humans, these column names may cause parsing issues with R, especially as there are special characters.
+
+Because of this, we will rename the columns in their UPPER_CASE format after removing the special characters. We will create a helper function that will help us accomplish this:
+
+```{r}
+rename_realis_column <- function(orig_name) {
+  # Add underscores to spaces
+  gsub(" +", "_",
+       # Remove special characters
+       gsub("[^A-Z ]", "",
+            # Convert to upper case and remove trailing spaces
+            toupper(orig_name)) %>% trimws())
+}
+```
+
+We will use `read_csv()` to import each file and use `rename_realis_column()` in the `rename_with()` function.
+
+::: panel-tabset
+### 2023 Q1
+
+```{r}
+realis_2023q1 <- read_csv('data/ResidentialTransaction20240308160536.csv') %>%
+                  rename_with(rename_realis_column)
+kable(head(realis_2023q1, n=10))
+```
+
+There are **4,722** private residential propertysales for 2023 Q1.
+
+### 2023 Q2
+
+```{r}
+realis_2023q2 <- read_csv('data/ResidentialTransaction20240308160736.csv') %>%
+                  rename_with(rename_realis_column)
+kable(head(realis_2023q2, n=10))
+```
+
+There are **6,125** private residential property sales for 2023 Q2.
+
+### 2023 Q3
+
+```{r}
+realis_2023q3 <- read_csv('data/ResidentialTransaction20240308161009.csv') %>%
+                  rename_with(rename_realis_column)
+kable(head(realis_2023q3, n=10))
+```
+
+There are **6,206** private residential property sales for 2023 Q3.
+
+### 2023 Q4
+
+```{r}
+realis_2023q4 <- read_csv('data/ResidentialTransaction20240308161109.csv') %>%
+                  rename_with(rename_realis_column)
+kable(head(realis_2023q4, n=10))
+```
+
+There are **4,851** private residential property sales for 2023 Q4.
+
+### 2024 Q1
+
+```{r}
+realis_2024q1 <- read_csv('data/ResidentialTransaction20240414220633.csv') %>%
+                  rename_with(rename_realis_column)
+kable(head(realis_2024q1, n=10))
+```
+
+There are **4,902** private residential property sales for 2024 Q1.
+:::
+
+The imported dataset has 21 variables.
+
+## 3.2 Combining the dataframes
+
+Next, we will combine all 5 `realis_202*q*` dataframes into a single one to simplify aggregation and partitioning of data for analysis.
+
+This will also simplify cleanup and transformation as they will be done on a single dataframe instead of 5.
+
+To do this, we need to add `QUARTER` values to each dataframe before merging them to a single one. We will use the format `YEAR-Q`, i.e `2024-1` for 2024 Q1. This is so we can identify which quarter the sale was made, which we will use for aggregation.
+
+::: {.callout-note appearance="simple"}
+### Functions used
+
+-   `mutate()` for adding new column
+
+-   `rbind()` for combining all dataframes
+:::
+
+::: panel-tabset
+### Adding QUARTER column
+
+```{r}
+realis_2023q1 <- mutate(realis_2023q1, QUARTER="2023-1")
+realis_2023q2 <- mutate(realis_2023q2, QUARTER="2023-2")
+realis_2023q3 <- mutate(realis_2023q3, QUARTER="2023-3")
+realis_2023q4 <- mutate(realis_2023q4, QUARTER="2023-4")
+realis_2024q1 <- mutate(realis_2024q1, QUARTER="2024-1")
+```
+
+### Combining data frames
+
+```{r}
+realis <- realis_2023q1 %>%
+  rbind(realis_2023q2) %>%
+  rbind(realis_2023q3) %>%
+  rbind(realis_2023q4) %>%
+  rbind(realis_2024q1)
+kable(head(realis, 20))
+```
+:::
+
+Let us check if all rows are accounted for by checking if the number of rows in `realis` is the total number of rows from all dataframes.
+
+```{r}
+nrow(realis) == nrow(realis_2023q1) + nrow(realis_2023q2) + nrow(realis_2023q3) + nrow(realis_2023q4) + nrow(realis_2024q1)
+```
+
+## 3.3 Filtering relevant columns
+
+After adding the `QUARTER` column, there are now 22 variables in the dataset. However, not all of them are relevant to answer the questions we are asking. The table below summarizes the columns and whether we will keep them or not.
+
+::: panel-tabset
+### Column Details
+
+| Column Name                 | Description                                                                                                                                                                  | Action                      | Reason                                                            |
+|-----------------|-----------------|-----------------|---------------------|
+| PROJECT_NAME                | Name of the project                                                                                                                                                          | [DROP]{style="color:red"}   | Too specific for aggregation                                      |
+| TRANSACTED_PRICE            | Transaction price (SGD)                                                                                                                                                      | [KEEP]{style="color:green"} | Core data for analysis                                            |
+| AREA_SQFT                   | Area of the property in sqft                                                                                                                                                 | [KEEP]{style="color:green"} | Can be useful partitioning data                                   |
+| UNIT_PRICE_PSF              | Price per sqft                                                                                                                                                               | [KEEP]{style="color:green"} | Can be useful for price analysis                                  |
+| SALE_DATE                   | Date when the sale was made                                                                                                                                                  | [DROP]{style="color:red"}   | We will aggregate by quarter, no need to know the specific dates. |
+| ADDRESS                     | Property Address                                                                                                                                                             | [DROP]{style="color:red"}   | Too specific for aggregation                                      |
+| TYPE_OF_SALE                | One of *New Sale*, *Resale*, *Subsale*                                                                                                                                       | [KEEP]{style="color:green"} | Important submarket information                                   |
+| TYPE_OF_AREA                | One of *Landed*, *Strata*                                                                                                                                                    | [KEEP]{style="color:green"} | Can be used to partition data                                     |
+| AREA_SQM                    | Price per sqm                                                                                                                                                                | [DROP]{style="color:red"}   | AREA_SFT is adequate                                              |
+| UNIT_PRICE_PSM              | Price per sqm                                                                                                                                                                | [DROP]{style="color:red"}   | UNIT_PRICE_PSF is adequate                                        |
+| NETT_PRICE                  |                                                                                                                                                                              | [DROP]{style="color:red"}   | Column is blank                                                   |
+| PROPERTY_TYPE               | Type of Property, e.g. *Apartment, Condominium, Executive Condominium, Terrace House, Semi-Detached House, Detached House*                                                   | [KEEP]{style="color:green"} | Can be used to partition data                                     |
+| NUMBER_OF_UNITS             | Number of units involved in the transaction                                                                                                                                  | [KEEP]{style="color:green"} | Core data for analysis                                            |
+| TENURE                      | Can be Freehold or Leasehold                                                                                                                                                 | [KEEP]{style="color:green"} | Can be used to partition data                                     |
+| COMPLETION_DATE             | When the property was completed. Some properties are Uncompleted as they will be turned over for the future                                                                  | [KEEP]{style="color:green"} | Can be used to partition data                                     |
+| PURCHASER_ADDRESS_INDICATOR | [Type of residence of the purchaser](https://www.ura.gov.sg/reis/dataDictionary#:~:text=Purchaser%20Address%20Indicator%3A%20It%20refers,is%20owned%20by%20the%20purchaser.) | [KEEP]{style="color:green"} | Can be used to partition data                                     |
+| POSTAL_CODE                 | Postal code of the property                                                                                                                                                  | [DROP]{style="color:red"}   | Too specific for aggregation                                      |
+| POSTAL_DISTRICT             | District where the property is located                                                                                                                                       | [KEEP]{style="color:green"} | Can be used to partition data                                     |
+| POSTAL_SECTOR               | Sector where the property is located                                                                                                                                         | [DROP]{style="color:red"}   | Irrelevant                                                        |
+| PLANNING_REGION             | Region where the property is located                                                                                                                                         | [KEEP]{style="color:green"} | Can be used to partition data                                     |
+| PLANNING_AREA               | Area where the property is located                                                                                                                                           | [KEEP]{style="color:green"} | Can be used to partition data                                     |
+| QUARTER                     | Quarter where the property was sold                                                                                                                                          | [KEEP]{style="color:green"} | Core data for aggregation                                         |
+
+### Filter code
+
+We will now use `select()` to keep only the relevant columns. We will define the function below for filtering the relevant columns.
+
+```{r}
+realis <-
+  realis %>% select(
+    c(
+      TRANSACTED_PRICE,
+      QUARTER,
+      AREA_SQFT,
+      UNIT_PRICE_PSF,
+      TYPE_OF_SALE,
+      TYPE_OF_AREA,
+      PROPERTY_TYPE,
+      NUMBER_OF_UNITS,
+      TENURE,
+      COMPLETION_DATE,
+      PURCHASER_ADDRESS_INDICATOR,
+      POSTAL_DISTRICT,
+      PLANNING_REGION,
+      PLANNING_AREA
+    ),
+  )
+```
+:::
+
+After this initial cleanup, we are left with 14 variables relevant to our exploration.
+
+::: callout-tip
+### Save point
+
+Let us save `realis` so we do not need to rerun the steps above.
+
+```{r}
+write_rds(realis, "data/rds/realis_after_clean.rds")
+```
+:::
+
+::: {.callout-warning collapse="true"}
+### Data clear point
+
+We do not need the `realis_202*q*` dataframes anymore so we can remove them from the RStudio environment.
+
+```{r}
+#| eval: true
+rm(realis_2023q1)
+rm(realis_2023q2)
+rm(realis_2023q3)
+rm(realis_2023q4)
+rm(realis_2024q1)
+```
+:::
+
+# 4 Data Exploration
+
+```{r}
+#| eval: false
+ggplot(data=hdb_res_txn2024_q1, 
+       aes(y = TRANSACTED_PRICE/1000,       
+           x= SALE_TYPE)) +
+  labs(x="Type of Sale", y="Transacted Price ($1000)") +
+  geom_violin() +
+  geom_point(stat="summary",        
+             fun="mean",           
+             colour ="red",          
+             size=2) +
+  geom_label(aes(label=after_stat(round(y, 0))), stat="summary", fun="mean", colour="green") +
+  geom_label(aes(label=after_stat(y)), stat="summary", fun="max", colour="blue") +
+  geom_label(aes(label=after_stat(y)), stat="summary", fun="min", colour="orange") +
+  scale_y_log10() +
+  #coord_cartesian(ylim = c(0,5000)) +
+  #theme_economist()
+  theme_ipsum_es()
+```
+
+# 5 Summary
+
+# 6 References
+
+Lim, Abram. (2024). 13+ Housing & Household Statistics in Singapore (2024).*SmartWealth Singapore*. <https://smartwealth.sg/housing-household-statistics-singapore/>
+
+Trading Economics. (2024). *Home Ownership Rate \| G20*. <https://tradingeconomics.com/country-list/home-ownership-rate?continent=g20>
+
+<https://www.dbs.com.sg/personal/articles/nav/my-home/cooling-measures-in-singapore>
+
+<https://www.cedricscherer.com/2019/08/05/a-ggplot2-tutorial-for-beautiful-plotting-in-r/https://www.cedricscherer.com/2019/08/05/a-ggplot2-tutorial-for-beautiful-plotting-in-r/>

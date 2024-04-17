@@ -9,7 +9,7 @@
 <meta name="author" content="Kristine Joy Paas">
 <meta name="dcterms.date" content="2024-04-16">
 
-<title>ISSS608 - Take-home Exercise 1: Creating Visualization Beyond Default</title>
+<title>ISSS608 - Take-home Exercise 1: Creating Visualization Beyond Default - Singapore Private Residential Property Market for 2024 Q1</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -96,8 +96,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="../../styles.css">
 </head>
@@ -184,18 +182,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">1 Overview</a>
   <ul class="collapse">
-  <li><a href="#problem-statement" id="toc-problem-statement" class="nav-link" data-scroll-target="#problem-statement">1.1 Problem Statement</a></li>
-  <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data">1.2 The Data</a></li>
+  <li><a href="#background" id="toc-background" class="nav-link" data-scroll-target="#background">1.1 Background</a></li>
+  <li><a href="#loading-the-data-sources" id="toc-loading-the-data-sources" class="nav-link" data-scroll-target="#loading-the-data-sources">1.2 Loading the data sources</a></li>
   <li><a href="#methodology" id="toc-methodology" class="nav-link" data-scroll-target="#methodology">1.3 Methodology</a></li>
   </ul></li>
   <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">2 Setup</a>
   <ul class="collapse">
   <li><a href="#loading-the-r-packages" id="toc-loading-the-r-packages" class="nav-link" data-scroll-target="#loading-the-r-packages">2.1 Loading the R packages</a></li>
-  <li><a href="#import-the-datasets" id="toc-import-the-datasets" class="nav-link" data-scroll-target="#import-the-datasets">2.2 Import the datasets</a></li>
+  <li><a href="#data-checkpoints" id="toc-data-checkpoints" class="nav-link" data-scroll-target="#data-checkpoints">2.2 Data Checkpoints</a></li>
   </ul></li>
-  <li><a href="#data-wrangling" id="toc-data-wrangling" class="nav-link" data-scroll-target="#data-wrangling">3 Data Wrangling</a></li>
-  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">4 Summary</a></li>
-  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">5 References</a></li>
+  <li><a href="#data-wrangling" id="toc-data-wrangling" class="nav-link" data-scroll-target="#data-wrangling">3 Data Wrangling</a>
+  <ul class="collapse">
+  <li><a href="#importing-the-datasets" id="toc-importing-the-datasets" class="nav-link" data-scroll-target="#importing-the-datasets">3.1 Importing the datasets</a></li>
+  <li><a href="#combining-the-dataframes" id="toc-combining-the-dataframes" class="nav-link" data-scroll-target="#combining-the-dataframes">3.2 Combining the dataframes</a></li>
+  <li><a href="#filtering-relevant-columns" id="toc-filtering-relevant-columns" class="nav-link" data-scroll-target="#filtering-relevant-columns">3.3 Filtering relevant columns</a></li>
+  </ul></li>
+  <li><a href="#data-exploration" id="toc-data-exploration" class="nav-link" data-scroll-target="#data-exploration">4 Data Exploration</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">5 Summary</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">6 References</a></li>
   </ul>
 </nav>
     </div>
@@ -204,7 +208,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Take-home Exercise 1: Creating Visualization Beyond Default</h1>
+<h1 class="title">Take-home Exercise 1: Creating Visualization Beyond Default - Singapore Private Residential Property Market for 2024 Q1</h1>
 </div>
 
 
@@ -228,7 +232,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">April 16, 2024</p>
+      <p class="date-modified">April 18, 2024</p>
     </div>
   </div>
     
@@ -239,30 +243,57 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="overview" class="level1">
 <h1>1 Overview</h1>
+<section id="background" class="level2">
+<h2 class="anchored" data-anchor-id="background">1.1 Background</h2>
+<p>Singapore has one of the highest home ownership rates in the world at 89.7%, <a href="https://tradingeconomics.com/country-list/home-ownership-rate?continent=g20">2nd only to Russia among the G20</a> countries. Due to Singapore’s successful public housing program, <a href="13+ Housing &amp; Household Statistics in Singapore (2024)">77.8% of Singapore residents live in HDB flats</a>, while 22% live in private properties like condos or landed properties.</p>
+<p>While the HDB market targets Singaporeans with household income of up to 14,000 SGD, the private housing market is Singapore is still in demand for households looking to upgrade, invest their property, and for residents not eligible for public housing (e.g.&nbsp;high income household, foreigners, etc.)</p>
+<p>In this exercise we will look at the market trends for private residential property market for 2024 Q1 and see how the economic factors have affected it.</p>
+</section>
+<section id="loading-the-data-sources" class="level2">
+<h2 class="anchored" data-anchor-id="loading-the-data-sources">1.2 Loading the data sources</h2>
+<p>For this exercise, we will use the residential real estate transaction data from <a href="https://www.ura.gov.sg/reis/index">REALIS</a>. This provides comprehensive and up-to-date statistics on the private property market in Singapore.</p>
+<p>The dataset has been provided via eLearn and added to the <code>data/</code> folder of this exercise.</p>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-TODO
+File Structure
 </div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Revise based on narrative</p>
-</div>
-</div>
-<section id="problem-statement" class="level2">
-<h2 class="anchored" data-anchor-id="problem-statement">1.1 Problem Statement</h2>
-</section>
-<section id="the-data" class="level2">
-<h2 class="anchored" data-anchor-id="the-data">1.2 The Data</h2>
-<p>For this exercise, we will use the residential real estate transaction data from <a href="https://www.ura.gov.sg/reis/index">REALIS</a>. This provides comprehensive and up-to-date statistics on the property market in Singapore.</p>
-<p>The dataset has been provided via eLearn and added to the <code>data/</code> folder of this exercise.</p>
 <p><img src="images/file_structure.png" class="img-fluid"></p>
+</div>
+</div>
+</div>
+<p>For the purposes of this exercise, we will refer to each data as the following:</p>
+<ul>
+<li><p><strong>2023Q1</strong>: <code>ResidentialTransaction20240308160536.csv</code></p></li>
+<li><p><strong>2023Q2</strong>: <code>ResidentialTransaction20240308160736.csv</code></p></li>
+<li><p><strong>2023Q3</strong>: <code>ResidentialTransaction20240308161009.csv</code></p></li>
+<li><p><strong>2023Q4</strong>: <code>ResidentialTransaction20240308161109.csv</code></p></li>
+<li><p><strong>2024Q1</strong>: <code>ResidentialTransaction20240414220633.csv</code></p></li>
+</ul>
 </section>
 <section id="methodology" class="level2">
 <h2 class="anchored" data-anchor-id="methodology">1.3 Methodology</h2>
+<p>To start the data analysis, we first need to prepare the R environment for analysis. This includes loading the R packages and loading the datasets.</p>
+<p>After the setup, we need to do data wrangling where we clean and transform the data into a form that is fitting for our analysis. This will possible entail removing irrelevant data, deriving additional variables, renaming columns, etc.</p>
+<p>Next, we need to decide on what data we would like to look at closely. For the purposes of this exercise, these are the data we can look at that can potentially give valuable insights:</p>
+<ul>
+<li><p>Total units sold by quarter</p></li>
+<li><p>Units sold by submarkets such as property type (e.g.&nbsp;landed, strata), sale type (e.g.&nbsp;resale, new sale, subsale), etc.</p></li>
+<li><p>Transaction price by submarkets such property type (e.g.&nbsp;landed, strata), sale type (e.g.&nbsp;resale, new sale, subsale), etc.</p></li>
+</ul>
+<p>Finally, we will do data exploration and visualize the insights gained from the data. Some of the questions we would ask are:</p>
+<ul>
+<li><p>What is the general quarterly trend of private residential property sales prices?</p></li>
+<li><p>Is this trend consistent among all submarkets?</p></li>
+<li><p>How affordable are private residential properties for Singaporean households?</p></li>
+</ul>
 </section>
 </section>
 <section id="setup" class="level1">
@@ -271,296 +302,145 @@ TODO
 <h2 class="anchored" data-anchor-id="loading-the-r-packages">2.1 Loading the R packages</h2>
 <p>For this exercise, we will mainly use the following packages:</p>
 <ul>
-<li>tidyverse:</li>
+<li><a href="https://www.tidyverse.org/">tidyverse</a>: collection of R packages used in data science, which includes <a href="https://ggplot2.tidyverse.org/">ggplot2</a>, <a href="https://tibble.tidyverse.org/">tibble</a>, <a href="https://readr.tidyverse.org/">readr</a>, among others</li>
 </ul>
 <p>Aside from these, we will also include other packages that will help us present the data better.</p>
 <ul>
 <li><a href="https://www.rdocumentation.org/packages/knitr/versions/1.45">knitr</a>: used for dynamic report generation in R. For this exercise, we will use this package to render our tables better.</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(knitr, tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(ggthemes, hrbrthemes, knitr, tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="import-the-datasets" class="level2">
-<h2 class="anchored" data-anchor-id="import-the-datasets">2.2 Import the datasets</h2>
-<p>First, we need to import the provided datasets. We will use <code>read_csv()</code> for each csv file to do this.</p>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<section id="data-checkpoints" class="level2">
+<h2 class="anchored" data-anchor-id="data-checkpoints">2.2 Data Checkpoints</h2>
+<p>As the analysis is expected to have a lot of intermediate steps, <strong>Save</strong>, <strong>Load</strong>, and <strong>Data clear</strong> points are available to make our data wrangling more efficient.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Issues with column names
+Save point
 </div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Some of the column names have special characters that affect the data import.</p>
-<p>For example, if we read one of the files without any revisions, it results into the following:</p>
+<p>This is where data is written as <code>rds</code> files using <code>write_rds()</code> for important data sets that will be used in later analysis. Examples are:</p>
+<ul>
+<li>Data we need to prepare for analysis</li>
+<li>Critical outputs of expensive calculations</li>
+<li>Cleaned up data for lightweight processing</li>
+</ul>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Load point
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This is where data is loaded from <code>rds</code> files using <code>read_rds()</code>. They were previously generated by the save point.</p>
+<p><strong>TIP</strong>: Skip to the load points to progress without running the code above it</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Data clear point
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This is where data that will not be used anymore are cleared. The data in RStudio environment will pile up and will make it more difficult to check the relevant data in each part.</p>
+<p>We can set <code>#| eval: false</code> in code chunks if we want skip the clearing. For example, the code below won’t be run.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">read_csv</span>(<span class="st">'data/ResidentialTransaction20240308160536.csv'</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>message <span class="ot">&lt;-</span> <span class="st">"This code chunk executed"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+<p>To use these checkpoints, we need to create <code>data/rds</code> folder.</p>
+</section>
+</section>
+<section id="data-wrangling" class="level1">
+<h1>3 Data Wrangling</h1>
+<section id="importing-the-datasets" class="level2">
+<h2 class="anchored" data-anchor-id="importing-the-datasets">3.1 Importing the datasets</h2>
+<p>First, we need to import the provided datasets.</p>
+<p>Upon inspecting the csv file, column names have human-readable titles such as “Project Name”, “Transacted Price ($)”, etc. While good for humans, these column names may cause parsing issues with R, especially as there are special characters.</p>
+<p>Because of this, we will rename the columns in their UPPER_CASE format after removing the special characters. We will create a helper function that will help us accomplish this:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>rename_realis_column <span class="ot">&lt;-</span> <span class="cf">function</span>(orig_name) {</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add underscores to spaces</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gsub</span>(<span class="st">" +"</span>, <span class="st">"_"</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>       <span class="co"># Remove special characters</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>       <span class="fu">gsub</span>(<span class="st">"[^A-Z ]"</span>, <span class="st">""</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Convert to upper case and remove trailing spaces</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>            <span class="fu">toupper</span>(orig_name)) <span class="sc">%&gt;%</span> <span class="fu">trimws</span>())</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We will use <code>read_csv()</code> to import each file and use <code>rename_realis_column()</code> in the <code>rename_with()</code> function.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">2023 Q1</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">2023 Q2</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">2023 Q3</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false">2023 Q4</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-5" role="tab" aria-controls="tabset-1-5" aria-selected="false">2024 Q1</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>realis_2023q1 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">'data/ResidentialTransaction20240308160536.csv'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">rename_with</span>(rename_realis_column)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">head</span>(realis_2023q1, <span class="at">n=</span><span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
 <colgroup>
 <col style="width: 6%">
-<col style="width: 5%">
-<col style="width: 3%">
-<col style="width: 5%">
+<col style="width: 4%">
+<col style="width: 2%">
+<col style="width: 4%">
 <col style="width: 3%">
 <col style="width: 8%">
 <col style="width: 3%">
 <col style="width: 3%">
 <col style="width: 2%">
-<col style="width: 5%">
+<col style="width: 4%">
 <col style="width: 3%">
-<col style="width: 5%">
+<col style="width: 6%">
 <col style="width: 4%">
 <col style="width: 6%">
 <col style="width: 4%">
-<col style="width: 7%">
+<col style="width: 8%">
 <col style="width: 3%">
 <col style="width: 4%">
-<col style="width: 3%">
 <col style="width: 4%">
-<col style="width: 3%">
+<col style="width: 5%">
+<col style="width: 4%">
 </colgroup>
 <thead>
 <tr class="header">
-<th style="text-align: left;">Project Name</th>
-<th style="text-align: right;">Transacted Price (<span class="math inline">\()| Area (SQFT)| Unit Price (\)</span> PSF)</th>
-<th style="text-align: right;">Sale Date</th>
-<th style="text-align: right;">Address</th>
-<th style="text-align: left;">Type of Sale</th>
-<th style="text-align: left;">Type of Area</th>
-<th style="text-align: left;">Area (SQM)</th>
-<th style="text-align: left;">Unit Price ($ PSM)</th>
-<th style="text-align: right;">Nett Price($)</th>
-<th style="text-align: right;">Property Type</th>
-<th style="text-align: left;">Number of Units</th>
-<th style="text-align: left;">Tenure</th>
-<th style="text-align: right;">Completion Date</th>
-<th style="text-align: left;">Purchaser Address Indicator</th>
-<th style="text-align: left;">Postal Code</th>
-<th style="text-align: left;">Postal District</th>
-<th style="text-align: left;">Postal Sector</th>
-<th style="text-align: left;">Planning Region</th>
-<th style="text-align: left;">Planning Area</th>
-<th style="text-align: left;"></th>
-<th style="text-align: left;"></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">THE REEF AT KING’S DOCK</td>
-<td style="text-align: right;">2317000</td>
-<td style="text-align: right;">882.65</td>
-<td style="text-align: right;">2625</td>
-<td style="text-align: left;">01 Jan 2023</td>
-<td style="text-align: left;">12 HARBOURFRONT AVENUE #05-32</td>
-<td style="text-align: left;">New Sale</td>
-<td style="text-align: left;">Strata</td>
-<td style="text-align: right;">82.0</td>
-<td style="text-align: right;">28256</td>
-<td style="text-align: left;">-</td>
-<td style="text-align: left;">Condominium</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: left;">99 yrs from 12/01/2021</td>
-<td style="text-align: left;">Uncompleted</td>
-<td style="text-align: left;">HDB</td>
-<td style="text-align: left;">097996</td>
-<td style="text-align: left;">04</td>
-<td style="text-align: left;">09</td>
-<td style="text-align: left;">Central Region</td>
-<td style="text-align: left;">Bukit Merah</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">URBAN TREASURES</td>
-<td style="text-align: right;">1823500</td>
-<td style="text-align: right;">882.65</td>
-<td style="text-align: right;">2066</td>
-<td style="text-align: left;">02 Jan 2023</td>
-<td style="text-align: left;">205 JALAN EUNOS #08-02</td>
-<td style="text-align: left;">New Sale</td>
-<td style="text-align: left;">Strata</td>
-<td style="text-align: right;">82.0</td>
-<td style="text-align: right;">22238</td>
-<td style="text-align: left;">-</td>
-<td style="text-align: left;">Condominium</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: left;">Freehold</td>
-<td style="text-align: left;">Uncompleted</td>
-<td style="text-align: left;">Private</td>
-<td style="text-align: left;">419535</td>
-<td style="text-align: left;">14</td>
-<td style="text-align: left;">41</td>
-<td style="text-align: left;">East Region</td>
-<td style="text-align: left;">Bedok</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">NORTH GAIA</td>
-<td style="text-align: right;">1421112</td>
-<td style="text-align: right;">1076.40</td>
-<td style="text-align: right;">1320</td>
-<td style="text-align: left;">02 Jan 2023</td>
-<td style="text-align: left;">29 YISHUN CLOSE #08-10</td>
-<td style="text-align: left;">New Sale</td>
-<td style="text-align: left;">Strata</td>
-<td style="text-align: right;">100.0</td>
-<td style="text-align: right;">14211</td>
-<td style="text-align: left;">-</td>
-<td style="text-align: left;">Executive Condominium</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: left;">99 yrs from 15/02/2021</td>
-<td style="text-align: left;">Uncompleted</td>
-<td style="text-align: left;">HDB</td>
-<td style="text-align: left;">269343</td>
-<td style="text-align: left;">27</td>
-<td style="text-align: left;">26</td>
-<td style="text-align: left;">North Region</td>
-<td style="text-align: left;">Yishun</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">NORTH GAIA</td>
-<td style="text-align: right;">1258112</td>
-<td style="text-align: right;">1033.34</td>
-<td style="text-align: right;">1218</td>
-<td style="text-align: left;">02 Jan 2023</td>
-<td style="text-align: left;">45 YISHUN CLOSE #07-42</td>
-<td style="text-align: left;">New Sale</td>
-<td style="text-align: left;">Strata</td>
-<td style="text-align: right;">96.0</td>
-<td style="text-align: right;">13105</td>
-<td style="text-align: left;">-</td>
-<td style="text-align: left;">Executive Condominium</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: left;">99 yrs from 15/02/2021</td>
-<td style="text-align: left;">Uncompleted</td>
-<td style="text-align: left;">HDB</td>
-<td style="text-align: left;">269294</td>
-<td style="text-align: left;">27</td>
-<td style="text-align: left;">26</td>
-<td style="text-align: left;">North Region</td>
-<td style="text-align: left;">Yishun</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">PARC BOTANNIA</td>
-<td style="text-align: right;">1280000</td>
-<td style="text-align: right;">871.88</td>
-<td style="text-align: right;">1468</td>
-<td style="text-align: left;">03 Jan 2023</td>
-<td style="text-align: left;">12 FERNVALE STREET #06-16</td>
-<td style="text-align: left;">Resale</td>
-<td style="text-align: left;">Strata</td>
-<td style="text-align: right;">81.0</td>
-<td style="text-align: right;">15802</td>
-<td style="text-align: left;">-</td>
-<td style="text-align: left;">Condominium</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: left;">99 yrs from 28/12/2016</td>
-<td style="text-align: left;">2022</td>
-<td style="text-align: left;">HDB</td>
-<td style="text-align: left;">797391</td>
-<td style="text-align: left;">28</td>
-<td style="text-align: left;">79</td>
-<td style="text-align: left;">North East Region</td>
-<td style="text-align: left;">Sengkang</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">NANYANG PARK</td>
-<td style="text-align: right;">5870000</td>
-<td style="text-align: right;">3322.85</td>
-<td style="text-align: right;">1767</td>
-<td style="text-align: left;">03 Jan 2023</td>
-<td style="text-align: left;">72 JALAN LIMBOK</td>
-<td style="text-align: left;">Resale</td>
-<td style="text-align: left;">Land</td>
-<td style="text-align: right;">308.7</td>
-<td style="text-align: right;">19015</td>
-<td style="text-align: left;">-</td>
-<td style="text-align: left;">Terrace House</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: left;">999 yrs from 14/02/1881</td>
-<td style="text-align: left;">-</td>
-<td style="text-align: left;">Private</td>
-<td style="text-align: left;">548742</td>
-<td style="text-align: left;">19</td>
-<td style="text-align: left;">54</td>
-<td style="text-align: left;">North East Region</td>
-<td style="text-align: left;">Hougang</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<p>As shown above, the headers for <code>Transacted Price ($)</code>,<code>Area (SQFT)</code>, <code>UnitPrice(PSF)</code> have merged and the <code>$</code> did not render properly.</p>
-<p>To prevent this, we will rename <code>$</code> in the column names to <code>SGD</code> using <code>rename()</code> function.</p>
-</div>
-</div>
-</div>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">res_txn1</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">res_txn2</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">res_txn3</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false">res_txn4</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-5" role="tab" aria-controls="tabset-1-5" aria-selected="false">res_txn5</a></li></ul>
-<div class="tab-content">
-<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>res_txn1 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">'data/ResidentialTransaction20240308160536.csv'</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>            <span class="fu">rename</span>(</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Transacted Price (SGD)"</span> <span class="ot">=</span> <span class="st">"Transacted Price ($)"</span>,</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Unit Price (SGD PSF)"</span> <span class="ot">=</span> <span class="st">"Unit Price ($ PSF)"</span>,</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Unit Price (SGD PSM)"</span> <span class="ot">=</span> <span class="st">"Unit Price ($ PSM)"</span>,</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Nett Price(SGD)"</span> <span class="ot">=</span> <span class="st">"Nett Price($)"</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>            )</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">head</span>(res_txn1, <span class="at">n=</span><span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<table class="table table-sm table-striped small">
-<colgroup>
-<col style="width: 6%">
-<col style="width: 6%">
-<col style="width: 3%">
-<col style="width: 5%">
-<col style="width: 3%">
-<col style="width: 7%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 2%">
-<col style="width: 5%">
-<col style="width: 4%">
-<col style="width: 5%">
-<col style="width: 4%">
-<col style="width: 6%">
-<col style="width: 4%">
-<col style="width: 7%">
-<col style="width: 3%">
-<col style="width: 4%">
-<col style="width: 3%">
-<col style="width: 4%">
-<col style="width: 3%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Project Name</th>
-<th style="text-align: right;">Transacted Price (SGD)</th>
-<th style="text-align: right;">Area (SQFT)</th>
-<th style="text-align: right;">Unit Price (SGD PSF)</th>
-<th style="text-align: left;">Sale Date</th>
-<th style="text-align: left;">Address</th>
-<th style="text-align: left;">Type of Sale</th>
-<th style="text-align: left;">Type of Area</th>
-<th style="text-align: right;">Area (SQM)</th>
-<th style="text-align: right;">Unit Price (SGD PSM)</th>
-<th style="text-align: left;">Nett Price(SGD)</th>
-<th style="text-align: left;">Property Type</th>
-<th style="text-align: right;">Number of Units</th>
-<th style="text-align: left;">Tenure</th>
-<th style="text-align: left;">Completion Date</th>
-<th style="text-align: left;">Purchaser Address Indicator</th>
-<th style="text-align: left;">Postal Code</th>
-<th style="text-align: left;">Postal District</th>
-<th style="text-align: left;">Postal Sector</th>
-<th style="text-align: left;">Planning Region</th>
-<th style="text-align: left;">Planning Area</th>
+<th style="text-align: left;">PROJECT_NAME</th>
+<th style="text-align: right;">TRANSACTED_PRICE</th>
+<th style="text-align: right;">AREA_SQFT</th>
+<th style="text-align: right;">UNIT_PRICE_PSF</th>
+<th style="text-align: left;">SALE_DATE</th>
+<th style="text-align: left;">ADDRESS</th>
+<th style="text-align: left;">TYPE_OF_SALE</th>
+<th style="text-align: left;">TYPE_OF_AREA</th>
+<th style="text-align: right;">AREA_SQM</th>
+<th style="text-align: right;">UNIT_PRICE_PSM</th>
+<th style="text-align: left;">NETT_PRICE</th>
+<th style="text-align: left;">PROPERTY_TYPE</th>
+<th style="text-align: right;">NUMBER_OF_UNITS</th>
+<th style="text-align: left;">TENURE</th>
+<th style="text-align: left;">COMPLETION_DATE</th>
+<th style="text-align: left;">PURCHASER_ADDRESS_INDICATOR</th>
+<th style="text-align: left;">POSTAL_CODE</th>
+<th style="text-align: left;">POSTAL_DISTRICT</th>
+<th style="text-align: left;">POSTAL_SECTOR</th>
+<th style="text-align: left;">PLANNING_REGION</th>
+<th style="text-align: left;">PLANNING_AREA</th>
 </tr>
 </thead>
 <tbody>
@@ -798,65 +678,61 @@ Issues with column names
 </table>
 </div>
 </div>
+<p>There are <strong>4,722</strong> private residential propertysales for 2023 Q1.</p>
 </div>
 <div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>res_txn2 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">'data/ResidentialTransaction20240308160736.csv'</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>            <span class="fu">rename</span>(</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Transacted Price (SGD)"</span> <span class="ot">=</span> <span class="st">"Transacted Price ($)"</span>,</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Unit Price (SGD PSF)"</span> <span class="ot">=</span> <span class="st">"Unit Price ($ PSF)"</span>,</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Unit Price (SGD PSM)"</span> <span class="ot">=</span> <span class="st">"Unit Price ($ PSM)"</span>,</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Nett Price(SGD)"</span> <span class="ot">=</span> <span class="st">"Nett Price($)"</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>            )</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">head</span>(res_txn2, <span class="at">n=</span><span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>realis_2023q2 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">'data/ResidentialTransaction20240308160736.csv'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">rename_with</span>(rename_realis_column)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">head</span>(realis_2023q2, <span class="at">n=</span><span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
 <colgroup>
 <col style="width: 6%">
-<col style="width: 6%">
+<col style="width: 4%">
+<col style="width: 2%">
+<col style="width: 4%">
 <col style="width: 3%">
-<col style="width: 5%">
-<col style="width: 3%">
-<col style="width: 6%">
+<col style="width: 7%">
 <col style="width: 3%">
 <col style="width: 3%">
 <col style="width: 2%">
-<col style="width: 5%">
 <col style="width: 4%">
-<col style="width: 5%">
+<col style="width: 3%">
+<col style="width: 6%">
 <col style="width: 4%">
 <col style="width: 6%">
 <col style="width: 4%">
-<col style="width: 7%">
+<col style="width: 8%">
 <col style="width: 3%">
 <col style="width: 4%">
-<col style="width: 3%">
 <col style="width: 4%">
-<col style="width: 3%">
+<col style="width: 5%">
+<col style="width: 4%">
 </colgroup>
 <thead>
 <tr class="header">
-<th style="text-align: left;">Project Name</th>
-<th style="text-align: right;">Transacted Price (SGD)</th>
-<th style="text-align: right;">Area (SQFT)</th>
-<th style="text-align: right;">Unit Price (SGD PSF)</th>
-<th style="text-align: left;">Sale Date</th>
-<th style="text-align: left;">Address</th>
-<th style="text-align: left;">Type of Sale</th>
-<th style="text-align: left;">Type of Area</th>
-<th style="text-align: right;">Area (SQM)</th>
-<th style="text-align: right;">Unit Price (SGD PSM)</th>
-<th style="text-align: left;">Nett Price(SGD)</th>
-<th style="text-align: left;">Property Type</th>
-<th style="text-align: right;">Number of Units</th>
-<th style="text-align: left;">Tenure</th>
-<th style="text-align: left;">Completion Date</th>
-<th style="text-align: left;">Purchaser Address Indicator</th>
-<th style="text-align: left;">Postal Code</th>
-<th style="text-align: left;">Postal District</th>
-<th style="text-align: left;">Postal Sector</th>
-<th style="text-align: left;">Planning Region</th>
-<th style="text-align: left;">Planning Area</th>
+<th style="text-align: left;">PROJECT_NAME</th>
+<th style="text-align: right;">TRANSACTED_PRICE</th>
+<th style="text-align: right;">AREA_SQFT</th>
+<th style="text-align: right;">UNIT_PRICE_PSF</th>
+<th style="text-align: left;">SALE_DATE</th>
+<th style="text-align: left;">ADDRESS</th>
+<th style="text-align: left;">TYPE_OF_SALE</th>
+<th style="text-align: left;">TYPE_OF_AREA</th>
+<th style="text-align: right;">AREA_SQM</th>
+<th style="text-align: right;">UNIT_PRICE_PSM</th>
+<th style="text-align: left;">NETT_PRICE</th>
+<th style="text-align: left;">PROPERTY_TYPE</th>
+<th style="text-align: right;">NUMBER_OF_UNITS</th>
+<th style="text-align: left;">TENURE</th>
+<th style="text-align: left;">COMPLETION_DATE</th>
+<th style="text-align: left;">PURCHASER_ADDRESS_INDICATOR</th>
+<th style="text-align: left;">POSTAL_CODE</th>
+<th style="text-align: left;">POSTAL_DISTRICT</th>
+<th style="text-align: left;">POSTAL_SECTOR</th>
+<th style="text-align: left;">PLANNING_REGION</th>
+<th style="text-align: left;">PLANNING_AREA</th>
 </tr>
 </thead>
 <tbody>
@@ -1094,65 +970,61 @@ Issues with column names
 </table>
 </div>
 </div>
+<p>There are <strong>6,125</strong> private residential property sales for 2023 Q2.</p>
 </div>
 <div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>res_txn3 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">'data/ResidentialTransaction20240308161009.csv'</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>            <span class="fu">rename</span>(</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Transacted Price (SGD)"</span> <span class="ot">=</span> <span class="st">"Transacted Price ($)"</span>,</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Unit Price (SGD PSF)"</span> <span class="ot">=</span> <span class="st">"Unit Price ($ PSF)"</span>,</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Unit Price (SGD PSM)"</span> <span class="ot">=</span> <span class="st">"Unit Price ($ PSM)"</span>,</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Nett Price(SGD)"</span> <span class="ot">=</span> <span class="st">"Nett Price($)"</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>            )</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">head</span>(res_txn3), <span class="at">n=</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>realis_2023q3 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">'data/ResidentialTransaction20240308161009.csv'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">rename_with</span>(rename_realis_column)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">head</span>(realis_2023q3, <span class="at">n=</span><span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
 <colgroup>
 <col style="width: 4%">
-<col style="width: 6%">
+<col style="width: 4%">
+<col style="width: 2%">
+<col style="width: 4%">
 <col style="width: 3%">
-<col style="width: 5%">
-<col style="width: 3%">
-<col style="width: 8%">
+<col style="width: 9%">
 <col style="width: 3%">
 <col style="width: 3%">
 <col style="width: 2%">
-<col style="width: 5%">
 <col style="width: 4%">
-<col style="width: 5%">
+<col style="width: 3%">
+<col style="width: 6%">
 <col style="width: 4%">
 <col style="width: 6%">
 <col style="width: 4%">
-<col style="width: 7%">
+<col style="width: 8%">
 <col style="width: 3%">
 <col style="width: 4%">
-<col style="width: 3%">
 <col style="width: 4%">
-<col style="width: 3%">
+<col style="width: 4%">
+<col style="width: 4%">
 </colgroup>
 <thead>
 <tr class="header">
-<th style="text-align: left;">Project Name</th>
-<th style="text-align: right;">Transacted Price (SGD)</th>
-<th style="text-align: right;">Area (SQFT)</th>
-<th style="text-align: right;">Unit Price (SGD PSF)</th>
-<th style="text-align: left;">Sale Date</th>
-<th style="text-align: left;">Address</th>
-<th style="text-align: left;">Type of Sale</th>
-<th style="text-align: left;">Type of Area</th>
-<th style="text-align: right;">Area (SQM)</th>
-<th style="text-align: right;">Unit Price (SGD PSM)</th>
-<th style="text-align: left;">Nett Price(SGD)</th>
-<th style="text-align: left;">Property Type</th>
-<th style="text-align: right;">Number of Units</th>
-<th style="text-align: left;">Tenure</th>
-<th style="text-align: left;">Completion Date</th>
-<th style="text-align: left;">Purchaser Address Indicator</th>
-<th style="text-align: left;">Postal Code</th>
-<th style="text-align: left;">Postal District</th>
-<th style="text-align: left;">Postal Sector</th>
-<th style="text-align: left;">Planning Region</th>
-<th style="text-align: left;">Planning Area</th>
+<th style="text-align: left;">PROJECT_NAME</th>
+<th style="text-align: right;">TRANSACTED_PRICE</th>
+<th style="text-align: right;">AREA_SQFT</th>
+<th style="text-align: right;">UNIT_PRICE_PSF</th>
+<th style="text-align: left;">SALE_DATE</th>
+<th style="text-align: left;">ADDRESS</th>
+<th style="text-align: left;">TYPE_OF_SALE</th>
+<th style="text-align: left;">TYPE_OF_AREA</th>
+<th style="text-align: right;">AREA_SQM</th>
+<th style="text-align: right;">UNIT_PRICE_PSM</th>
+<th style="text-align: left;">NETT_PRICE</th>
+<th style="text-align: left;">PROPERTY_TYPE</th>
+<th style="text-align: right;">NUMBER_OF_UNITS</th>
+<th style="text-align: left;">TENURE</th>
+<th style="text-align: left;">COMPLETION_DATE</th>
+<th style="text-align: left;">PURCHASER_ADDRESS_INDICATOR</th>
+<th style="text-align: left;">POSTAL_CODE</th>
+<th style="text-align: left;">POSTAL_DISTRICT</th>
+<th style="text-align: left;">POSTAL_SECTOR</th>
+<th style="text-align: left;">PLANNING_REGION</th>
+<th style="text-align: left;">PLANNING_AREA</th>
 </tr>
 </thead>
 <tbody>
@@ -1294,69 +1166,157 @@ Issues with column names
 <td style="text-align: left;">Central Region</td>
 <td style="text-align: left;">Kallang</td>
 </tr>
+<tr class="odd">
+<td style="text-align: left;">TENET</td>
+<td style="text-align: right;">1356000</td>
+<td style="text-align: right;">925.70</td>
+<td style="text-align: right;">1465</td>
+<td style="text-align: left;">01 Jul 2023</td>
+<td style="text-align: left;">71 TAMPINES STREET 62 #14-02</td>
+<td style="text-align: left;">New Sale</td>
+<td style="text-align: left;">Strata</td>
+<td style="text-align: right;">86</td>
+<td style="text-align: right;">15767</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Executive Condominium</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">99 yrs from 01/11/2021</td>
+<td style="text-align: left;">Uncompleted</td>
+<td style="text-align: left;">HDB</td>
+<td style="text-align: left;">529699</td>
+<td style="text-align: left;">18</td>
+<td style="text-align: left;">52</td>
+<td style="text-align: left;">East Region</td>
+<td style="text-align: left;">Tampines</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">TENET</td>
+<td style="text-align: right;">1345000</td>
+<td style="text-align: right;">925.70</td>
+<td style="text-align: right;">1453</td>
+<td style="text-align: left;">01 Jul 2023</td>
+<td style="text-align: left;">73 TAMPINES STREET 62 #12-05</td>
+<td style="text-align: left;">New Sale</td>
+<td style="text-align: left;">Strata</td>
+<td style="text-align: right;">86</td>
+<td style="text-align: right;">15640</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Executive Condominium</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">99 yrs from 01/11/2021</td>
+<td style="text-align: left;">Uncompleted</td>
+<td style="text-align: left;">N.A</td>
+<td style="text-align: left;">529700</td>
+<td style="text-align: left;">18</td>
+<td style="text-align: left;">52</td>
+<td style="text-align: left;">East Region</td>
+<td style="text-align: left;">Tampines</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">TENET</td>
+<td style="text-align: right;">1334000</td>
+<td style="text-align: right;">925.70</td>
+<td style="text-align: right;">1441</td>
+<td style="text-align: left;">01 Jul 2023</td>
+<td style="text-align: left;">77 TAMPINES STREET 62 #09-14</td>
+<td style="text-align: left;">New Sale</td>
+<td style="text-align: left;">Strata</td>
+<td style="text-align: right;">86</td>
+<td style="text-align: right;">15512</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Executive Condominium</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">99 yrs from 01/11/2021</td>
+<td style="text-align: left;">Uncompleted</td>
+<td style="text-align: left;">HDB</td>
+<td style="text-align: left;">529702</td>
+<td style="text-align: left;">18</td>
+<td style="text-align: left;">52</td>
+<td style="text-align: left;">East Region</td>
+<td style="text-align: left;">Tampines</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">TENET</td>
+<td style="text-align: right;">1311000</td>
+<td style="text-align: right;">925.70</td>
+<td style="text-align: right;">1416</td>
+<td style="text-align: left;">01 Jul 2023</td>
+<td style="text-align: left;">77 TAMPINES STREET 62 #13-14</td>
+<td style="text-align: left;">New Sale</td>
+<td style="text-align: left;">Strata</td>
+<td style="text-align: right;">86</td>
+<td style="text-align: right;">15244</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Executive Condominium</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">99 yrs from 01/11/2021</td>
+<td style="text-align: left;">Uncompleted</td>
+<td style="text-align: left;">Private</td>
+<td style="text-align: left;">529702</td>
+<td style="text-align: left;">18</td>
+<td style="text-align: left;">52</td>
+<td style="text-align: left;">East Region</td>
+<td style="text-align: left;">Tampines</td>
+</tr>
 </tbody>
 </table>
 </div>
 </div>
+<p>There are <strong>6,206</strong> private residential property sales for 2023 Q3.</p>
 </div>
 <div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>res_txn4 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">'data/ResidentialTransaction20240308161109.csv'</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>            <span class="fu">rename</span>(</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Transacted Price (SGD)"</span> <span class="ot">=</span> <span class="st">"Transacted Price ($)"</span>,</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Unit Price (SGD PSF)"</span> <span class="ot">=</span> <span class="st">"Unit Price ($ PSF)"</span>,</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Unit Price (SGD PSM)"</span> <span class="ot">=</span> <span class="st">"Unit Price ($ PSM)"</span>,</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Nett Price(SGD)"</span> <span class="ot">=</span> <span class="st">"Nett Price($)"</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>            )</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">head</span>(res_txn4), <span class="at">n=</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>realis_2023q4 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">'data/ResidentialTransaction20240308161109.csv'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">rename_with</span>(rename_realis_column)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">head</span>(realis_2023q4, <span class="at">n=</span><span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
 <colgroup>
 <col style="width: 7%">
+<col style="width: 4%">
+<col style="width: 2%">
+<col style="width: 4%">
+<col style="width: 3%">
+<col style="width: 9%">
+<col style="width: 3%">
+<col style="width: 3%">
+<col style="width: 2%">
+<col style="width: 4%">
+<col style="width: 3%">
+<col style="width: 4%">
+<col style="width: 4%">
 <col style="width: 6%">
+<col style="width: 4%">
+<col style="width: 8%">
 <col style="width: 3%">
-<col style="width: 5%">
-<col style="width: 3%">
-<col style="width: 7%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
+<col style="width: 4%">
+<col style="width: 4%">
 <col style="width: 5%">
 <col style="width: 4%">
-<col style="width: 3%">
-<col style="width: 4%">
-<col style="width: 6%">
-<col style="width: 4%">
-<col style="width: 7%">
-<col style="width: 3%">
-<col style="width: 4%">
-<col style="width: 3%">
-<col style="width: 4%">
-<col style="width: 3%">
 </colgroup>
 <thead>
 <tr class="header">
-<th style="text-align: left;">Project Name</th>
-<th style="text-align: right;">Transacted Price (SGD)</th>
-<th style="text-align: right;">Area (SQFT)</th>
-<th style="text-align: right;">Unit Price (SGD PSF)</th>
-<th style="text-align: left;">Sale Date</th>
-<th style="text-align: left;">Address</th>
-<th style="text-align: left;">Type of Sale</th>
-<th style="text-align: left;">Type of Area</th>
-<th style="text-align: right;">Area (SQM)</th>
-<th style="text-align: right;">Unit Price (SGD PSM)</th>
-<th style="text-align: left;">Nett Price(SGD)</th>
-<th style="text-align: left;">Property Type</th>
-<th style="text-align: right;">Number of Units</th>
-<th style="text-align: left;">Tenure</th>
-<th style="text-align: left;">Completion Date</th>
-<th style="text-align: left;">Purchaser Address Indicator</th>
-<th style="text-align: left;">Postal Code</th>
-<th style="text-align: left;">Postal District</th>
-<th style="text-align: left;">Postal Sector</th>
-<th style="text-align: left;">Planning Region</th>
-<th style="text-align: left;">Planning Area</th>
+<th style="text-align: left;">PROJECT_NAME</th>
+<th style="text-align: right;">TRANSACTED_PRICE</th>
+<th style="text-align: right;">AREA_SQFT</th>
+<th style="text-align: right;">UNIT_PRICE_PSF</th>
+<th style="text-align: left;">SALE_DATE</th>
+<th style="text-align: left;">ADDRESS</th>
+<th style="text-align: left;">TYPE_OF_SALE</th>
+<th style="text-align: left;">TYPE_OF_AREA</th>
+<th style="text-align: right;">AREA_SQM</th>
+<th style="text-align: right;">UNIT_PRICE_PSM</th>
+<th style="text-align: left;">NETT_PRICE</th>
+<th style="text-align: left;">PROPERTY_TYPE</th>
+<th style="text-align: right;">NUMBER_OF_UNITS</th>
+<th style="text-align: left;">TENURE</th>
+<th style="text-align: left;">COMPLETION_DATE</th>
+<th style="text-align: left;">PURCHASER_ADDRESS_INDICATOR</th>
+<th style="text-align: left;">POSTAL_CODE</th>
+<th style="text-align: left;">POSTAL_DISTRICT</th>
+<th style="text-align: left;">POSTAL_SECTOR</th>
+<th style="text-align: left;">PLANNING_REGION</th>
+<th style="text-align: left;">PLANNING_AREA</th>
 </tr>
 </thead>
 <tbody>
@@ -1498,69 +1458,157 @@ Issues with column names
 <td style="text-align: left;">West Region</td>
 <td style="text-align: left;">Jurong East</td>
 </tr>
+<tr class="odd">
+<td style="text-align: left;">LENTOR HILLS RESIDENCES</td>
+<td style="text-align: right;">2890000</td>
+<td style="text-align: right;">1356.26</td>
+<td style="text-align: right;">2131</td>
+<td style="text-align: left;">01 Oct 2023</td>
+<td style="text-align: left;">31 LENTOR HILLS ROAD #15-03</td>
+<td style="text-align: left;">New Sale</td>
+<td style="text-align: left;">Strata</td>
+<td style="text-align: right;">126</td>
+<td style="text-align: right;">22937</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Apartment</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">99 yrs from 25/04/2022</td>
+<td style="text-align: left;">Uncompleted</td>
+<td style="text-align: left;">HDB</td>
+<td style="text-align: left;">788881</td>
+<td style="text-align: left;">26</td>
+<td style="text-align: left;">78</td>
+<td style="text-align: left;">North East Region</td>
+<td style="text-align: left;">Ang Mo Kio</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">LENTOR HILLS RESIDENCES</td>
+<td style="text-align: right;">1678000</td>
+<td style="text-align: right;">753.48</td>
+<td style="text-align: right;">2227</td>
+<td style="text-align: left;">01 Oct 2023</td>
+<td style="text-align: left;">37 LENTOR HILLS ROAD #21-26</td>
+<td style="text-align: left;">New Sale</td>
+<td style="text-align: left;">Strata</td>
+<td style="text-align: right;">70</td>
+<td style="text-align: right;">23971</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Apartment</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">99 yrs from 25/04/2022</td>
+<td style="text-align: left;">Uncompleted</td>
+<td style="text-align: left;">Private</td>
+<td style="text-align: left;">788884</td>
+<td style="text-align: left;">26</td>
+<td style="text-align: left;">78</td>
+<td style="text-align: left;">North East Region</td>
+<td style="text-align: left;">Ang Mo Kio</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">THE MYST</td>
+<td style="text-align: right;">1555000</td>
+<td style="text-align: right;">699.66</td>
+<td style="text-align: right;">2223</td>
+<td style="text-align: left;">01 Oct 2023</td>
+<td style="text-align: left;">802 UPPER BUKIT TIMAH ROAD #16-17</td>
+<td style="text-align: left;">New Sale</td>
+<td style="text-align: left;">Strata</td>
+<td style="text-align: right;">65</td>
+<td style="text-align: right;">23923</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Condominium</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">99 yrs from 11/05/2023</td>
+<td style="text-align: left;">Uncompleted</td>
+<td style="text-align: left;">N.A</td>
+<td style="text-align: left;">678140</td>
+<td style="text-align: left;">23</td>
+<td style="text-align: left;">67</td>
+<td style="text-align: left;">West Region</td>
+<td style="text-align: left;">Bukit Panjang</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">STUDIO8</td>
+<td style="text-align: right;">800000</td>
+<td style="text-align: right;">538.20</td>
+<td style="text-align: right;">1486</td>
+<td style="text-align: left;">02 Oct 2023</td>
+<td style="text-align: left;">8 JALAN AYER #05-01</td>
+<td style="text-align: left;">Resale</td>
+<td style="text-align: left;">Strata</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">16000</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Apartment</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">Freehold</td>
+<td style="text-align: left;">2014</td>
+<td style="text-align: left;">HDB</td>
+<td style="text-align: left;">389144</td>
+<td style="text-align: left;">14</td>
+<td style="text-align: left;">38</td>
+<td style="text-align: left;">Central Region</td>
+<td style="text-align: left;">Kallang</td>
+</tr>
 </tbody>
 </table>
 </div>
 </div>
+<p>There are <strong>4,851</strong> private residential property sales for 2023 Q4.</p>
 </div>
 <div id="tabset-1-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-5-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>res_txn5 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">'data/ResidentialTransaction20240414220633.csv'</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>            <span class="fu">rename</span>(</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Transacted Price (SGD)"</span> <span class="ot">=</span> <span class="st">"Transacted Price ($)"</span>,</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Unit Price (SGD PSF)"</span> <span class="ot">=</span> <span class="st">"Unit Price ($ PSF)"</span>,</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Unit Price (SGD PSM)"</span> <span class="ot">=</span> <span class="st">"Unit Price ($ PSM)"</span>,</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Nett Price(SGD)"</span> <span class="ot">=</span> <span class="st">"Nett Price($)"</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>            )</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">head</span>(res_txn5), <span class="at">n=</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>realis_2024q1 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">'data/ResidentialTransaction20240414220633.csv'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">rename_with</span>(rename_realis_column)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">head</span>(realis_2024q1, <span class="at">n=</span><span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
 <colgroup>
 <col style="width: 6%">
-<col style="width: 6%">
-<col style="width: 3%">
 <col style="width: 5%">
-<col style="width: 3%">
-<col style="width: 7%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 5%">
+<col style="width: 2%">
 <col style="width: 4%">
 <col style="width: 3%">
+<col style="width: 8%">
+<col style="width: 3%">
+<col style="width: 3%">
+<col style="width: 2%">
+<col style="width: 4%">
+<col style="width: 3%">
+<col style="width: 4%">
 <col style="width: 4%">
 <col style="width: 6%">
 <col style="width: 4%">
-<col style="width: 7%">
+<col style="width: 8%">
 <col style="width: 3%">
 <col style="width: 4%">
-<col style="width: 3%">
 <col style="width: 4%">
-<col style="width: 3%">
+<col style="width: 5%">
+<col style="width: 4%">
 </colgroup>
 <thead>
 <tr class="header">
-<th style="text-align: left;">Project Name</th>
-<th style="text-align: right;">Transacted Price (SGD)</th>
-<th style="text-align: right;">Area (SQFT)</th>
-<th style="text-align: right;">Unit Price (SGD PSF)</th>
-<th style="text-align: left;">Sale Date</th>
-<th style="text-align: left;">Address</th>
-<th style="text-align: left;">Type of Sale</th>
-<th style="text-align: left;">Type of Area</th>
-<th style="text-align: right;">Area (SQM)</th>
-<th style="text-align: right;">Unit Price (SGD PSM)</th>
-<th style="text-align: left;">Nett Price(SGD)</th>
-<th style="text-align: left;">Property Type</th>
-<th style="text-align: right;">Number of Units</th>
-<th style="text-align: left;">Tenure</th>
-<th style="text-align: left;">Completion Date</th>
-<th style="text-align: left;">Purchaser Address Indicator</th>
-<th style="text-align: left;">Postal Code</th>
-<th style="text-align: left;">Postal District</th>
-<th style="text-align: left;">Postal Sector</th>
-<th style="text-align: left;">Planning Region</th>
-<th style="text-align: left;">Planning Area</th>
+<th style="text-align: left;">PROJECT_NAME</th>
+<th style="text-align: right;">TRANSACTED_PRICE</th>
+<th style="text-align: right;">AREA_SQFT</th>
+<th style="text-align: right;">UNIT_PRICE_PSF</th>
+<th style="text-align: left;">SALE_DATE</th>
+<th style="text-align: left;">ADDRESS</th>
+<th style="text-align: left;">TYPE_OF_SALE</th>
+<th style="text-align: left;">TYPE_OF_AREA</th>
+<th style="text-align: right;">AREA_SQM</th>
+<th style="text-align: right;">UNIT_PRICE_PSM</th>
+<th style="text-align: left;">NETT_PRICE</th>
+<th style="text-align: left;">PROPERTY_TYPE</th>
+<th style="text-align: right;">NUMBER_OF_UNITS</th>
+<th style="text-align: left;">TENURE</th>
+<th style="text-align: left;">COMPLETION_DATE</th>
+<th style="text-align: left;">PURCHASER_ADDRESS_INDICATOR</th>
+<th style="text-align: left;">POSTAL_CODE</th>
+<th style="text-align: left;">POSTAL_DISTRICT</th>
+<th style="text-align: left;">POSTAL_SECTOR</th>
+<th style="text-align: left;">PLANNING_REGION</th>
+<th style="text-align: left;">PLANNING_AREA</th>
 </tr>
 </thead>
 <tbody>
@@ -1573,7 +1621,7 @@ Issues with column names
 <td style="text-align: left;">173 CHIN SWEE ROAD #22-11</td>
 <td style="text-align: left;">New Sale</td>
 <td style="text-align: left;">Strata</td>
-<td style="text-align: right;">100</td>
+<td style="text-align: right;">100.0</td>
 <td style="text-align: right;">27269</td>
 <td style="text-align: left;">-</td>
 <td style="text-align: left;">Condominium</td>
@@ -1596,7 +1644,7 @@ Issues with column names
 <td style="text-align: left;">34 POLLEN PLACE</td>
 <td style="text-align: left;">New Sale</td>
 <td style="text-align: left;">Land</td>
-<td style="text-align: right;">168</td>
+<td style="text-align: right;">168.0</td>
 <td style="text-align: right;">22917</td>
 <td style="text-align: left;">-</td>
 <td style="text-align: left;">Terrace House</td>
@@ -1619,7 +1667,7 @@ Issues with column names
 <td style="text-align: left;">1 BEDOK CENTRAL #09-10</td>
 <td style="text-align: left;">New Sale</td>
 <td style="text-align: left;">Strata</td>
-<td style="text-align: right;">101</td>
+<td style="text-align: right;">101.0</td>
 <td style="text-align: right;">23228</td>
 <td style="text-align: left;">-</td>
 <td style="text-align: left;">Apartment</td>
@@ -1642,7 +1690,7 @@ Issues with column names
 <td style="text-align: left;">18A YEW SIANG ROAD #03-12</td>
 <td style="text-align: left;">New Sale</td>
 <td style="text-align: left;">Strata</td>
-<td style="text-align: right;">75</td>
+<td style="text-align: right;">75.0</td>
 <td style="text-align: right;">29200</td>
 <td style="text-align: left;">-</td>
 <td style="text-align: left;">Apartment</td>
@@ -1665,7 +1713,7 @@ Issues with column names
 <td style="text-align: left;">36 PINE GROVE #05-18</td>
 <td style="text-align: left;">New Sale</td>
 <td style="text-align: left;">Strata</td>
-<td style="text-align: right;">74</td>
+<td style="text-align: right;">74.0</td>
 <td style="text-align: right;">26405</td>
 <td style="text-align: left;">-</td>
 <td style="text-align: left;">Condominium</td>
@@ -1688,7 +1736,7 @@ Issues with column names
 <td style="text-align: left;">13 JALAN ANAK BUKIT #28-106</td>
 <td style="text-align: left;">New Sale</td>
 <td style="text-align: left;">Strata</td>
-<td style="text-align: right;">123</td>
+<td style="text-align: right;">123.0</td>
 <td style="text-align: right;">27741</td>
 <td style="text-align: left;">-</td>
 <td style="text-align: left;">Apartment</td>
@@ -1702,6 +1750,682 @@ Issues with column names
 <td style="text-align: left;">Central Region</td>
 <td style="text-align: left;">Bukit Timah</td>
 </tr>
+<tr class="odd">
+<td style="text-align: left;">SUMMER VILLAS</td>
+<td style="text-align: right;">2960000</td>
+<td style="text-align: right;">3530.59</td>
+<td style="text-align: right;">838</td>
+<td style="text-align: left;">02 Jan 2024</td>
+<td style="text-align: left;">73 GERALD DRIVE #01-06</td>
+<td style="text-align: left;">Resale</td>
+<td style="text-align: left;">Strata</td>
+<td style="text-align: right;">328.0</td>
+<td style="text-align: right;">9024</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Terrace House</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">Freehold</td>
+<td style="text-align: left;">2004</td>
+<td style="text-align: left;">Private</td>
+<td style="text-align: left;">797703</td>
+<td style="text-align: left;">28</td>
+<td style="text-align: left;">79</td>
+<td style="text-align: left;">North East Region</td>
+<td style="text-align: left;">Hougang</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">THE MINTON</td>
+<td style="text-align: right;">1840000</td>
+<td style="text-align: right;">1216.33</td>
+<td style="text-align: right;">1513</td>
+<td style="text-align: left;">02 Jan 2024</td>
+<td style="text-align: left;">6 HOUGANG STREET 11 #11-09</td>
+<td style="text-align: left;">Resale</td>
+<td style="text-align: left;">Strata</td>
+<td style="text-align: right;">113.0</td>
+<td style="text-align: right;">16283</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Condominium</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">99 yrs from 27/07/2007</td>
+<td style="text-align: left;">2013</td>
+<td style="text-align: left;">HDB</td>
+<td style="text-align: left;">538755</td>
+<td style="text-align: left;">19</td>
+<td style="text-align: left;">53</td>
+<td style="text-align: left;">North East Region</td>
+<td style="text-align: left;">Hougang</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">SEMBAWANG HILLS ESTATE</td>
+<td style="text-align: right;">4200000</td>
+<td style="text-align: right;">2092.52</td>
+<td style="text-align: right;">2007</td>
+<td style="text-align: left;">02 Jan 2024</td>
+<td style="text-align: left;">67 JALAN CHENGAM</td>
+<td style="text-align: left;">Resale</td>
+<td style="text-align: left;">Land</td>
+<td style="text-align: right;">194.4</td>
+<td style="text-align: right;">21605</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Terrace House</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">Freehold</td>
+<td style="text-align: left;">2015</td>
+<td style="text-align: left;">Private</td>
+<td style="text-align: left;">578350</td>
+<td style="text-align: left;">20</td>
+<td style="text-align: left;">57</td>
+<td style="text-align: left;">North East Region</td>
+<td style="text-align: left;">Ang Mo Kio</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">NV RESIDENCES</td>
+<td style="text-align: right;">1350000</td>
+<td style="text-align: right;">1108.69</td>
+<td style="text-align: right;">1218</td>
+<td style="text-align: left;">02 Jan 2024</td>
+<td style="text-align: left;">99 PASIR RIS GROVE #08-47</td>
+<td style="text-align: left;">Resale</td>
+<td style="text-align: left;">Strata</td>
+<td style="text-align: right;">103.0</td>
+<td style="text-align: right;">13107</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Condominium</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">99 yrs from 07/01/2008</td>
+<td style="text-align: left;">2013</td>
+<td style="text-align: left;">HDB</td>
+<td style="text-align: left;">518194</td>
+<td style="text-align: left;">18</td>
+<td style="text-align: left;">51</td>
+<td style="text-align: left;">East Region</td>
+<td style="text-align: left;">Pasir Ris</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>There are <strong>4,902</strong> private residential property sales for 2024 Q1.</p>
+</div>
+</div>
+</div>
+<p>The imported dataset has 21 variables.</p>
+</section>
+<section id="combining-the-dataframes" class="level2">
+<h2 class="anchored" data-anchor-id="combining-the-dataframes">3.2 Combining the dataframes</h2>
+<p>Next, we will combine all 5 <code>realis_202*q*</code> dataframes into a single one to simplify aggregation and partitioning of data for analysis.</p>
+<p>This will also simplify cleanup and transformation as they will be done on a single dataframe instead of 5.</p>
+<p>To do this, we need to add <code>QUARTER</code> values to each dataframe before merging them to a single one. We will use the format <code>YEAR-Q</code>, i.e <code>2024-1</code> for 2024 Q1. This is so we can identify which quarter the sale was made, which we will use for aggregation.</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Functions used
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><p><code>mutate()</code> for adding new column</p></li>
+<li><p><code>rbind()</code> for combining all dataframes</p></li>
+</ul>
+</div>
+</div>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Adding QUARTER column</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Combining data frames</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>realis_2023q1 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(realis_2023q1, <span class="at">QUARTER=</span><span class="st">"2023-1"</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>realis_2023q2 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(realis_2023q2, <span class="at">QUARTER=</span><span class="st">"2023-2"</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>realis_2023q3 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(realis_2023q3, <span class="at">QUARTER=</span><span class="st">"2023-3"</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>realis_2023q4 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(realis_2023q4, <span class="at">QUARTER=</span><span class="st">"2023-4"</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>realis_2024q1 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(realis_2024q1, <span class="at">QUARTER=</span><span class="st">"2024-1"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>realis <span class="ot">&lt;-</span> realis_2023q1 <span class="sc">%&gt;%</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rbind</span>(realis_2023q2) <span class="sc">%&gt;%</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rbind</span>(realis_2023q3) <span class="sc">%&gt;%</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rbind</span>(realis_2023q4) <span class="sc">%&gt;%</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rbind</span>(realis_2024q1)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">head</span>(realis, <span class="dv">20</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 4%">
+<col style="width: 2%">
+<col style="width: 4%">
+<col style="width: 3%">
+<col style="width: 8%">
+<col style="width: 3%">
+<col style="width: 3%">
+<col style="width: 2%">
+<col style="width: 4%">
+<col style="width: 3%">
+<col style="width: 6%">
+<col style="width: 4%">
+<col style="width: 6%">
+<col style="width: 4%">
+<col style="width: 7%">
+<col style="width: 3%">
+<col style="width: 4%">
+<col style="width: 3%">
+<col style="width: 5%">
+<col style="width: 3%">
+<col style="width: 2%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">PROJECT_NAME</th>
+<th style="text-align: right;">TRANSACTED_PRICE</th>
+<th style="text-align: right;">AREA_SQFT</th>
+<th style="text-align: right;">UNIT_PRICE_PSF</th>
+<th style="text-align: left;">SALE_DATE</th>
+<th style="text-align: left;">ADDRESS</th>
+<th style="text-align: left;">TYPE_OF_SALE</th>
+<th style="text-align: left;">TYPE_OF_AREA</th>
+<th style="text-align: right;">AREA_SQM</th>
+<th style="text-align: right;">UNIT_PRICE_PSM</th>
+<th style="text-align: left;">NETT_PRICE</th>
+<th style="text-align: left;">PROPERTY_TYPE</th>
+<th style="text-align: right;">NUMBER_OF_UNITS</th>
+<th style="text-align: left;">TENURE</th>
+<th style="text-align: left;">COMPLETION_DATE</th>
+<th style="text-align: left;">PURCHASER_ADDRESS_INDICATOR</th>
+<th style="text-align: left;">POSTAL_CODE</th>
+<th style="text-align: left;">POSTAL_DISTRICT</th>
+<th style="text-align: left;">POSTAL_SECTOR</th>
+<th style="text-align: left;">PLANNING_REGION</th>
+<th style="text-align: left;">PLANNING_AREA</th>
+<th style="text-align: left;">QUARTER</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">THE REEF AT KING’S DOCK</td>
+<td style="text-align: right;">2317000</td>
+<td style="text-align: right;">882.65</td>
+<td style="text-align: right;">2625</td>
+<td style="text-align: left;">01 Jan 2023</td>
+<td style="text-align: left;">12 HARBOURFRONT AVENUE #05-32</td>
+<td style="text-align: left;">New Sale</td>
+<td style="text-align: left;">Strata</td>
+<td style="text-align: right;">82.0</td>
+<td style="text-align: right;">28256</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Condominium</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">99 yrs from 12/01/2021</td>
+<td style="text-align: left;">Uncompleted</td>
+<td style="text-align: left;">HDB</td>
+<td style="text-align: left;">097996</td>
+<td style="text-align: left;">04</td>
+<td style="text-align: left;">09</td>
+<td style="text-align: left;">Central Region</td>
+<td style="text-align: left;">Bukit Merah</td>
+<td style="text-align: left;">2023-1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">URBAN TREASURES</td>
+<td style="text-align: right;">1823500</td>
+<td style="text-align: right;">882.65</td>
+<td style="text-align: right;">2066</td>
+<td style="text-align: left;">02 Jan 2023</td>
+<td style="text-align: left;">205 JALAN EUNOS #08-02</td>
+<td style="text-align: left;">New Sale</td>
+<td style="text-align: left;">Strata</td>
+<td style="text-align: right;">82.0</td>
+<td style="text-align: right;">22238</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Condominium</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">Freehold</td>
+<td style="text-align: left;">Uncompleted</td>
+<td style="text-align: left;">Private</td>
+<td style="text-align: left;">419535</td>
+<td style="text-align: left;">14</td>
+<td style="text-align: left;">41</td>
+<td style="text-align: left;">East Region</td>
+<td style="text-align: left;">Bedok</td>
+<td style="text-align: left;">2023-1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">NORTH GAIA</td>
+<td style="text-align: right;">1421112</td>
+<td style="text-align: right;">1076.40</td>
+<td style="text-align: right;">1320</td>
+<td style="text-align: left;">02 Jan 2023</td>
+<td style="text-align: left;">29 YISHUN CLOSE #08-10</td>
+<td style="text-align: left;">New Sale</td>
+<td style="text-align: left;">Strata</td>
+<td style="text-align: right;">100.0</td>
+<td style="text-align: right;">14211</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Executive Condominium</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">99 yrs from 15/02/2021</td>
+<td style="text-align: left;">Uncompleted</td>
+<td style="text-align: left;">HDB</td>
+<td style="text-align: left;">269343</td>
+<td style="text-align: left;">27</td>
+<td style="text-align: left;">26</td>
+<td style="text-align: left;">North Region</td>
+<td style="text-align: left;">Yishun</td>
+<td style="text-align: left;">2023-1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">NORTH GAIA</td>
+<td style="text-align: right;">1258112</td>
+<td style="text-align: right;">1033.34</td>
+<td style="text-align: right;">1218</td>
+<td style="text-align: left;">02 Jan 2023</td>
+<td style="text-align: left;">45 YISHUN CLOSE #07-42</td>
+<td style="text-align: left;">New Sale</td>
+<td style="text-align: left;">Strata</td>
+<td style="text-align: right;">96.0</td>
+<td style="text-align: right;">13105</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Executive Condominium</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">99 yrs from 15/02/2021</td>
+<td style="text-align: left;">Uncompleted</td>
+<td style="text-align: left;">HDB</td>
+<td style="text-align: left;">269294</td>
+<td style="text-align: left;">27</td>
+<td style="text-align: left;">26</td>
+<td style="text-align: left;">North Region</td>
+<td style="text-align: left;">Yishun</td>
+<td style="text-align: left;">2023-1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">PARC BOTANNIA</td>
+<td style="text-align: right;">1280000</td>
+<td style="text-align: right;">871.88</td>
+<td style="text-align: right;">1468</td>
+<td style="text-align: left;">03 Jan 2023</td>
+<td style="text-align: left;">12 FERNVALE STREET #06-16</td>
+<td style="text-align: left;">Resale</td>
+<td style="text-align: left;">Strata</td>
+<td style="text-align: right;">81.0</td>
+<td style="text-align: right;">15802</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Condominium</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">99 yrs from 28/12/2016</td>
+<td style="text-align: left;">2022</td>
+<td style="text-align: left;">HDB</td>
+<td style="text-align: left;">797391</td>
+<td style="text-align: left;">28</td>
+<td style="text-align: left;">79</td>
+<td style="text-align: left;">North East Region</td>
+<td style="text-align: left;">Sengkang</td>
+<td style="text-align: left;">2023-1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">NANYANG PARK</td>
+<td style="text-align: right;">5870000</td>
+<td style="text-align: right;">3322.85</td>
+<td style="text-align: right;">1767</td>
+<td style="text-align: left;">03 Jan 2023</td>
+<td style="text-align: left;">72 JALAN LIMBOK</td>
+<td style="text-align: left;">Resale</td>
+<td style="text-align: left;">Land</td>
+<td style="text-align: right;">308.7</td>
+<td style="text-align: right;">19015</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Terrace House</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">999 yrs from 14/02/1881</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Private</td>
+<td style="text-align: left;">548742</td>
+<td style="text-align: left;">19</td>
+<td style="text-align: left;">54</td>
+<td style="text-align: left;">North East Region</td>
+<td style="text-align: left;">Hougang</td>
+<td style="text-align: left;">2023-1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">PALMS @ SIXTH AVENUE</td>
+<td style="text-align: right;">4950000</td>
+<td style="text-align: right;">4520.88</td>
+<td style="text-align: right;">1095</td>
+<td style="text-align: left;">03 Jan 2023</td>
+<td style="text-align: left;">231 SIXTH AVENUE</td>
+<td style="text-align: left;">Resale</td>
+<td style="text-align: left;">Strata</td>
+<td style="text-align: right;">420.0</td>
+<td style="text-align: right;">11786</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Semi-Detached House</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">Freehold</td>
+<td style="text-align: left;">2015</td>
+<td style="text-align: left;">Private</td>
+<td style="text-align: left;">275780</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: left;">27</td>
+<td style="text-align: left;">Central Region</td>
+<td style="text-align: left;">Bukit Timah</td>
+<td style="text-align: left;">2023-1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">N.A.</td>
+<td style="text-align: right;">3260000</td>
+<td style="text-align: right;">1555.40</td>
+<td style="text-align: right;">2096</td>
+<td style="text-align: left;">03 Jan 2023</td>
+<td style="text-align: left;">19 TENG TONG ROAD</td>
+<td style="text-align: left;">Resale</td>
+<td style="text-align: left;">Land</td>
+<td style="text-align: right;">144.5</td>
+<td style="text-align: right;">22561</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Terrace House</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">Freehold</td>
+<td style="text-align: left;">1941</td>
+<td style="text-align: left;">Private</td>
+<td style="text-align: left;">423510</td>
+<td style="text-align: left;">15</td>
+<td style="text-align: left;">42</td>
+<td style="text-align: left;">Central Region</td>
+<td style="text-align: left;">Marine Parade</td>
+<td style="text-align: left;">2023-1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">WHISTLER GRAND</td>
+<td style="text-align: right;">850000</td>
+<td style="text-align: right;">441.32</td>
+<td style="text-align: right;">1926</td>
+<td style="text-align: left;">03 Jan 2023</td>
+<td style="text-align: left;">107 WEST COAST VALE #30-04</td>
+<td style="text-align: left;">Sub Sale</td>
+<td style="text-align: left;">Strata</td>
+<td style="text-align: right;">41.0</td>
+<td style="text-align: right;">20732</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Apartment</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">99 yrs from 07/05/2018</td>
+<td style="text-align: left;">2022</td>
+<td style="text-align: left;">HDB</td>
+<td style="text-align: left;">126751</td>
+<td style="text-align: left;">05</td>
+<td style="text-align: left;">12</td>
+<td style="text-align: left;">West Region</td>
+<td style="text-align: left;">Clementi</td>
+<td style="text-align: left;">2023-1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">NORTHOAKS</td>
+<td style="text-align: right;">1268000</td>
+<td style="text-align: right;">1603.84</td>
+<td style="text-align: right;">791</td>
+<td style="text-align: left;">03 Jan 2023</td>
+<td style="text-align: left;">30 WOODLANDS CRESCENT #01-11</td>
+<td style="text-align: left;">Resale</td>
+<td style="text-align: left;">Strata</td>
+<td style="text-align: right;">149.0</td>
+<td style="text-align: right;">8510</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Executive Condominium</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">99 yrs from 16/12/1997</td>
+<td style="text-align: left;">2000</td>
+<td style="text-align: left;">HDB</td>
+<td style="text-align: left;">738086</td>
+<td style="text-align: left;">25</td>
+<td style="text-align: left;">73</td>
+<td style="text-align: left;">North Region</td>
+<td style="text-align: left;">Woodlands</td>
+<td style="text-align: left;">2023-1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">AMBER PARK</td>
+<td style="text-align: right;">1888000</td>
+<td style="text-align: right;">678.13</td>
+<td style="text-align: right;">2784</td>
+<td style="text-align: left;">03 Jan 2023</td>
+<td style="text-align: left;">16 AMBER GARDENS #04-08</td>
+<td style="text-align: left;">New Sale</td>
+<td style="text-align: left;">Strata</td>
+<td style="text-align: right;">63.0</td>
+<td style="text-align: right;">29968</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Condominium</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">Freehold</td>
+<td style="text-align: left;">Uncompleted</td>
+<td style="text-align: left;">HDB</td>
+<td style="text-align: left;">439961</td>
+<td style="text-align: left;">15</td>
+<td style="text-align: left;">43</td>
+<td style="text-align: left;">Central Region</td>
+<td style="text-align: left;">Marine Parade</td>
+<td style="text-align: left;">2023-1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">THE GAZANIA</td>
+<td style="text-align: right;">1477000</td>
+<td style="text-align: right;">635.08</td>
+<td style="text-align: right;">2326</td>
+<td style="text-align: left;">03 Jan 2023</td>
+<td style="text-align: left;">5 HOW SUN DRIVE #04-08</td>
+<td style="text-align: left;">New Sale</td>
+<td style="text-align: left;">Strata</td>
+<td style="text-align: right;">59.0</td>
+<td style="text-align: right;">25034</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Condominium</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">Freehold</td>
+<td style="text-align: left;">2022</td>
+<td style="text-align: left;">Private</td>
+<td style="text-align: left;">538527</td>
+<td style="text-align: left;">19</td>
+<td style="text-align: left;">53</td>
+<td style="text-align: left;">North East Region</td>
+<td style="text-align: left;">Serangoon</td>
+<td style="text-align: left;">2023-1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">WILSHIRE RESIDENCES</td>
+<td style="text-align: right;">1990000</td>
+<td style="text-align: right;">753.48</td>
+<td style="text-align: right;">2641</td>
+<td style="text-align: left;">03 Jan 2023</td>
+<td style="text-align: left;">30 FARRER ROAD #05-03</td>
+<td style="text-align: left;">New Sale</td>
+<td style="text-align: left;">Strata</td>
+<td style="text-align: right;">70.0</td>
+<td style="text-align: right;">28429</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Apartment</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">Freehold</td>
+<td style="text-align: left;">Uncompleted</td>
+<td style="text-align: left;">Private</td>
+<td style="text-align: left;">268832</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: left;">26</td>
+<td style="text-align: left;">Central Region</td>
+<td style="text-align: left;">Tanglin</td>
+<td style="text-align: left;">2023-1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">WILSHIRE RESIDENCES</td>
+<td style="text-align: right;">1975000</td>
+<td style="text-align: right;">742.72</td>
+<td style="text-align: right;">2659</td>
+<td style="text-align: left;">03 Jan 2023</td>
+<td style="text-align: left;">30 FARRER ROAD #06-05</td>
+<td style="text-align: left;">New Sale</td>
+<td style="text-align: left;">Strata</td>
+<td style="text-align: right;">69.0</td>
+<td style="text-align: right;">28623</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Apartment</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">Freehold</td>
+<td style="text-align: left;">Uncompleted</td>
+<td style="text-align: left;">HDB</td>
+<td style="text-align: left;">268832</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: left;">26</td>
+<td style="text-align: left;">Central Region</td>
+<td style="text-align: left;">Tanglin</td>
+<td style="text-align: left;">2023-1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">PARC CLEMATIS</td>
+<td style="text-align: right;">2735000</td>
+<td style="text-align: right;">1463.90</td>
+<td style="text-align: right;">1868</td>
+<td style="text-align: left;">03 Jan 2023</td>
+<td style="text-align: left;">6A JALAN LEMPENG #13-05</td>
+<td style="text-align: left;">New Sale</td>
+<td style="text-align: left;">Strata</td>
+<td style="text-align: right;">136.0</td>
+<td style="text-align: right;">20110</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Apartment</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">99 yrs from 08/08/2019</td>
+<td style="text-align: left;">Uncompleted</td>
+<td style="text-align: left;">N.A</td>
+<td style="text-align: left;">128822</td>
+<td style="text-align: left;">05</td>
+<td style="text-align: left;">12</td>
+<td style="text-align: left;">West Region</td>
+<td style="text-align: left;">Clementi</td>
+<td style="text-align: left;">2023-1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MOOI RESIDENCES</td>
+<td style="text-align: right;">3288888</td>
+<td style="text-align: right;">1280.92</td>
+<td style="text-align: right;">2568</td>
+<td style="text-align: left;">03 Jan 2023</td>
+<td style="text-align: left;">139 HOLLAND ROAD #05-01</td>
+<td style="text-align: left;">New Sale</td>
+<td style="text-align: left;">Strata</td>
+<td style="text-align: right;">119.0</td>
+<td style="text-align: right;">27638</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Apartment</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">Freehold</td>
+<td style="text-align: left;">Uncompleted</td>
+<td style="text-align: left;">N.A</td>
+<td style="text-align: left;">278573</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: left;">27</td>
+<td style="text-align: left;">Central Region</td>
+<td style="text-align: left;">Bukit Timah</td>
+<td style="text-align: left;">2023-1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">TENET</td>
+<td style="text-align: right;">1224000</td>
+<td style="text-align: right;">925.70</td>
+<td style="text-align: right;">1322</td>
+<td style="text-align: left;">03 Jan 2023</td>
+<td style="text-align: left;">73 TAMPINES STREET 62 #07-06</td>
+<td style="text-align: left;">New Sale</td>
+<td style="text-align: left;">Strata</td>
+<td style="text-align: right;">86.0</td>
+<td style="text-align: right;">14233</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Executive Condominium</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">99 yrs from 01/11/2021</td>
+<td style="text-align: left;">Uncompleted</td>
+<td style="text-align: left;">HDB</td>
+<td style="text-align: left;">529700</td>
+<td style="text-align: left;">18</td>
+<td style="text-align: left;">52</td>
+<td style="text-align: left;">East Region</td>
+<td style="text-align: left;">Tampines</td>
+<td style="text-align: left;">2023-1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">TENET</td>
+<td style="text-align: right;">1534000</td>
+<td style="text-align: right;">1108.69</td>
+<td style="text-align: right;">1384</td>
+<td style="text-align: left;">03 Jan 2023</td>
+<td style="text-align: left;">73 TAMPINES STREET 62 #02-08</td>
+<td style="text-align: left;">New Sale</td>
+<td style="text-align: left;">Strata</td>
+<td style="text-align: right;">103.0</td>
+<td style="text-align: right;">14893</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Executive Condominium</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">99 yrs from 01/11/2021</td>
+<td style="text-align: left;">Uncompleted</td>
+<td style="text-align: left;">Private</td>
+<td style="text-align: left;">529700</td>
+<td style="text-align: left;">18</td>
+<td style="text-align: left;">52</td>
+<td style="text-align: left;">East Region</td>
+<td style="text-align: left;">Tampines</td>
+<td style="text-align: left;">2023-1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">FRANKEL ESTATE</td>
+<td style="text-align: right;">6765000</td>
+<td style="text-align: right;">3962.23</td>
+<td style="text-align: right;">1707</td>
+<td style="text-align: left;">03 Jan 2023</td>
+<td style="text-align: left;">72A FRANKEL AVENUE</td>
+<td style="text-align: left;">Resale</td>
+<td style="text-align: left;">Land</td>
+<td style="text-align: right;">368.1</td>
+<td style="text-align: right;">18378</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Semi-Detached House</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">Freehold</td>
+<td style="text-align: left;">1958</td>
+<td style="text-align: left;">Private</td>
+<td style="text-align: left;">458202</td>
+<td style="text-align: left;">15</td>
+<td style="text-align: left;">45</td>
+<td style="text-align: left;">East Region</td>
+<td style="text-align: left;">Bedok</td>
+<td style="text-align: left;">2023-1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">THE URBANITE</td>
+<td style="text-align: right;">1470000</td>
+<td style="text-align: right;">1173.28</td>
+<td style="text-align: right;">1253</td>
+<td style="text-align: left;">03 Jan 2023</td>
+<td style="text-align: left;">29 HERTFORD ROAD #05-02</td>
+<td style="text-align: left;">Resale</td>
+<td style="text-align: left;">Strata</td>
+<td style="text-align: right;">109.0</td>
+<td style="text-align: right;">13486</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">Apartment</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">Freehold</td>
+<td style="text-align: left;">2014</td>
+<td style="text-align: left;">HDB</td>
+<td style="text-align: left;">219384</td>
+<td style="text-align: left;">08</td>
+<td style="text-align: left;">21</td>
+<td style="text-align: left;">Central Region</td>
+<td style="text-align: left;">Kallang</td>
+<td style="text-align: left;">2023-1</td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -1709,16 +2433,264 @@ Issues with column names
 </div>
 </div>
 </div>
+<p>Let us check if all rows are accounted for by checking if the number of rows in <code>realis</code> is the total number of rows from all dataframes.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(realis) <span class="sc">==</span> <span class="fu">nrow</span>(realis_2023q1) <span class="sc">+</span> <span class="fu">nrow</span>(realis_2023q2) <span class="sc">+</span> <span class="fu">nrow</span>(realis_2023q3) <span class="sc">+</span> <span class="fu">nrow</span>(realis_2023q4) <span class="sc">+</span> <span class="fu">nrow</span>(realis_2024q1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+</section>
+<section id="filtering-relevant-columns" class="level2">
+<h2 class="anchored" data-anchor-id="filtering-relevant-columns">3.3 Filtering relevant columns</h2>
+<p>After adding the <code>QUARTER</code> column, there are now 22 variables in the dataset. However, not all of them are relevant to answer the questions we are asking. The table below summarizes the columns and whether we will keep them or not.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">Column Details</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">Filter code</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
+<table class="table">
+<thead>
+<tr class="header">
+<th>Column Name</th>
+<th>Description</th>
+<th>Action</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>PROJECT_NAME</td>
+<td>Name of the project</td>
+<td><span style="color:red">DROP</span></td>
+<td>Too specific for aggregation</td>
+</tr>
+<tr class="even">
+<td>TRANSACTED_PRICE</td>
+<td>Transaction price (SGD)</td>
+<td><span style="color:green">KEEP</span></td>
+<td>Core data for analysis</td>
+</tr>
+<tr class="odd">
+<td>AREA_SQFT</td>
+<td>Area of the property in sqft</td>
+<td><span style="color:green">KEEP</span></td>
+<td>Can be useful partitioning data</td>
+</tr>
+<tr class="even">
+<td>UNIT_PRICE_PSF</td>
+<td>Price per sqft</td>
+<td><span style="color:green">KEEP</span></td>
+<td>Can be useful for price analysis</td>
+</tr>
+<tr class="odd">
+<td>SALE_DATE</td>
+<td>Date when the sale was made</td>
+<td><span style="color:red">DROP</span></td>
+<td>We will aggregate by quarter, no need to know the specific dates.</td>
+</tr>
+<tr class="even">
+<td>ADDRESS</td>
+<td>Property Address</td>
+<td><span style="color:red">DROP</span></td>
+<td>Too specific for aggregation</td>
+</tr>
+<tr class="odd">
+<td>TYPE_OF_SALE</td>
+<td>One of <em>New Sale</em>, <em>Resale</em>, <em>Subsale</em></td>
+<td><span style="color:green">KEEP</span></td>
+<td>Important submarket information</td>
+</tr>
+<tr class="even">
+<td>TYPE_OF_AREA</td>
+<td>One of <em>Landed</em>, <em>Strata</em></td>
+<td><span style="color:green">KEEP</span></td>
+<td>Can be used to partition data</td>
+</tr>
+<tr class="odd">
+<td>AREA_SQM</td>
+<td>Price per sqm</td>
+<td><span style="color:red">DROP</span></td>
+<td>AREA_SFT is adequate</td>
+</tr>
+<tr class="even">
+<td>UNIT_PRICE_PSM</td>
+<td>Price per sqm</td>
+<td><span style="color:red">DROP</span></td>
+<td>UNIT_PRICE_PSF is adequate</td>
+</tr>
+<tr class="odd">
+<td>NETT_PRICE</td>
+<td></td>
+<td><span style="color:red">DROP</span></td>
+<td>Column is blank</td>
+</tr>
+<tr class="even">
+<td>PROPERTY_TYPE</td>
+<td>Type of Property, e.g.&nbsp;<em>Apartment, Condominium, Executive Condominium, Terrace House, Semi-Detached House, Detached House</em></td>
+<td><span style="color:green">KEEP</span></td>
+<td>Can be used to partition data</td>
+</tr>
+<tr class="odd">
+<td>NUMBER_OF_UNITS</td>
+<td>Number of units involved in the transaction</td>
+<td><span style="color:green">KEEP</span></td>
+<td>Core data for analysis</td>
+</tr>
+<tr class="even">
+<td>TENURE</td>
+<td>Can be Freehold or Leasehold</td>
+<td><span style="color:green">KEEP</span></td>
+<td>Can be used to partition data</td>
+</tr>
+<tr class="odd">
+<td>COMPLETION_DATE</td>
+<td>When the property was completed. Some properties are Uncompleted as they will be turned over for the future</td>
+<td><span style="color:green">KEEP</span></td>
+<td>Can be used to partition data</td>
+</tr>
+<tr class="even">
+<td>PURCHASER_ADDRESS_INDICATOR</td>
+<td><a href="https://www.ura.gov.sg/reis/dataDictionary#:~:text=Purchaser%20Address%20Indicator%3A%20It%20refers,is%20owned%20by%20the%20purchaser.">Type of residence of the purchaser</a></td>
+<td><span style="color:green">KEEP</span></td>
+<td>Can be used to partition data</td>
+</tr>
+<tr class="odd">
+<td>POSTAL_CODE</td>
+<td>Postal code of the property</td>
+<td><span style="color:red">DROP</span></td>
+<td>Too specific for aggregation</td>
+</tr>
+<tr class="even">
+<td>POSTAL_DISTRICT</td>
+<td>District where the property is located</td>
+<td><span style="color:green">KEEP</span></td>
+<td>Can be used to partition data</td>
+</tr>
+<tr class="odd">
+<td>POSTAL_SECTOR</td>
+<td>Sector where the property is located</td>
+<td><span style="color:red">DROP</span></td>
+<td>Irrelevant</td>
+</tr>
+<tr class="even">
+<td>PLANNING_REGION</td>
+<td>Region where the property is located</td>
+<td><span style="color:green">KEEP</span></td>
+<td>Can be used to partition data</td>
+</tr>
+<tr class="odd">
+<td>PLANNING_AREA</td>
+<td>Area where the property is located</td>
+<td><span style="color:green">KEEP</span></td>
+<td>Can be used to partition data</td>
+</tr>
+<tr class="even">
+<td>QUARTER</td>
+<td>Quarter where the property was sold</td>
+<td><span style="color:green">KEEP</span></td>
+<td>Core data for aggregation</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
+<p>We will now use <code>select()</code> to keep only the relevant columns. We will define the function below for filtering the relevant columns.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>realis <span class="ot">&lt;-</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  realis <span class="sc">%&gt;%</span> <span class="fu">select</span>(</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>(</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>      TRANSACTED_PRICE,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>      QUARTER,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>      AREA_SQFT,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>      UNIT_PRICE_PSF,</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>      TYPE_OF_SALE,</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>      TYPE_OF_AREA,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>      PROPERTY_TYPE,</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>      NUMBER_OF_UNITS,</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>      TENURE,</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>      COMPLETION_DATE,</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>      PURCHASER_ADDRESS_INDICATOR,</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>      POSTAL_DISTRICT,</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>      PLANNING_REGION,</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>      PLANNING_AREA</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+<p>After this initial cleanup, we are left with 14 variables relevant to our exploration.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Save point
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Let us save <code>realis</code> so we do not need to rerun the steps above.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(realis, <span class="st">"data/rds/realis_after_clean.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Data clear point
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>We do not need the <code>realis_202*q*</code> dataframes anymore so we can remove them from the RStudio environment.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(realis_2023q1)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(realis_2023q2)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(realis_2023q3)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(realis_2023q4)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(realis_2024q1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
 </section>
 </section>
-<section id="data-wrangling" class="level1">
-<h1>3 Data Wrangling</h1>
+<section id="data-exploration" class="level1">
+<h1>4 Data Exploration</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>hdb_res_txn2024_q1, </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">y =</span> TRANSACTED_PRICE<span class="sc">/</span><span class="dv">1000</span>,       </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">x=</span> SALE_TYPE)) <span class="sc">+</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Type of Sale"</span>, <span class="at">y=</span><span class="st">"Transacted Price ($1000)"</span>) <span class="sc">+</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_violin</span>() <span class="sc">+</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">stat=</span><span class="st">"summary"</span>,        </span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>             <span class="at">fun=</span><span class="st">"mean"</span>,           </span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>             <span class="at">colour =</span><span class="st">"red"</span>,          </span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">size=</span><span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label</span>(<span class="fu">aes</span>(<span class="at">label=</span><span class="fu">after_stat</span>(<span class="fu">round</span>(y, <span class="dv">0</span>))), <span class="at">stat=</span><span class="st">"summary"</span>, <span class="at">fun=</span><span class="st">"mean"</span>, <span class="at">colour=</span><span class="st">"green"</span>) <span class="sc">+</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label</span>(<span class="fu">aes</span>(<span class="at">label=</span><span class="fu">after_stat</span>(y)), <span class="at">stat=</span><span class="st">"summary"</span>, <span class="at">fun=</span><span class="st">"max"</span>, <span class="at">colour=</span><span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label</span>(<span class="fu">aes</span>(<span class="at">label=</span><span class="fu">after_stat</span>(y)), <span class="at">stat=</span><span class="st">"summary"</span>, <span class="at">fun=</span><span class="st">"min"</span>, <span class="at">colour=</span><span class="st">"orange"</span>) <span class="sc">+</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>() <span class="sc">+</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="co">#coord_cartesian(ylim = c(0,5000)) +</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  <span class="co">#theme_economist()</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_ipsum_es</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 <section id="summary" class="level1">
-<h1>4 Summary</h1>
+<h1>5 Summary</h1>
 </section>
 <section id="references" class="level1">
-<h1>5 References</h1>
+<h1>6 References</h1>
+<p>Lim, Abram. (2024). 13+ Housing &amp; Household Statistics in Singapore (2024).<em>SmartWealth Singapore</em>. <a href="https://smartwealth.sg/housing-household-statistics-singapore/" class="uri">https://smartwealth.sg/housing-household-statistics-singapore/</a></p>
+<p>Trading Economics. (2024). <em>Home Ownership Rate | G20</em>. <a href="https://tradingeconomics.com/country-list/home-ownership-rate?continent=g20" class="uri">https://tradingeconomics.com/country-list/home-ownership-rate?continent=g20</a></p>
+<p><a href="https://www.dbs.com.sg/personal/articles/nav/my-home/cooling-measures-in-singapore" class="uri">https://www.dbs.com.sg/personal/articles/nav/my-home/cooling-measures-in-singapore</a></p>
+<p><a href="https://www.cedricscherer.com/2019/08/05/a-ggplot2-tutorial-for-beautiful-plotting-in-r/https://www.cedricscherer.com/2019/08/05/a-ggplot2-tutorial-for-beautiful-plotting-in-r/" class="uri">https://www.cedricscherer.com/2019/08/05/a-ggplot2-tutorial-for-beautiful-plotting-in-r/https://www.cedricscherer.com/2019/08/05/a-ggplot2-tutorial-for-beautiful-plotting-in-r/</a></p>
 
 
 </section>
