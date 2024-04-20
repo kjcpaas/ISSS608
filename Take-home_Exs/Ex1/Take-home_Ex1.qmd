@@ -479,111 +479,99 @@ Credit to [https://akalestale.netlify.app/take-home_ex/take-home_ex01/take-home_
 This section uses ChatGPT to revise the plot headlines and captions.
 :::
 
+### 4.1.2 Creating the base Visualization
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show ggplot2 code"
-q1 <- realis_per_unit %>% filter(QUARTER %in% c("2023Q1", "2024Q1"))
-
-get_sale_subset <- function(type) {
-  if (type == "All Sales") {
-    return(q1)
-  }
-  q1 %>% filter(TYPE_OF_SALE == type)
+plot_q1_yoy_psf_price <- function() {
+  ggplot(
+    realis_per_unit %>% filter(QUARTER %in% c("2023Q1", "2024Q1")),
+    aes(
+      x = QUARTER,
+      y = UNIT_PRICE_PSF,
+      fill = QUARTER,
+      color = QUARTER
+    )
+  ) +
+    stat_halfeye(
+      aes(
+        fill = QUARTER,
+        justification = ifelse(QUARTER == "2023Q1", 1.22, 0),
+        side = ifelse(QUARTER == "2023Q1", "left", "right")
+      ),
+      position = position_nudge(x = 0.1, y = 0),
+      .width = 0,
+      alpha = .8,
+      point_color = NA,
+      show.legend = FALSE
+    ) +
+    geom_jitter(
+      width = 0.08,
+      size = 0.01,
+      alpha = 0.2,
+      show.legend = FALSE
+    ) +
+    geom_boxplot(
+      outlier.shape = NA,
+      alpha = 0,
+      width = .1,
+      color = "black",
+      show.legend = FALSE
+    ) +
+    stat_summary(
+      aes(label = paste0("$", after_stat(y))),
+      geom = "text",
+      fun = "median",
+      position = position_nudge(y = 2500),
+      family = "Roboto Condensed",
+      show.legend = FALSE
+    )+
+    scale_fill_manual(values = c("grey50", "blue")) +
+    scale_color_manual(values = c("grey50", "blue")) +
+    labs(y = "Unit Price Per Sqft ($)") +
+    theme_minimal()
 }
 
-calc_median_diff <- function(data) {
-  median2023 = (data %>% filter(QUARTER == "2023Q1"))$TRANSACTED_PRICE %>% median()
-  median2024 = (data %>% filter(QUARTER == "2024Q1"))$TRANSACTED_PRICE %>% median()
-  (100 * (median2024 - median2023) / median2023) %>% round(1)
-}
+plot_q1_yoy_psf_price()
+```
 
-plot_price_by_sale_type <-
-  function(type,
-           bg = element_blank(),
-           ylabel = NULL,
-           yaxis_text = element_blank()) {
-    subset = get_sale_subset(type)
-    percent_diff = calc_median_diff(subset)
-    diff_color = ifelse(percent_diff < 0, "brown","darkgreen")
-    
-    ggplot(subset, aes(x = QUARTER, y = TRANSACTED_PRICE / 1000, fill = QUARTER)) +
-      # Generate half violin + boxplot
-      stat_halfeye(
-        aes(
-          fill = QUARTER,
-          justification = ifelse(QUARTER == "2023Q1", 1.25, 0),
-          side = ifelse(QUARTER == "2023Q1", "left", "right")
-        ),
-        position = position_nudge(x = 0.1, y = 0),
-        .width = 0,
-        alpha = .8,
-        point_colour = NA
-      ) +
-      scale_fill_manual(values=c("darkgrey", "blue"))+
-      
-      # Visualize diff
-      stat_summary(
-        fun = median,
-        geom = "line",
-        aes(group = 1),
-        colour = diff_color,
-        linetype = "dotted",
-        show.legend = FALSE
-      ) +
-      annotate(
-        "text",
-        x = 1.5,
-        y = 11000,
-        label = paste0(abs(percent_diff), "%"),
-        color = diff_color,
-        size = 4,
-        fontface = "bold",
-        family = "Roboto Condensed"
-      ) +
-      annotate(
-        "text",
-        x = 1.5,
-        y = ifelse(percent_diff < 0, 8000, 17000),
-        label = ifelse(percent_diff < 0, "↓", "↑"),
-        color = diff_color,
-        size = 7,
-        fontface = "bold"
-      ) +
-      
-      geom_boxplot(
-        aes(x = QUARTER, y = TRANSACTED_PRICE / 1000, fill = QUARTER),
-        outlier.shape = NA,
-        alpha = .5,
-        width = .1,
-        colour = "black"
-      ) +
-      guides(fill = FALSE) +
-      scale_y_log10(limits = c(500, 60000)) +
-      labs(x = type, y = ylabel) +
-      theme_minimal() +
-      theme(
-        axis.text.y = yaxis_text,
-        panel.background = bg
-      )
-  }
+### 4.2.2 Generating the visualization
 
-# Compose the visual using patchwork
-q1_all_sales <- plot_price_by_sale_type("All Sales", ylabel = "Transaction Price (,000 SGD)",
-    yaxis_text = element_text(), bg = element_rect(fill = "aliceblue", linewidth=0))
-q1_new_sale <- plot_price_by_sale_type("New Sale")
-q1_resale <- plot_price_by_sale_type("Resale")
-q1_sub_sale <- plot_price_by_sale_type("Sub Sale")
+```{r}
+#| code-fold: true
+#| code-summary: "Show ggplot2 code"
 
-(q1_all_sales | q1_new_sale | q1_resale | q1_sub_sale ) +
-  # Add headline and subtitle
+q1_yoy_psf_price_submarkets_graph <- plot_q1_yoy_psf_price() +
+  facet_wrap(~ TYPE_OF_SALE, strip.position = "bottom") +
+  theme_minimal() +
+  theme(
+        axis.title.y = element_blank(),
+    axis.text.y = element_blank())
+
+q1_yoy_psf_price_all_markets_graph <- plot_q1_yoy_psf_price() +
+  facet_wrap(~ NUMBER_OF_UNITS, strip.position = "bottom", labeller = as_labeller(function(l) {"All Sales"})) +
+  labs(x = "Transaction Price (,000 SGD)") +
+  theme(
+    panel.background = element_rect(fill = "aliceblue", linewidth=0)
+  )
+
+(q1_yoy_psf_price_all_markets_graph | q1_yoy_psf_price_submarkets_graph ) +
+  plot_layout(widths=c(1, 3)) +
   plot_annotation(
     title="Singapore Median Private Property Prices Up 2% from Q1 2023 to Q1 2024.",
     subtitle="In the **New Sales** market, prices decrease by <span style='color:brown;'>**7.1%**</span>, while **Resale** and **Sub Sale** markets see increases of <span style='color:darkgreen;'>**4.5%**</span> and <span style='color:darkgreen;'>**8.5%**</span>, respectively."
   ) &
-  theme(text = element_text(family = "Roboto Condensed"),
-        plot.title = element_text(face="bold", color="blue"),
-        plot.subtitle = element_markdown(color="#464646", size=rel(0.9)),
-                axis.ticks.y = element_blank(),axis.line.x = element_line()) 
+  theme(
+    text = element_text(family = "Roboto Condensed"),
+    axis.line.x = element_line(),
+    axis.title.x = element_blank(),
+    axis.ticks.y = element_blank(),
+    plot.title = element_text(face="bold", color="blue"),
+    plot.subtitle = element_markdown(color="grey50", size=rel(0.9)),
+    strip.placement = "outside",
+    strip.text = element_text(size = rel(1))
+  )
 ```
 
 ::: callout-tip
@@ -597,6 +585,14 @@ Although there is an overall increase in market prices, the New Sale market expe
 ```{r}
 #| code-fold: true
 #| code-summary: "Show ggplot2 code"
+
+q1 <- realis_per_unit %>% filter(QUARTER %in% c("2023Q1", "2024Q1"))
+get_sale_subset <- function(type) {
+  if (type == "All Sales") {
+    return(q1)
+  }
+  q1 %>% filter(TYPE_OF_SALE == type)
+}
 plot_volume_by_sale_type <- function(type,
                                      bg = element_blank(),
                                      ylabel = NULL,
@@ -711,3 +707,5 @@ Trading Economics. (2024). *Home Ownership Rate \| G20*. <https://tradingeconomi
 <https://www.propertyguru.com.sg/property-guides/singapore-property-market-outlook-2024-90041#1>
 
 <https://akalestale.netlify.app/take-home_ex/take-home_ex01/take-home_ex01> (stat_halfeye usage)
+
+<https://sape.inf.usi.ch/quick-reference/ggplot2/colour>

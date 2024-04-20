@@ -143,6 +143,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../../In-class_Exs/Ex1/In-class_Ex1.html" rel="" target="">
  <span class="dropdown-text">1: Introduction to Visual Analytics</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Exs/Ex2/In-class_Ex2.html" rel="" target="">
+ <span class="dropdown-text">2: ggplot</span></a>
+  </li>  
     </ul>
   </li>
   <li class="nav-item dropdown ">
@@ -203,9 +207,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#data-exploration" id="toc-data-exploration" class="nav-link" data-scroll-target="#data-exploration">4 Data Exploration</a>
   <ul class="collapse">
-  <li><a href="#comparing-2023q1-and-2024q1-prices" id="toc-comparing-2023q1-and-2024q1-prices" class="nav-link" data-scroll-target="#comparing-2023q1-and-2024q1-prices">4.1 Comparing 2023Q1 and 2024Q1 prices</a></li>
+  <li><a href="#comparing-2023q1-and-2024q1-prices" id="toc-comparing-2023q1-and-2024q1-prices" class="nav-link" data-scroll-target="#comparing-2023q1-and-2024q1-prices">4.1 Comparing 2023Q1 and 2024Q1 prices</a>
+  <ul class="collapse">
+  <li><a href="#creating-the-base-visualization" id="toc-creating-the-base-visualization" class="nav-link" data-scroll-target="#creating-the-base-visualization">4.1.2 Creating the base Visualization</a></li>
+  <li><a href="#generating-the-visualization" id="toc-generating-the-visualization" class="nav-link" data-scroll-target="#generating-the-visualization">4.2.2 Generating the visualization</a></li>
+  </ul></li>
   <li><a href="#sales-volume" id="toc-sales-volume" class="nav-link" data-scroll-target="#sales-volume">4.2 Sales Volume</a></li>
-  <li><a href="#q1-insights" id="toc-q1-insights" class="nav-link" data-scroll-target="#q1-insights">2024 Q1 Insights</a></li>
+  <li><a href="#diving-deep-into-the-2024-q1-market" id="toc-diving-deep-into-the-2024-q1-market" class="nav-link" data-scroll-target="#diving-deep-into-the-2024-q1-market">4.3 Diving deep into the 2024 Q1 Market</a></li>
   </ul></li>
   <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">5 Summary</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">6 References</a></li>
@@ -241,7 +249,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">April 20, 2024</p>
+      <p class="date-modified">April 21, 2024</p>
     </div>
   </div>
     
@@ -320,7 +328,7 @@ File Structure
 <li><a href="https://www.rdocumentation.org/packages/knitr/versions/1.45">knitr</a>: used for dynamic report generation in R. For this exercise, we will use this package to render our tables better.</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(knitr, tidyverse, patchwork, ggdist, ggtext, ggpubr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(knitr, tidyverse, patchwork, ggdist, ggtext, ggpubr, treemapify)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="data-checkpoints" class="level2">
@@ -2825,114 +2833,105 @@ Save point
 </div>
 </div>
 </div>
+<section id="creating-the-base-visualization" class="level3">
+<h3 class="anchored" data-anchor-id="creating-the-base-visualization">4.1.2 Creating the base Visualization</h3>
 <div class="cell">
 <details>
 <summary>Show ggplot2 code</summary>
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>q1 <span class="ot">&lt;-</span> realis_per_unit <span class="sc">%&gt;%</span> <span class="fu">filter</span>(QUARTER <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"2023Q1"</span>, <span class="st">"2024Q1"</span>))</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>get_sale_subset <span class="ot">&lt;-</span> <span class="cf">function</span>(type) {</span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (type <span class="sc">==</span> <span class="st">"All Sales"</span>) {</span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(q1)</span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  q1 <span class="sc">%&gt;%</span> <span class="fu">filter</span>(TYPE_OF_SALE <span class="sc">==</span> type)</span>
-<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>calc_median_diff <span class="ot">&lt;-</span> <span class="cf">function</span>(data) {</span>
-<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>  median2023 <span class="ot">=</span> (data <span class="sc">%&gt;%</span> <span class="fu">filter</span>(QUARTER <span class="sc">==</span> <span class="st">"2023Q1"</span>))<span class="sc">$</span>TRANSACTED_PRICE <span class="sc">%&gt;%</span> <span class="fu">median</span>()</span>
-<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>  median2024 <span class="ot">=</span> (data <span class="sc">%&gt;%</span> <span class="fu">filter</span>(QUARTER <span class="sc">==</span> <span class="st">"2024Q1"</span>))<span class="sc">$</span>TRANSACTED_PRICE <span class="sc">%&gt;%</span> <span class="fu">median</span>()</span>
-<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>  (<span class="dv">100</span> <span class="sc">*</span> (median2024 <span class="sc">-</span> median2023) <span class="sc">/</span> median2023) <span class="sc">%&gt;%</span> <span class="fu">round</span>(<span class="dv">1</span>)</span>
-<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>plot_price_by_sale_type <span class="ot">&lt;-</span></span>
-<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">function</span>(type,</span>
-<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>           <span class="at">bg =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>           <span class="at">ylabel =</span> <span class="cn">NULL</span>,</span>
-<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>           <span class="at">yaxis_text =</span> <span class="fu">element_blank</span>()) {</span>
-<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>    subset <span class="ot">=</span> <span class="fu">get_sale_subset</span>(type)</span>
-<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>    percent_diff <span class="ot">=</span> <span class="fu">calc_median_diff</span>(subset)</span>
-<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>    diff_color <span class="ot">=</span> <span class="fu">ifelse</span>(percent_diff <span class="sc">&lt;</span> <span class="dv">0</span>, <span class="st">"brown"</span>,<span class="st">"darkgreen"</span>)</span>
-<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(subset, <span class="fu">aes</span>(<span class="at">x =</span> QUARTER, <span class="at">y =</span> TRANSACTED_PRICE <span class="sc">/</span> <span class="dv">1000</span>, <span class="at">fill =</span> QUARTER)) <span class="sc">+</span></span>
-<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Generate half violin + boxplot</span></span>
-<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a>      <span class="fu">stat_halfeye</span>(</span>
-<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>        <span class="fu">aes</span>(</span>
-<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a>          <span class="at">fill =</span> QUARTER,</span>
-<span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a>          <span class="at">justification =</span> <span class="fu">ifelse</span>(QUARTER <span class="sc">==</span> <span class="st">"2023Q1"</span>, <span class="fl">1.25</span>, <span class="dv">0</span>),</span>
-<span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a>          <span class="at">side =</span> <span class="fu">ifelse</span>(QUARTER <span class="sc">==</span> <span class="st">"2023Q1"</span>, <span class="st">"left"</span>, <span class="st">"right"</span>)</span>
-<span id="cb29-32"><a href="#cb29-32" aria-hidden="true" tabindex="-1"></a>        ),</span>
-<span id="cb29-33"><a href="#cb29-33" aria-hidden="true" tabindex="-1"></a>        <span class="at">position =</span> <span class="fu">position_nudge</span>(<span class="at">x =</span> <span class="fl">0.1</span>, <span class="at">y =</span> <span class="dv">0</span>),</span>
-<span id="cb29-34"><a href="#cb29-34" aria-hidden="true" tabindex="-1"></a>        <span class="at">.width =</span> <span class="dv">0</span>,</span>
-<span id="cb29-35"><a href="#cb29-35" aria-hidden="true" tabindex="-1"></a>        <span class="at">alpha =</span> .<span class="dv">8</span>,</span>
-<span id="cb29-36"><a href="#cb29-36" aria-hidden="true" tabindex="-1"></a>        <span class="at">point_colour =</span> <span class="cn">NA</span></span>
-<span id="cb29-37"><a href="#cb29-37" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">+</span></span>
-<span id="cb29-38"><a href="#cb29-38" aria-hidden="true" tabindex="-1"></a>      <span class="fu">scale_fill_manual</span>(<span class="at">values=</span><span class="fu">c</span>(<span class="st">"darkgrey"</span>, <span class="st">"blue"</span>))<span class="sc">+</span></span>
-<span id="cb29-39"><a href="#cb29-39" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb29-40"><a href="#cb29-40" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Visualize diff</span></span>
-<span id="cb29-41"><a href="#cb29-41" aria-hidden="true" tabindex="-1"></a>      <span class="fu">stat_summary</span>(</span>
-<span id="cb29-42"><a href="#cb29-42" aria-hidden="true" tabindex="-1"></a>        <span class="at">fun =</span> median,</span>
-<span id="cb29-43"><a href="#cb29-43" aria-hidden="true" tabindex="-1"></a>        <span class="at">geom =</span> <span class="st">"line"</span>,</span>
-<span id="cb29-44"><a href="#cb29-44" aria-hidden="true" tabindex="-1"></a>        <span class="fu">aes</span>(<span class="at">group =</span> <span class="dv">1</span>),</span>
-<span id="cb29-45"><a href="#cb29-45" aria-hidden="true" tabindex="-1"></a>        <span class="at">colour =</span> diff_color,</span>
-<span id="cb29-46"><a href="#cb29-46" aria-hidden="true" tabindex="-1"></a>        <span class="at">linetype =</span> <span class="st">"dotted"</span>,</span>
-<span id="cb29-47"><a href="#cb29-47" aria-hidden="true" tabindex="-1"></a>        <span class="at">show.legend =</span> <span class="cn">FALSE</span></span>
-<span id="cb29-48"><a href="#cb29-48" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">+</span></span>
-<span id="cb29-49"><a href="#cb29-49" aria-hidden="true" tabindex="-1"></a>      <span class="fu">annotate</span>(</span>
-<span id="cb29-50"><a href="#cb29-50" aria-hidden="true" tabindex="-1"></a>        <span class="st">"text"</span>,</span>
-<span id="cb29-51"><a href="#cb29-51" aria-hidden="true" tabindex="-1"></a>        <span class="at">x =</span> <span class="fl">1.5</span>,</span>
-<span id="cb29-52"><a href="#cb29-52" aria-hidden="true" tabindex="-1"></a>        <span class="at">y =</span> <span class="dv">11000</span>,</span>
-<span id="cb29-53"><a href="#cb29-53" aria-hidden="true" tabindex="-1"></a>        <span class="at">label =</span> <span class="fu">paste0</span>(<span class="fu">abs</span>(percent_diff), <span class="st">"%"</span>),</span>
-<span id="cb29-54"><a href="#cb29-54" aria-hidden="true" tabindex="-1"></a>        <span class="at">color =</span> diff_color,</span>
-<span id="cb29-55"><a href="#cb29-55" aria-hidden="true" tabindex="-1"></a>        <span class="at">size =</span> <span class="dv">4</span>,</span>
-<span id="cb29-56"><a href="#cb29-56" aria-hidden="true" tabindex="-1"></a>        <span class="at">fontface =</span> <span class="st">"bold"</span>,</span>
-<span id="cb29-57"><a href="#cb29-57" aria-hidden="true" tabindex="-1"></a>        <span class="at">family =</span> <span class="st">"Roboto Condensed"</span></span>
-<span id="cb29-58"><a href="#cb29-58" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">+</span></span>
-<span id="cb29-59"><a href="#cb29-59" aria-hidden="true" tabindex="-1"></a>      <span class="fu">annotate</span>(</span>
-<span id="cb29-60"><a href="#cb29-60" aria-hidden="true" tabindex="-1"></a>        <span class="st">"text"</span>,</span>
-<span id="cb29-61"><a href="#cb29-61" aria-hidden="true" tabindex="-1"></a>        <span class="at">x =</span> <span class="fl">1.5</span>,</span>
-<span id="cb29-62"><a href="#cb29-62" aria-hidden="true" tabindex="-1"></a>        <span class="at">y =</span> <span class="fu">ifelse</span>(percent_diff <span class="sc">&lt;</span> <span class="dv">0</span>, <span class="dv">8000</span>, <span class="dv">17000</span>),</span>
-<span id="cb29-63"><a href="#cb29-63" aria-hidden="true" tabindex="-1"></a>        <span class="at">label =</span> <span class="fu">ifelse</span>(percent_diff <span class="sc">&lt;</span> <span class="dv">0</span>, <span class="st">"↓"</span>, <span class="st">"↑"</span>),</span>
-<span id="cb29-64"><a href="#cb29-64" aria-hidden="true" tabindex="-1"></a>        <span class="at">color =</span> diff_color,</span>
-<span id="cb29-65"><a href="#cb29-65" aria-hidden="true" tabindex="-1"></a>        <span class="at">size =</span> <span class="dv">7</span>,</span>
-<span id="cb29-66"><a href="#cb29-66" aria-hidden="true" tabindex="-1"></a>        <span class="at">fontface =</span> <span class="st">"bold"</span></span>
-<span id="cb29-67"><a href="#cb29-67" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">+</span></span>
-<span id="cb29-68"><a href="#cb29-68" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb29-69"><a href="#cb29-69" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_boxplot</span>(</span>
-<span id="cb29-70"><a href="#cb29-70" aria-hidden="true" tabindex="-1"></a>        <span class="fu">aes</span>(<span class="at">x =</span> QUARTER, <span class="at">y =</span> TRANSACTED_PRICE <span class="sc">/</span> <span class="dv">1000</span>, <span class="at">fill =</span> QUARTER),</span>
-<span id="cb29-71"><a href="#cb29-71" aria-hidden="true" tabindex="-1"></a>        <span class="at">outlier.shape =</span> <span class="cn">NA</span>,</span>
-<span id="cb29-72"><a href="#cb29-72" aria-hidden="true" tabindex="-1"></a>        <span class="at">alpha =</span> .<span class="dv">5</span>,</span>
-<span id="cb29-73"><a href="#cb29-73" aria-hidden="true" tabindex="-1"></a>        <span class="at">width =</span> .<span class="dv">1</span>,</span>
-<span id="cb29-74"><a href="#cb29-74" aria-hidden="true" tabindex="-1"></a>        <span class="at">colour =</span> <span class="st">"black"</span></span>
-<span id="cb29-75"><a href="#cb29-75" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">+</span></span>
-<span id="cb29-76"><a href="#cb29-76" aria-hidden="true" tabindex="-1"></a>      <span class="fu">guides</span>(<span class="at">fill =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb29-77"><a href="#cb29-77" aria-hidden="true" tabindex="-1"></a>      <span class="fu">scale_y_log10</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">500</span>, <span class="dv">60000</span>)) <span class="sc">+</span></span>
-<span id="cb29-78"><a href="#cb29-78" aria-hidden="true" tabindex="-1"></a>      <span class="fu">labs</span>(<span class="at">x =</span> type, <span class="at">y =</span> ylabel) <span class="sc">+</span></span>
-<span id="cb29-79"><a href="#cb29-79" aria-hidden="true" tabindex="-1"></a>      <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb29-80"><a href="#cb29-80" aria-hidden="true" tabindex="-1"></a>      <span class="fu">theme</span>(</span>
-<span id="cb29-81"><a href="#cb29-81" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text.y =</span> yaxis_text,</span>
-<span id="cb29-82"><a href="#cb29-82" aria-hidden="true" tabindex="-1"></a>        <span class="at">panel.background =</span> bg</span>
-<span id="cb29-83"><a href="#cb29-83" aria-hidden="true" tabindex="-1"></a>      )</span>
-<span id="cb29-84"><a href="#cb29-84" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb29-85"><a href="#cb29-85" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-86"><a href="#cb29-86" aria-hidden="true" tabindex="-1"></a><span class="co"># Compose the visual using patchwork</span></span>
-<span id="cb29-87"><a href="#cb29-87" aria-hidden="true" tabindex="-1"></a>q1_all_sales <span class="ot">&lt;-</span> <span class="fu">plot_price_by_sale_type</span>(<span class="st">"All Sales"</span>, <span class="at">ylabel =</span> <span class="st">"Transaction Price (,000 SGD)"</span>,</span>
-<span id="cb29-88"><a href="#cb29-88" aria-hidden="true" tabindex="-1"></a>    <span class="at">yaxis_text =</span> <span class="fu">element_text</span>(), <span class="at">bg =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"aliceblue"</span>, <span class="at">linewidth=</span><span class="dv">0</span>))</span>
-<span id="cb29-89"><a href="#cb29-89" aria-hidden="true" tabindex="-1"></a>q1_new_sale <span class="ot">&lt;-</span> <span class="fu">plot_price_by_sale_type</span>(<span class="st">"New Sale"</span>)</span>
-<span id="cb29-90"><a href="#cb29-90" aria-hidden="true" tabindex="-1"></a>q1_resale <span class="ot">&lt;-</span> <span class="fu">plot_price_by_sale_type</span>(<span class="st">"Resale"</span>)</span>
-<span id="cb29-91"><a href="#cb29-91" aria-hidden="true" tabindex="-1"></a>q1_sub_sale <span class="ot">&lt;-</span> <span class="fu">plot_price_by_sale_type</span>(<span class="st">"Sub Sale"</span>)</span>
-<span id="cb29-92"><a href="#cb29-92" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-93"><a href="#cb29-93" aria-hidden="true" tabindex="-1"></a>(q1_all_sales <span class="sc">|</span> q1_new_sale <span class="sc">|</span> q1_resale <span class="sc">|</span> q1_sub_sale ) <span class="sc">+</span></span>
-<span id="cb29-94"><a href="#cb29-94" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add headline and subtitle</span></span>
-<span id="cb29-95"><a href="#cb29-95" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_annotation</span>(</span>
-<span id="cb29-96"><a href="#cb29-96" aria-hidden="true" tabindex="-1"></a>    <span class="at">title=</span><span class="st">"Singapore Median Private Property Prices Up 2% from Q1 2023 to Q1 2024."</span>,</span>
-<span id="cb29-97"><a href="#cb29-97" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle=</span><span class="st">"In the **New Sales** market, prices decrease by &lt;span style='color:brown;'&gt;**7.1%**&lt;/span&gt;, while **Resale** and **Sub Sale** markets see increases of &lt;span style='color:darkgreen;'&gt;**4.5%**&lt;/span&gt; and &lt;span style='color:darkgreen;'&gt;**8.5%**&lt;/span&gt;, respectively."</span></span>
-<span id="cb29-98"><a href="#cb29-98" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">&amp;</span></span>
-<span id="cb29-99"><a href="#cb29-99" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">"Roboto Condensed"</span>),</span>
-<span id="cb29-100"><a href="#cb29-100" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face=</span><span class="st">"bold"</span>, <span class="at">color=</span><span class="st">"blue"</span>),</span>
-<span id="cb29-101"><a href="#cb29-101" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.subtitle =</span> <span class="fu">element_markdown</span>(<span class="at">color=</span><span class="st">"#464646"</span>, <span class="at">size=</span><span class="fu">rel</span>(<span class="fl">0.9</span>)),</span>
-<span id="cb29-102"><a href="#cb29-102" aria-hidden="true" tabindex="-1"></a>                <span class="at">axis.ticks.y =</span> <span class="fu">element_blank</span>(),<span class="at">axis.line.x =</span> <span class="fu">element_line</span>()) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>plot_q1_yoy_psf_price <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    realis_per_unit <span class="sc">%&gt;%</span> <span class="fu">filter</span>(QUARTER <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"2023Q1"</span>, <span class="st">"2024Q1"</span>)),</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> QUARTER,</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> UNIT_PRICE_PSF,</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">fill =</span> QUARTER,</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">color =</span> QUARTER</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stat_halfeye</span>(</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">aes</span>(</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">fill =</span> QUARTER,</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">justification =</span> <span class="fu">ifelse</span>(QUARTER <span class="sc">==</span> <span class="st">"2023Q1"</span>, <span class="fl">1.22</span>, <span class="dv">0</span>),</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>        <span class="at">side =</span> <span class="fu">ifelse</span>(QUARTER <span class="sc">==</span> <span class="st">"2023Q1"</span>, <span class="st">"left"</span>, <span class="st">"right"</span>)</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">position =</span> <span class="fu">position_nudge</span>(<span class="at">x =</span> <span class="fl">0.1</span>, <span class="at">y =</span> <span class="dv">0</span>),</span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">.width =</span> <span class="dv">0</span>,</span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>      <span class="at">alpha =</span> .<span class="dv">8</span>,</span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">point_color =</span> <span class="cn">NA</span>,</span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">show.legend =</span> <span class="cn">FALSE</span></span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_jitter</span>(</span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">width =</span> <span class="fl">0.08</span>,</span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>      <span class="at">size =</span> <span class="fl">0.01</span>,</span>
+<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>      <span class="at">alpha =</span> <span class="fl">0.2</span>,</span>
+<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a>      <span class="at">show.legend =</span> <span class="cn">FALSE</span></span>
+<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_boxplot</span>(</span>
+<span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a>      <span class="at">outlier.shape =</span> <span class="cn">NA</span>,</span>
+<span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a>      <span class="at">alpha =</span> <span class="dv">0</span>,</span>
+<span id="cb29-32"><a href="#cb29-32" aria-hidden="true" tabindex="-1"></a>      <span class="at">width =</span> .<span class="dv">1</span>,</span>
+<span id="cb29-33"><a href="#cb29-33" aria-hidden="true" tabindex="-1"></a>      <span class="at">color =</span> <span class="st">"black"</span>,</span>
+<span id="cb29-34"><a href="#cb29-34" aria-hidden="true" tabindex="-1"></a>      <span class="at">show.legend =</span> <span class="cn">FALSE</span></span>
+<span id="cb29-35"><a href="#cb29-35" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb29-36"><a href="#cb29-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stat_summary</span>(</span>
+<span id="cb29-37"><a href="#cb29-37" aria-hidden="true" tabindex="-1"></a>      <span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(<span class="st">"$"</span>, <span class="fu">after_stat</span>(y))),</span>
+<span id="cb29-38"><a href="#cb29-38" aria-hidden="true" tabindex="-1"></a>      <span class="at">geom =</span> <span class="st">"text"</span>,</span>
+<span id="cb29-39"><a href="#cb29-39" aria-hidden="true" tabindex="-1"></a>      <span class="at">fun =</span> <span class="st">"median"</span>,</span>
+<span id="cb29-40"><a href="#cb29-40" aria-hidden="true" tabindex="-1"></a>      <span class="at">position =</span> <span class="fu">position_nudge</span>(<span class="at">y =</span> <span class="dv">2500</span>),</span>
+<span id="cb29-41"><a href="#cb29-41" aria-hidden="true" tabindex="-1"></a>      <span class="at">family =</span> <span class="st">"Roboto Condensed"</span>,</span>
+<span id="cb29-42"><a href="#cb29-42" aria-hidden="true" tabindex="-1"></a>      <span class="at">show.legend =</span> <span class="cn">FALSE</span></span>
+<span id="cb29-43"><a href="#cb29-43" aria-hidden="true" tabindex="-1"></a>    )<span class="sc">+</span></span>
+<span id="cb29-44"><a href="#cb29-44" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"grey50"</span>, <span class="st">"blue"</span>)) <span class="sc">+</span></span>
+<span id="cb29-45"><a href="#cb29-45" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"grey50"</span>, <span class="st">"blue"</span>)) <span class="sc">+</span></span>
+<span id="cb29-46"><a href="#cb29-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Unit Price Per Sqft ($)"</span>) <span class="sc">+</span></span>
+<span id="cb29-47"><a href="#cb29-47" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>()</span>
+<span id="cb29-48"><a href="#cb29-48" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb29-49"><a href="#cb29-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-50"><a href="#cb29-50" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_q1_yoy_psf_price</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <p><img src="Take-home_Ex1_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="generating-the-visualization" class="level3">
+<h3 class="anchored" data-anchor-id="generating-the-visualization">4.2.2 Generating the visualization</h3>
+<div class="cell">
+<details>
+<summary>Show ggplot2 code</summary>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>q1_yoy_psf_price_submarkets_graph <span class="ot">&lt;-</span> <span class="fu">plot_q1_yoy_psf_price</span>() <span class="sc">+</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> TYPE_OF_SALE, <span class="at">strip.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.title.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.y =</span> <span class="fu">element_blank</span>())</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>q1_yoy_psf_price_all_markets_graph <span class="ot">&lt;-</span> <span class="fu">plot_q1_yoy_psf_price</span>() <span class="sc">+</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> NUMBER_OF_UNITS, <span class="at">strip.position =</span> <span class="st">"bottom"</span>, <span class="at">labeller =</span> <span class="fu">as_labeller</span>(<span class="cf">function</span>(l) {<span class="st">"All Sales"</span>})) <span class="sc">+</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Transaction Price (,000 SGD)"</span>) <span class="sc">+</span></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"aliceblue"</span>, <span class="at">linewidth=</span><span class="dv">0</span>)</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>(q1_yoy_psf_price_all_markets_graph <span class="sc">|</span> q1_yoy_psf_price_submarkets_graph ) <span class="sc">+</span></span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_layout</span>(<span class="at">widths=</span><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>)) <span class="sc">+</span></span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_annotation</span>(</span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">title=</span><span class="st">"Singapore Median Private Property Prices Up 2% from Q1 2023 to Q1 2024."</span>,</span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle=</span><span class="st">"In the **New Sales** market, prices decrease by &lt;span style='color:brown;'&gt;**7.1%**&lt;/span&gt;, while **Resale** and **Sub Sale** markets see increases of &lt;span style='color:darkgreen;'&gt;**4.5%**&lt;/span&gt; and &lt;span style='color:darkgreen;'&gt;**8.5%**&lt;/span&gt;, respectively."</span></span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">&amp;</span></span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">"Roboto Condensed"</span>),</span>
+<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.line.x =</span> <span class="fu">element_line</span>(),</span>
+<span id="cb30-24"><a href="#cb30-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb30-25"><a href="#cb30-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.ticks.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb30-26"><a href="#cb30-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face=</span><span class="st">"bold"</span>, <span class="at">color=</span><span class="st">"blue"</span>),</span>
+<span id="cb30-27"><a href="#cb30-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_markdown</span>(<span class="at">color=</span><span class="st">"grey50"</span>, <span class="at">size=</span><span class="fu">rel</span>(<span class="fl">0.9</span>)),</span>
+<span id="cb30-28"><a href="#cb30-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.placement =</span> <span class="st">"outside"</span>,</span>
+<span id="cb30-29"><a href="#cb30-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="fu">rel</span>(<span class="dv">1</span>))</span>
+<span id="cb30-30"><a href="#cb30-30" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="Take-home_Ex1_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div class="callout callout-style-default callout-tip callout-titled">
@@ -2949,103 +2948,126 @@ Insights
 </div>
 </div>
 </section>
+</section>
 <section id="sales-volume" class="level2">
 <h2 class="anchored" data-anchor-id="sales-volume">4.2 Sales Volume</h2>
 <div class="cell">
 <details>
 <summary>Show ggplot2 code</summary>
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>plot_volume_by_sale_type <span class="ot">&lt;-</span> <span class="cf">function</span>(type,</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">bg =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">ylabel =</span> <span class="cn">NULL</span>,</span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">yaxis_text =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">percent_change =</span> <span class="st">""</span>) {</span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  subset <span class="ot">=</span> <span class="fu">get_sale_subset</span>(type)</span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(subset, <span class="fu">aes</span>(<span class="at">x =</span> QUARTER, <span class="at">fill =</span> QUARTER)) <span class="sc">+</span></span>
-<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>(</span>
-<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">aes</span>(<span class="at">color =</span> <span class="cn">NULL</span>),</span>
-<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">alpha =</span> <span class="fl">0.8</span>,</span>
-<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">show.legend =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">size =</span> <span class="dv">0</span>,</span>
-<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">width =</span> <span class="fl">0.5</span></span>
-<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
-<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ylim</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">6000</span>)) <span class="sc">+</span></span>
-<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_text</span>(</span>
-<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">stat =</span> <span class="st">"count"</span>,</span>
-<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>      <span class="fu">aes</span>(</span>
-<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a>        <span class="at">label =</span> <span class="fu">after_stat</span>(count),</span>
-<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a>        <span class="at">y =</span> <span class="fu">after_stat</span>(count) <span class="sc">+</span> <span class="dv">150</span>,</span>
-<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>        <span class="at">color =</span> QUARTER,</span>
-<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a>        <span class="at">family =</span> <span class="st">"Roboto Condensed"</span></span>
-<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a>      ),</span>
-<span id="cb30-24"><a href="#cb30-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">show.legend =</span> <span class="cn">FALSE</span></span>
-<span id="cb30-25"><a href="#cb30-25" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
-<span id="cb30-26"><a href="#cb30-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"darkgrey"</span>, <span class="st">"blue"</span>)) <span class="sc">+</span></span>
-<span id="cb30-27"><a href="#cb30-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"darkgrey"</span>, <span class="st">"blue"</span>)) <span class="sc">+</span></span>
-<span id="cb30-28"><a href="#cb30-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Add market and the percent change</span></span>
-<span id="cb30-29"><a href="#cb30-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="fu">paste0</span>(type, percent_change), <span class="at">y =</span> ylabel) <span class="sc">+</span></span>
-<span id="cb30-30"><a href="#cb30-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb30-31"><a href="#cb30-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">axis.text.y =</span> yaxis_text,</span>
-<span id="cb30-32"><a href="#cb30-32" aria-hidden="true" tabindex="-1"></a>          <span class="at">panel.background =</span> bg)</span>
-<span id="cb30-33"><a href="#cb30-33" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb30-34"><a href="#cb30-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-35"><a href="#cb30-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine plots for visualization</span></span>
-<span id="cb30-36"><a href="#cb30-36" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: Ideally, the percentages are generated dynamically. However, setting the color in visualization and revising the headlines and subtitles are not straightforward to do dynamically</span></span>
-<span id="cb30-37"><a href="#cb30-37" aria-hidden="true" tabindex="-1"></a>q1_all_sales_vol <span class="ot">&lt;-</span></span>
-<span id="cb30-38"><a href="#cb30-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_volume_by_sale_type</span>(</span>
-<span id="cb30-39"><a href="#cb30-39" aria-hidden="true" tabindex="-1"></a>    <span class="st">"All Sales"</span>,</span>
-<span id="cb30-40"><a href="#cb30-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">ylabel =</span> <span class="st">"No. of Sales"</span>,</span>
-<span id="cb30-41"><a href="#cb30-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">yaxis_text =</span> <span class="fu">element_text</span>(),</span>
-<span id="cb30-42"><a href="#cb30-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">bg =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"aliceblue"</span>, <span class="at">linewidth =</span> <span class="dv">0</span>),</span>
-<span id="cb30-43"><a href="#cb30-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">percent_change =</span> <span class="st">" (&lt;span style='color:darkgreen;'&gt;**+1.5%**&lt;/span&gt;)"</span></span>
-<span id="cb30-44"><a href="#cb30-44" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb30-45"><a href="#cb30-45" aria-hidden="true" tabindex="-1"></a>q1_new_sale_vol <span class="ot">&lt;-</span></span>
-<span id="cb30-46"><a href="#cb30-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_volume_by_sale_type</span>(<span class="st">"New Sale"</span>, <span class="at">percent_change =</span> <span class="st">" (&lt;span style='color:darkgreen;'&gt;**+15.2%**&lt;/span&gt;)"</span>)</span>
-<span id="cb30-47"><a href="#cb30-47" aria-hidden="true" tabindex="-1"></a>q1_resale_vol <span class="ot">&lt;-</span></span>
-<span id="cb30-48"><a href="#cb30-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_volume_by_sale_type</span>(<span class="st">"Resale"</span>, <span class="at">percent_change =</span> <span class="st">" (&lt;span style='color:brown;'&gt;**-6.1**%&lt;/span&gt;)"</span>)</span>
-<span id="cb30-49"><a href="#cb30-49" aria-hidden="true" tabindex="-1"></a>q1_sub_sale_vol <span class="ot">&lt;-</span></span>
-<span id="cb30-50"><a href="#cb30-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_volume_by_sale_type</span>(<span class="st">"Sub Sale"</span>, <span class="at">percent_change =</span> <span class="st">" (&lt;span style='color:darkgreen;'&gt;**+25.7%**&lt;/span&gt;)"</span>)</span>
-<span id="cb30-51"><a href="#cb30-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-52"><a href="#cb30-52" aria-hidden="true" tabindex="-1"></a>(q1_all_sales_vol <span class="sc">|</span></span>
-<span id="cb30-53"><a href="#cb30-53" aria-hidden="true" tabindex="-1"></a>    q1_new_sale_vol <span class="sc">|</span> q1_resale_vol <span class="sc">|</span> q1_sub_sale_vol) <span class="sc">+</span></span>
-<span id="cb30-54"><a href="#cb30-54" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Add headline and subtitle</span></span>
-<span id="cb30-55"><a href="#cb30-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_annotation</span>(<span class="at">title =</span> <span class="st">"Singapore Private Property Sales Volume Up 1.5% from Q1 2023 to Q1 2024."</span>,</span>
-<span id="cb30-56"><a href="#cb30-56" aria-hidden="true" tabindex="-1"></a>                  <span class="at">subtitle =</span> <span class="st">"Among the markets, **Sub Sale** showed the highest percentage growth with a &lt;span style='color:darkgreen;'&gt;**25.7%**&lt;/span&gt; increase, while the **Resale** market&lt;br/&gt;experienceda decline of &lt;span style='color:brown;'&gt;**6.1%**&lt;/span&gt;."</span>) <span class="sc">&amp;</span></span>
-<span id="cb30-57"><a href="#cb30-57" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Set universal styles</span></span>
-<span id="cb30-58"><a href="#cb30-58" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb30-59"><a href="#cb30-59" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">"Roboto Condensed"</span>),</span>
-<span id="cb30-60"><a href="#cb30-60" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">color =</span> <span class="st">"blue"</span>),</span>
-<span id="cb30-61"><a href="#cb30-61" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_markdown</span>(<span class="at">color =</span> <span class="st">"#464646"</span>, <span class="at">size =</span> <span class="fu">rel</span>(<span class="fl">0.9</span>)),</span>
-<span id="cb30-62"><a href="#cb30-62" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x =</span> <span class="fu">element_markdown</span>(),</span>
-<span id="cb30-63"><a href="#cb30-63" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.line.x =</span> <span class="fu">element_line</span>(),</span>
-<span id="cb30-64"><a href="#cb30-64" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.ticks.y =</span> <span class="fu">element_blank</span>()</span>
-<span id="cb30-65"><a href="#cb30-65" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>q1 <span class="ot">&lt;-</span> realis_per_unit <span class="sc">%&gt;%</span> <span class="fu">filter</span>(QUARTER <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"2023Q1"</span>, <span class="st">"2024Q1"</span>))</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>get_sale_subset <span class="ot">&lt;-</span> <span class="cf">function</span>(type) {</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (type <span class="sc">==</span> <span class="st">"All Sales"</span>) {</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(q1)</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  q1 <span class="sc">%&gt;%</span> <span class="fu">filter</span>(TYPE_OF_SALE <span class="sc">==</span> type)</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>plot_volume_by_sale_type <span class="ot">&lt;-</span> <span class="cf">function</span>(type,</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">bg =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">ylabel =</span> <span class="cn">NULL</span>,</span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">yaxis_text =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">percent_change =</span> <span class="st">""</span>) {</span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>  subset <span class="ot">=</span> <span class="fu">get_sale_subset</span>(type)</span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(subset, <span class="fu">aes</span>(<span class="at">x =</span> QUARTER, <span class="at">fill =</span> QUARTER)) <span class="sc">+</span></span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>(</span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>      <span class="fu">aes</span>(<span class="at">color =</span> <span class="cn">NULL</span>),</span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">alpha =</span> <span class="fl">0.8</span>,</span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">show.legend =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>      <span class="at">size =</span> <span class="dv">0</span>,</span>
+<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">width =</span> <span class="fl">0.5</span></span>
+<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ylim</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">6000</span>)) <span class="sc">+</span></span>
+<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_text</span>(</span>
+<span id="cb31-24"><a href="#cb31-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">stat =</span> <span class="st">"count"</span>,</span>
+<span id="cb31-25"><a href="#cb31-25" aria-hidden="true" tabindex="-1"></a>      <span class="fu">aes</span>(</span>
+<span id="cb31-26"><a href="#cb31-26" aria-hidden="true" tabindex="-1"></a>        <span class="at">label =</span> <span class="fu">after_stat</span>(count),</span>
+<span id="cb31-27"><a href="#cb31-27" aria-hidden="true" tabindex="-1"></a>        <span class="at">y =</span> <span class="fu">after_stat</span>(count) <span class="sc">+</span> <span class="dv">150</span>,</span>
+<span id="cb31-28"><a href="#cb31-28" aria-hidden="true" tabindex="-1"></a>        <span class="at">color =</span> QUARTER,</span>
+<span id="cb31-29"><a href="#cb31-29" aria-hidden="true" tabindex="-1"></a>        <span class="at">family =</span> <span class="st">"Roboto Condensed"</span></span>
+<span id="cb31-30"><a href="#cb31-30" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb31-31"><a href="#cb31-31" aria-hidden="true" tabindex="-1"></a>      <span class="at">show.legend =</span> <span class="cn">FALSE</span></span>
+<span id="cb31-32"><a href="#cb31-32" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb31-33"><a href="#cb31-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"darkgrey"</span>, <span class="st">"blue"</span>)) <span class="sc">+</span></span>
+<span id="cb31-34"><a href="#cb31-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"darkgrey"</span>, <span class="st">"blue"</span>)) <span class="sc">+</span></span>
+<span id="cb31-35"><a href="#cb31-35" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Add market and the percent change</span></span>
+<span id="cb31-36"><a href="#cb31-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="fu">paste0</span>(type, percent_change), <span class="at">y =</span> ylabel) <span class="sc">+</span></span>
+<span id="cb31-37"><a href="#cb31-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb31-38"><a href="#cb31-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">axis.text.y =</span> yaxis_text,</span>
+<span id="cb31-39"><a href="#cb31-39" aria-hidden="true" tabindex="-1"></a>          <span class="at">panel.background =</span> bg)</span>
+<span id="cb31-40"><a href="#cb31-40" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb31-41"><a href="#cb31-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-42"><a href="#cb31-42" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine plots for visualization</span></span>
+<span id="cb31-43"><a href="#cb31-43" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: Ideally, the percentages are generated dynamically. However, setting the color in visualization and revising the headlines and subtitles are not straightforward to do dynamically</span></span>
+<span id="cb31-44"><a href="#cb31-44" aria-hidden="true" tabindex="-1"></a>q1_all_sales_vol <span class="ot">&lt;-</span></span>
+<span id="cb31-45"><a href="#cb31-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_volume_by_sale_type</span>(</span>
+<span id="cb31-46"><a href="#cb31-46" aria-hidden="true" tabindex="-1"></a>    <span class="st">"All Sales"</span>,</span>
+<span id="cb31-47"><a href="#cb31-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">ylabel =</span> <span class="st">"No. of Sales"</span>,</span>
+<span id="cb31-48"><a href="#cb31-48" aria-hidden="true" tabindex="-1"></a>    <span class="at">yaxis_text =</span> <span class="fu">element_text</span>(),</span>
+<span id="cb31-49"><a href="#cb31-49" aria-hidden="true" tabindex="-1"></a>    <span class="at">bg =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"aliceblue"</span>, <span class="at">linewidth =</span> <span class="dv">0</span>),</span>
+<span id="cb31-50"><a href="#cb31-50" aria-hidden="true" tabindex="-1"></a>    <span class="at">percent_change =</span> <span class="st">" (&lt;span style='color:darkgreen;'&gt;**+1.5%**&lt;/span&gt;)"</span></span>
+<span id="cb31-51"><a href="#cb31-51" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb31-52"><a href="#cb31-52" aria-hidden="true" tabindex="-1"></a>q1_new_sale_vol <span class="ot">&lt;-</span></span>
+<span id="cb31-53"><a href="#cb31-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_volume_by_sale_type</span>(<span class="st">"New Sale"</span>, <span class="at">percent_change =</span> <span class="st">" (&lt;span style='color:darkgreen;'&gt;**+15.2%**&lt;/span&gt;)"</span>)</span>
+<span id="cb31-54"><a href="#cb31-54" aria-hidden="true" tabindex="-1"></a>q1_resale_vol <span class="ot">&lt;-</span></span>
+<span id="cb31-55"><a href="#cb31-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_volume_by_sale_type</span>(<span class="st">"Resale"</span>, <span class="at">percent_change =</span> <span class="st">" (&lt;span style='color:brown;'&gt;**-6.1**%&lt;/span&gt;)"</span>)</span>
+<span id="cb31-56"><a href="#cb31-56" aria-hidden="true" tabindex="-1"></a>q1_sub_sale_vol <span class="ot">&lt;-</span></span>
+<span id="cb31-57"><a href="#cb31-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_volume_by_sale_type</span>(<span class="st">"Sub Sale"</span>, <span class="at">percent_change =</span> <span class="st">" (&lt;span style='color:darkgreen;'&gt;**+25.7%**&lt;/span&gt;)"</span>)</span>
+<span id="cb31-58"><a href="#cb31-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-59"><a href="#cb31-59" aria-hidden="true" tabindex="-1"></a>(q1_all_sales_vol <span class="sc">|</span></span>
+<span id="cb31-60"><a href="#cb31-60" aria-hidden="true" tabindex="-1"></a>    q1_new_sale_vol <span class="sc">|</span> q1_resale_vol <span class="sc">|</span> q1_sub_sale_vol) <span class="sc">+</span></span>
+<span id="cb31-61"><a href="#cb31-61" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Add headline and subtitle</span></span>
+<span id="cb31-62"><a href="#cb31-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_annotation</span>(<span class="at">title =</span> <span class="st">"Singapore Private Property Sales Volume Up 1.5% from Q1 2023 to Q1 2024."</span>,</span>
+<span id="cb31-63"><a href="#cb31-63" aria-hidden="true" tabindex="-1"></a>                  <span class="at">subtitle =</span> <span class="st">"Among the markets, **Sub Sale** showed the highest percentage growth with a &lt;span style='color:darkgreen;'&gt;**25.7%**&lt;/span&gt; increase, while the **Resale** market&lt;br/&gt;experienceda decline of &lt;span style='color:brown;'&gt;**6.1%**&lt;/span&gt;."</span>) <span class="sc">&amp;</span></span>
+<span id="cb31-64"><a href="#cb31-64" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Set universal styles</span></span>
+<span id="cb31-65"><a href="#cb31-65" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb31-66"><a href="#cb31-66" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">"Roboto Condensed"</span>),</span>
+<span id="cb31-67"><a href="#cb31-67" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">color =</span> <span class="st">"blue"</span>),</span>
+<span id="cb31-68"><a href="#cb31-68" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_markdown</span>(<span class="at">color =</span> <span class="st">"#464646"</span>, <span class="at">size =</span> <span class="fu">rel</span>(<span class="fl">0.9</span>)),</span>
+<span id="cb31-69"><a href="#cb31-69" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x =</span> <span class="fu">element_markdown</span>(),</span>
+<span id="cb31-70"><a href="#cb31-70" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.line.x =</span> <span class="fu">element_line</span>(),</span>
+<span id="cb31-71"><a href="#cb31-71" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.ticks.y =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb31-72"><a href="#cb31-72" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-display">
-<p><img src="Take-home_Ex1_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-</section>
-<section id="q1-insights" class="level2">
-<h2 class="anchored" data-anchor-id="q1-insights">2024 Q1 Insights</h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>q12024 <span class="ot">&lt;-</span> realis_per_unit <span class="sc">%&gt;%</span> <span class="fu">filter</span>(QUARTER<span class="sc">==</span><span class="st">"2024Q1"</span>)</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(q12024, <span class="fu">aes</span>(<span class="at">x=</span>PROPERTY_TYPE, <span class="at">fill=</span>TYPE_OF_SALE)) <span class="sc">+</span></span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span></span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Take-home_Ex1_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+</section>
+<section id="diving-deep-into-the-2024-q1-market" class="level2">
+<h2 class="anchored" data-anchor-id="diving-deep-into-the-2024-q1-market">4.3 Diving deep into the 2024 Q1 Market</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(q12024, <span class="fu">aes</span>(<span class="at">x=</span>PROPERTY_TYPE, <span class="at">y=</span>TRANSACTED_PRICE<span class="sc">/</span><span class="dv">1000</span>, <span class="at">fill=</span>PROPERTY_TYPE)) <span class="sc">+</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_violin</span>() <span class="sc">+</span></span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept=</span><span class="fu">median</span>(q12024<span class="sc">$</span>TRANSACTED_PRICE)<span class="sc">/</span><span class="dv">1000</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept=</span><span class="fu">mean</span>(q12024<span class="sc">$</span>TRANSACTED_PRICE)<span class="sc">/</span><span class="dv">1000</span>) <span class="sc">+</span></span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>() <span class="sc">+</span></span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>q12024 <span class="ot">&lt;-</span> realis_per_unit <span class="sc">%&gt;%</span> <span class="fu">filter</span>(QUARTER<span class="sc">==</span><span class="st">"2024Q1"</span>)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(q12024, <span class="fu">aes</span>(<span class="at">x=</span>PROPERTY_TYPE, <span class="at">fill=</span>TYPE_OF_SALE)) <span class="sc">+</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Take-home_Ex1_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(q12024, <span class="fu">aes</span>(<span class="at">x=</span>PROPERTY_TYPE, <span class="at">y=</span>TRANSACTED_PRICE<span class="sc">/</span><span class="dv">1000</span>, <span class="at">fill=</span>PROPERTY_TYPE)) <span class="sc">+</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_violin</span>() <span class="sc">+</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept=</span><span class="fu">median</span>(q12024<span class="sc">$</span>TRANSACTED_PRICE)<span class="sc">/</span><span class="dv">1000</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept=</span><span class="fu">mean</span>(q12024<span class="sc">$</span>TRANSACTED_PRICE)<span class="sc">/</span><span class="dv">1000</span>) <span class="sc">+</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>() <span class="sc">+</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Take-home_Ex1_files/figure-html/unnamed-chunk-30-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>q1_2024_aggregated <span class="ot">=</span> q12024 <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(TYPE_OF_SALE, PROPERTY_TYPE) <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">COUNT =</span> <span class="fu">n</span>(),</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">MEDIAN_PRICE =</span> <span class="fu">median</span>(TRANSACTED_PRICE),</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">MEAN_PRICE =</span> <span class="fu">mean</span>(TRANSACTED_PRICE),</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">MIN_PRICE =</span> <span class="fu">min</span>(TRANSACTED_PRICE),</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">MAX_PRICE =</span> <span class="fu">max</span>(TRANSACTED_PRICE),</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(q1_2024_aggregated, <span class="fu">aes</span>(<span class="at">area=</span>COUNT, <span class="at">fill =</span> TYPE_OF_SALE,</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>               <span class="at">label =</span> TYPE_OF_SALE, <span class="at">subgroup =</span> PROPERTY_TYPE)) <span class="sc">+</span></span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_treemap</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Take-home_Ex1_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
@@ -3061,6 +3083,7 @@ Insights
 <p><a href="https://www.cedricscherer.com/2019/08/05/a-ggplot2-tutorial-for-beautiful-plotting-in-r/https://www.cedricscherer.com/2019/08/05/a-ggplot2-tutorial-for-beautiful-plotting-in-r/" class="uri">https://www.cedricscherer.com/2019/08/05/a-ggplot2-tutorial-for-beautiful-plotting-in-r</a></p>
 <p><a href="https://www.propertyguru.com.sg/property-guides/singapore-property-market-outlook-2024-90041#1" class="uri">https://www.propertyguru.com.sg/property-guides/singapore-property-market-outlook-2024-90041#1</a></p>
 <p><a href="https://akalestale.netlify.app/take-home_ex/take-home_ex01/take-home_ex01" class="uri">https://akalestale.netlify.app/take-home_ex/take-home_ex01/take-home_ex01</a> (stat_halfeye usage)</p>
+<p><a href="https://sape.inf.usi.ch/quick-reference/ggplot2/colour" class="uri">https://sape.inf.usi.ch/quick-reference/ggplot2/colour</a></p>
 
 
 </section>
