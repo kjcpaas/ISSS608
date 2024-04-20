@@ -1,0 +1,77 @@
+---
+title: "In-class Exercise 2"
+author: "Kristine Joy Paas"
+date: "20 April 2024"
+date-modified: "last-modified"
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+  freeze: true
+---
+
+# 1 Setup
+
+## 1.1 Loading the R packages
+
+```{r}
+#| label: setup
+pacman::p_load(tidyverse, ggdist, ggthemes, ggridges, colorspace)
+```
+
+## 1.2 Importing the data
+
+```{r}
+exam_df <- read_csv("data/Exam_data.csv")
+```
+
+# 2 Visualizing distribution
+
+## 2.1 Histogram
+
+```{r}
+ggplot(exam_df, aes(x=ENGLISH)) +
+  geom_histogram(color = "#1696d2",
+               adjust = 0.65,
+               alpha = 0.6)
+```
+
+## 2.2 Probability Density Diagram
+
+```{r}
+ggplot(exam_df, aes(x=ENGLISH)) +
+  geom_density(color = "#1696d2",
+               adjust = 0.65,
+               alpha = 0.6,)
+```
+
+## 2.3 Alternative design
+
+```{r}
+median_eng <- median(exam_df$ENGLISH)
+mean_eng <- mean(exam_df$ENGLISH)
+std_eng <- sd(exam_df$ENGLISH)
+
+ggplot(exam_df, aes(x=ENGLISH)) +
+  geom_density(color = "#1696d2",
+               adjust = 0.65,
+               alpha = 0.6,) +
+  stat_function(
+    fun=dnorm,
+    args = list(mean=mean_eng, sd = std_eng),
+    col = "grey30",
+    size = 0.8)+
+    geom_vline(aes(xintercept=mean_eng), color = "#4d5887", linewidth = 0.6, linetype = "dashed")+
+  annotate(geom = "text",
+           x = mean_eng - 10,
+           y = 0.04,
+           label = paste0("Mean ENGLISH:", round(mean_eng), 2),
+           color = "#4d5887") +
+  geom_vline(aes(xintercept=median_eng), color = "#4d5887", linewidth = 0.6) +
+  annotate(geom = "text",
+           x = median_eng + 10,
+           y = 0.04,
+           label = paste0("Median ENGLISH:", round(median_eng), 2),
+           color = "#4d5887")
+```

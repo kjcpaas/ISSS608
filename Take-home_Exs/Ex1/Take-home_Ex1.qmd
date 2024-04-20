@@ -83,7 +83,7 @@ Aside from these, we will also include other packages that will help us present 
 
 ```{r}
 #| label: setup
-pacman::p_load(knitr, tidyverse, patchwork, ggdist, ggtext, ggpubr)
+pacman::p_load(knitr, tidyverse, patchwork, ggdist, ggtext, ggpubr, treemapify)
 ```
 
 ## 2.2 Data Checkpoints
@@ -577,8 +577,8 @@ q1_sub_sale <- plot_price_by_sale_type("Sub Sale")
 (q1_all_sales | q1_new_sale | q1_resale | q1_sub_sale ) +
   # Add headline and subtitle
   plot_annotation(
-    title="Singapore Median Property Prices Up 2% from Q1 2023 to Q1 2024.",
-    subtitle="In the **New Sales** prices decrease by <span style='color:brown;'>**7.1%**</span>, while **Resale** and **Sub Sale** markets see increases of <span style='color:darkgreen;'>**4.5%**</span> and <span style='color:darkgreen;'>**8.5%**</span>, respectively."
+    title="Singapore Median Private Property Prices Up 2% from Q1 2023 to Q1 2024.",
+    subtitle="In the **New Sales** market, prices decrease by <span style='color:brown;'>**7.1%**</span>, while **Resale** and **Sub Sale** markets see increases of <span style='color:darkgreen;'>**4.5%**</span> and <span style='color:darkgreen;'>**8.5%**</span>, respectively."
   ) &
   theme(text = element_text(family = "Roboto Condensed"),
         plot.title = element_text(face="bold", color="blue"),
@@ -595,11 +595,13 @@ Although there is an overall increase in market prices, the New Sale market expe
 ## 4.2 Sales Volume
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show ggplot2 code"
 plot_volume_by_sale_type <- function(type,
                                      bg = element_blank(),
                                      ylabel = NULL,
                                      yaxis_text = element_blank(),
-                                     percent_change="") {
+                                     percent_change = "") {
   subset = get_sale_subset(type)
   ggplot(subset, aes(x = QUARTER, fill = QUARTER)) +
     geom_bar(
@@ -616,7 +618,7 @@ plot_volume_by_sale_type <- function(type,
         label = after_stat(count),
         y = after_stat(count) + 150,
         color = QUARTER,
-        family= "Roboto Condensed"
+        family = "Roboto Condensed"
       ),
       show.legend = FALSE
     ) +
@@ -625,41 +627,44 @@ plot_volume_by_sale_type <- function(type,
     # Add market and the percent change
     labs(x = paste0(type, percent_change), y = ylabel) +
     theme_minimal() +
-    theme(
-      axis.text.y = yaxis_text,
+    theme(axis.text.y = yaxis_text,
           panel.background = bg)
 }
 
 # Combine plots for visualization
+# NOTE: Ideally, the percentages are generated dynamically. However, setting the color in visualization and revising the headlines and subtitles are not straightforward to do dynamically
 q1_all_sales_vol <-
   plot_volume_by_sale_type(
     "All Sales",
     ylabel = "No. of Sales",
     yaxis_text = element_text(),
     bg = element_rect(fill = "aliceblue", linewidth = 0),
-    percent_change=" (<span style='color:darkgreen;'>**+1.5%**</span>)"
+    percent_change = " (<span style='color:darkgreen;'>**+1.5%**</span>)"
   )
-q1_new_sale_vol <- plot_volume_by_sale_type("New Sale", percent_change=" (<span style='color:darkgreen;'>**+15.2%**</span>)")
-q1_resale_vol <- plot_volume_by_sale_type("Resale", percent_change=" (<span style='color:brown;'>**-6.1**%</span>)")
-q1_sub_sale_vol <- plot_volume_by_sale_type("Sub Sale", percent_change=" (<span style='color:darkgreen;'>**+25.7%**</span>)")
+q1_new_sale_vol <-
+  plot_volume_by_sale_type("New Sale", percent_change = " (<span style='color:darkgreen;'>**+15.2%**</span>)")
+q1_resale_vol <-
+  plot_volume_by_sale_type("Resale", percent_change = " (<span style='color:brown;'>**-6.1**%</span>)")
+q1_sub_sale_vol <-
+  plot_volume_by_sale_type("Sub Sale", percent_change = " (<span style='color:darkgreen;'>**+25.7%**</span>)")
 
 (q1_all_sales_vol |
     q1_new_sale_vol | q1_resale_vol | q1_sub_sale_vol) +
-  plot_annotation(
-    title="Singapore Property Sales Volume Up 1.5% from Q1 2023 to Q1 2024.",
-    subtitle="Among the markets, **Sub Sale** showed the highest percentage growth with a <span style='color:darkgreen;'>**25.7%**</span> increase, while the **Resale** market experienced<br/>a decline of <span style='color:brown;'>**6.1%**</span>."
-  ) &
+  #Add headline and subtitle
+  plot_annotation(title = "Singapore Private Property Sales Volume Up 1.5% from Q1 2023 to Q1 2024.",
+                  subtitle = "Among the markets, **Sub Sale** showed the highest percentage growth with a <span style='color:darkgreen;'>**25.7%**</span> increase, while the **Resale** market<br/>experienceda decline of <span style='color:brown;'>**6.1%**</span>.") &
+  # Set universal styles
   theme(
     text = element_text(family = "Roboto Condensed"),
-    plot.title = element_text(face="bold", color="blue"),
-    plot.subtitle = element_markdown(color="#464646", size=rel(0.9)),
+    plot.title = element_text(face = "bold", color = "blue"),
+    plot.subtitle = element_markdown(color = "#464646", size = rel(0.9)),
     axis.title.x = element_markdown(),
     axis.line.x = element_line(),
     axis.ticks.y = element_blank()
   )
 ```
 
-## 2024 Q1 Insights
+## 4.3 Diving deep into the 2024 Q1 Market
 
 ```{r}
 q12024 <- realis_per_unit %>% filter(QUARTER=="2024Q1")
@@ -671,9 +676,24 @@ ggplot(q12024, aes(x=PROPERTY_TYPE, fill=TYPE_OF_SALE)) +
 
 ```{r}
 ggplot(q12024, aes(x=PROPERTY_TYPE, y=TRANSACTED_PRICE/1000, fill=PROPERTY_TYPE)) +
-  geom_boxplot() +
+  geom_violin() +
+  geom_hline(yintercept=median(q12024$TRANSACTED_PRICE)/1000, color = "red") +
+  geom_hline(yintercept=mean(q12024$TRANSACTED_PRICE)/1000) +
   scale_y_log10() +
   coord_flip()
+```
+
+```{r}
+q1_2024_aggregated = q12024 %>% group_by(TYPE_OF_SALE, PROPERTY_TYPE) %>% summarise(
+  COUNT = n(),
+  MEDIAN_PRICE = median(TRANSACTED_PRICE),
+  MEAN_PRICE = mean(TRANSACTED_PRICE),
+  MIN_PRICE = min(TRANSACTED_PRICE),
+  MAX_PRICE = max(TRANSACTED_PRICE),
+)
+ggplot(q1_2024_aggregated, aes(area=COUNT, fill = TYPE_OF_SALE,
+               label = TYPE_OF_SALE, subgroup = PROPERTY_TYPE)) +
+  geom_treemap()
 ```
 
 # 5 Summary

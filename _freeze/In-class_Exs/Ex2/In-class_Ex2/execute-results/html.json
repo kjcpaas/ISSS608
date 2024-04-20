@@ -1,0 +1,16 @@
+{
+  "hash": "45708d31c83bc221aa716607a1a8f860",
+  "result": {
+    "markdown": "---\ntitle: \"In-class Exercise 2\"\nauthor: \"Kristine Joy Paas\"\ndate: \"20 April 2024\"\ndate-modified: \"last-modified\"\nformat: html\nexecute: \n  echo: true\n  eval: true\n  warning: false\n  freeze: true\n---\n\n\n# 1 Setup\n\n## 1.1 Loading the R packages\n\n\n::: {.cell}\n\n```{.r .cell-code}\npacman::p_load(tidyverse, ggdist, ggthemes, ggridges, colorspace)\n```\n:::\n\n\n## 1.2 Importing the data\n\n\n::: {.cell}\n\n```{.r .cell-code}\nexam_df <- read_csv(\"data/Exam_data.csv\")\n```\n:::\n\n\n# 2 Visualizing distribution\n\n## 2.1 Histogram\n\n\n::: {.cell}\n\n```{.r .cell-code}\nggplot(exam_df, aes(x=ENGLISH)) +\n  geom_histogram(color = \"#1696d2\",\n               adjust = 0.65,\n               alpha = 0.6)\n```\n\n::: {.cell-output-display}\n![](In-class_Ex2_files/figure-html/unnamed-chunk-3-1.png){width=672}\n:::\n:::\n\n\n## 2.2 Probability Density Diagram\n\n\n::: {.cell}\n\n```{.r .cell-code}\nggplot(exam_df, aes(x=ENGLISH)) +\n  geom_density(color = \"#1696d2\",\n               adjust = 0.65,\n               alpha = 0.6,)\n```\n\n::: {.cell-output-display}\n![](In-class_Ex2_files/figure-html/unnamed-chunk-4-1.png){width=672}\n:::\n:::\n\n\n## 2.3 Alternative design\n\n\n::: {.cell}\n\n```{.r .cell-code}\nmedian_eng <- median(exam_df$ENGLISH)\nmean_eng <- mean(exam_df$ENGLISH)\nstd_eng <- sd(exam_df$ENGLISH)\n\nggplot(exam_df, aes(x=ENGLISH)) +\n  geom_density(color = \"#1696d2\",\n               adjust = 0.65,\n               alpha = 0.6,) +\n  stat_function(\n    fun=dnorm,\n    args = list(mean=mean_eng, sd = std_eng),\n    col = \"grey30\",\n    size = 0.8)+\n    geom_vline(aes(xintercept=mean_eng), color = \"#4d5887\", linewidth = 0.6, linetype = \"dashed\")+\n  annotate(geom = \"text\",\n           x = mean_eng - 10,\n           y = 0.04,\n           label = paste0(\"Mean ENGLISH:\", round(mean_eng), 2),\n           color = \"#4d5887\") +\n  geom_vline(aes(xintercept=median_eng), color = \"#4d5887\", linewidth = 0.6) +\n  annotate(geom = \"text\",\n           x = median_eng + 10,\n           y = 0.04,\n           label = paste0(\"Median ENGLISH:\", round(median_eng), 2),\n           color = \"#4d5887\")\n```\n\n::: {.cell-output-display}\n![](In-class_Ex2_files/figure-html/unnamed-chunk-5-1.png){width=672}\n:::\n:::\n",
+    "supporting": [
+      "In-class_Ex2_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

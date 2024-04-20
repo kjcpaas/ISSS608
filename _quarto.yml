@@ -15,6 +15,8 @@ website:
         menu:
           - text: "1: Introduction to Visual Analytics"
             href: In-class_Exs/Ex1/In-class_Ex1.qmd
+          - text: "2: ggplot"
+            href: In-class_Exs/Ex2/In-class_Ex2.qmd
       - text: Take-home Exercises
         menu:
           - text: "1: Creating data visualisation beyond default"
