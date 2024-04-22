@@ -273,7 +273,7 @@ After adding the `QUARTER` and `TXN_ID` columns, there are now 23 variables in t
 ### Column Details
 
 | Column Name                 | Description                                                                                                                                                                  | Action                      | Reason                                                            |
-|------------------|------------------|------------------|-------------------|
+|-----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------|-------------------------------------------------------------------|
 | PROJECT_NAME                | Name of the project                                                                                                                                                          | [DROP]{style="color:red"}   | Too specific for aggregation                                      |
 | TRANSACTED_PRICE            | Transaction price (SGD)                                                                                                                                                      | [KEEP]{style="color:green"} | Core data for analysis                                            |
 | AREA_SQFT                   | Area of the property in sqft                                                                                                                                                 | [KEEP]{style="color:green"} | Can be useful partitioning data                                   |

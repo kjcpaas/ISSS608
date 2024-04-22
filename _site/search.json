@@ -338,44 +338,44 @@
   {
     "objectID": "In-class_Exs/Ex2/In-class_Ex2.html",
     "href": "In-class_Exs/Ex2/In-class_Ex2.html",
-    "title": "In-class Exercise 2",
+    "title": "In-class Exercise 2: Visualizing distribution",
     "section": "",
-    "text": "pacman::p_load(tidyverse, ggdist, ggthemes, ggridges, colorspace)\n\n\n\n\n\nexam_df &lt;- read_csv(\"data/Exam_data.csv\")"
+    "text": "From exercise published on https://r4va.netlify.app/chap09\nI learned the following:\n\nDifferent ways to visualize distribution\nRidgeline plot using ggridges\nRaincloud plot using ggdists"
   },
   {
     "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#loading-the-r-packages",
     "href": "In-class_Exs/Ex2/In-class_Ex2.html#loading-the-r-packages",
-    "title": "In-class Exercise 2",
-    "section": "",
-    "text": "pacman::p_load(tidyverse, ggdist, ggthemes, ggridges, colorspace)"
+    "title": "In-class Exercise 2: Visualizing distribution",
+    "section": "2.1 Loading the R packages",
+    "text": "2.1 Loading the R packages\n\npacman::p_load(tidyverse, ggdist, ggthemes, ggridges, colorspace)"
   },
   {
     "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#importing-the-data",
     "href": "In-class_Exs/Ex2/In-class_Ex2.html#importing-the-data",
-    "title": "In-class Exercise 2",
-    "section": "",
-    "text": "exam_df &lt;- read_csv(\"data/Exam_data.csv\")"
+    "title": "In-class Exercise 2: Visualizing distribution",
+    "section": "2.2 Importing the data",
+    "text": "2.2 Importing the data\n\nexam_df &lt;- read_csv(\"data/Exam_data.csv\")"
   },
   {
     "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#histogram",
     "href": "In-class_Exs/Ex2/In-class_Ex2.html#histogram",
-    "title": "In-class Exercise 2",
-    "section": "2.1 Histogram",
-    "text": "2.1 Histogram\n\nggplot(exam_df, aes(x=ENGLISH)) +\n  geom_histogram(color = \"#1696d2\",\n               adjust = 0.65,\n               alpha = 0.6)"
+    "title": "In-class Exercise 2: Visualizing distribution",
+    "section": "3.1 Histogram",
+    "text": "3.1 Histogram\n\nggplot(exam_df, aes(x=ENGLISH)) +\n  geom_histogram(color = \"#1696d2\",\n               adjust = 0.65,\n               alpha = 0.6)"
   },
   {
     "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#probability-density-diagram",
     "href": "In-class_Exs/Ex2/In-class_Ex2.html#probability-density-diagram",
-    "title": "In-class Exercise 2",
-    "section": "2.2 Probability Density Diagram",
-    "text": "2.2 Probability Density Diagram\n\nggplot(exam_df, aes(x=ENGLISH)) +\n  geom_density(color = \"#1696d2\",\n               adjust = 0.65,\n               alpha = 0.6,)"
+    "title": "In-class Exercise 2: Visualizing distribution",
+    "section": "3.2 Probability Density Diagram",
+    "text": "3.2 Probability Density Diagram\nIt uses geom_density() from ggdist package.\n\nggplot(exam_df, aes(x=ENGLISH)) +\n  geom_density(color = \"#1696d2\",\n               adjust = 0.65,\n               alpha = 0.6,)"
   },
   {
     "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#alternative-design",
     "href": "In-class_Exs/Ex2/In-class_Ex2.html#alternative-design",
-    "title": "In-class Exercise 2",
-    "section": "2.3 Alternative design",
-    "text": "2.3 Alternative design\n\nmedian_eng &lt;- median(exam_df$ENGLISH)\nmean_eng &lt;- mean(exam_df$ENGLISH)\nstd_eng &lt;- sd(exam_df$ENGLISH)\n\nggplot(exam_df, aes(x=ENGLISH)) +\n  geom_density(color = \"#1696d2\",\n               adjust = 0.65,\n               alpha = 0.6,) +\n  stat_function(\n    fun=dnorm,\n    args = list(mean=mean_eng, sd = std_eng),\n    col = \"grey30\",\n    size = 0.8)+\n    geom_vline(aes(xintercept=mean_eng), color = \"#4d5887\", linewidth = 0.6, linetype = \"dashed\")+\n  annotate(geom = \"text\",\n           x = mean_eng - 10,\n           y = 0.04,\n           label = paste0(\"Mean ENGLISH:\", round(mean_eng), 2),\n           color = \"#4d5887\") +\n  geom_vline(aes(xintercept=median_eng), color = \"#4d5887\", linewidth = 0.6) +\n  annotate(geom = \"text\",\n           x = median_eng + 10,\n           y = 0.04,\n           label = paste0(\"Median ENGLISH:\", round(median_eng), 2),\n           color = \"#4d5887\")"
+    "title": "In-class Exercise 2: Visualizing distribution",
+    "section": "3.3 Alternative design",
+    "text": "3.3 Alternative design\n\nmedian_eng &lt;- median(exam_df$ENGLISH)\nmean_eng &lt;- mean(exam_df$ENGLISH)\nstd_eng &lt;- sd(exam_df$ENGLISH)\n\nggplot(exam_df, aes(x=ENGLISH)) +\n  geom_density(color = \"#1696d2\",\n               adjust = 0.65,\n               alpha = 0.6,) +\n  stat_function(\n    fun=dnorm,\n    args = list(mean=mean_eng, sd = std_eng),\n    col = \"grey30\",\n    size = 0.8)+\n    geom_vline(aes(xintercept=mean_eng), color = \"#4d5887\", linewidth = 0.6, linetype = \"dashed\")+\n  annotate(geom = \"text\",\n           x = mean_eng - 10,\n           y = 0.04,\n           label = paste0(\"Mean ENGLISH:\", round(mean_eng), 2),\n           color = \"#4d5887\") +\n  geom_vline(aes(xintercept=median_eng), color = \"#4d5887\", linewidth = 0.6) +\n  annotate(geom = \"text\",\n           x = median_eng + 10,\n           y = 0.04,\n           label = paste0(\"Median ENGLISH:\", round(median_eng), 2),\n           color = \"#4d5887\")"
   },
   {
     "objectID": "Take-home_Exs/Ex1/Take-home_Ex1.html#diving-deep-into-the-2024-q1-market",
@@ -383,5 +383,61 @@
     "title": "Take-home Exercise 1: Creating Visualization Beyond Default - Singapore Private Residential Property Market for 2024 Q1",
     "section": "4.3 Diving deep into the 2024 Q1 Market",
     "text": "4.3 Diving deep into the 2024 Q1 Market\n\nq12024 &lt;- realis_per_unit %&gt;% filter(QUARTER==\"2024Q1\")\n\nggplot(q12024, aes(x=PROPERTY_TYPE, fill=TYPE_OF_SALE)) +\n  geom_bar() +\n  coord_flip()\n\n\n\n\n\nggplot(q12024, aes(x=PROPERTY_TYPE, y=TRANSACTED_PRICE/1000, fill=PROPERTY_TYPE)) +\n  geom_violin() +\n  geom_hline(yintercept=median(q12024$TRANSACTED_PRICE)/1000, color = \"red\") +\n  geom_hline(yintercept=mean(q12024$TRANSACTED_PRICE)/1000) +\n  scale_y_log10() +\n  coord_flip()\n\n\n\n\n\nq1_2024_aggregated = q12024 %&gt;% group_by(TYPE_OF_SALE, PROPERTY_TYPE) %&gt;% summarise(\n  COUNT = n(),\n  MEDIAN_PRICE = median(TRANSACTED_PRICE),\n  MEAN_PRICE = mean(TRANSACTED_PRICE),\n  MIN_PRICE = min(TRANSACTED_PRICE),\n  MAX_PRICE = max(TRANSACTED_PRICE),\n)\nggplot(q1_2024_aggregated, aes(area=COUNT, fill = TYPE_OF_SALE,\n               label = TYPE_OF_SALE, subgroup = PROPERTY_TYPE)) +\n  geom_treemap()"
+  },
+  {
+    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#plotting-ridgeline-graph-ggridges-method",
+    "href": "In-class_Exs/Ex2/In-class_Ex2.html#plotting-ridgeline-graph-ggridges-method",
+    "title": "In-class Exercise 2: Visualizing distribution",
+    "section": "4.1 Plotting ridgeline graph: ggridges method",
+    "text": "4.1 Plotting ridgeline graph: ggridges method\nggridges package provides two main geom to plot gridgeline plots, they are: geom_ridgeline() and geom_density_ridges().\ngeom_ridgeline() plots the graph using the height values from the data directly. It is useful when the height values refer to a column directly.\nFor this particular dataset, it is more appropriate to use geom_density_ridges() as we need to plot the distribution of students’ English score. If we had tallied and aggregated the number of students who scores within score ranges, geom_ridgeline() might be appropriate but it isn’t the case.\n\n\nShow ggplot2 code\nggplot(exam_df, \n       aes(x = ENGLISH, \n           y = CLASS)) +\n  geom_density_ridges(\n    scale = 3,\n    rel_min_height = 0.01,\n    bandwidth = 3.4,\n    fill = lighten(\"#7097BB\", .3),\n    color = \"white\"\n  ) +\n  scale_x_continuous(\n    name = \"English grades\",\n    expand = c(0, 0)\n    ) +\n  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +\n  theme_ridges()"
+  },
+  {
+    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#varying-colors-along-the-x-axis",
+    "href": "In-class_Exs/Ex2/In-class_Ex2.html#varying-colors-along-the-x-axis",
+    "title": "In-class Exercise 2: Visualizing distribution",
+    "section": "4.2 Varying colors along the x-axis",
+    "text": "4.2 Varying colors along the x-axis\nSometimes we would like to have the area under a ridgeline not filled with a single solid color but rather with colors that vary in some form along the x axis. This effect can be achieved by using either geom_ridgeline_gradient() or geom_density_ridges_gradient(). Both geoms work just like geom_ridgeline() and geom_density_ridges(), except that they allow for varying fill colors. However, they do not allow for alpha transparency in the fill. For technical reasons, we can have changing fill colors or transparency but not both.\nIf we need emphasize the actual values with color gradient, using colors is appropriate. However, It may not be necessary when there are fewer ridge graphs, since the farthest graph is still relatively close to the axis.\nHowever, in the plot below, it can be more easily seen that 3I scored lowest, while 3A scored the highest among the different classes. Hence, in this case, colors are really valuable.\n\n\nShow ggplot2 code\nggplot(exam_df, \n       aes(x = ENGLISH, \n           y = CLASS,\n           fill = after_stat(x))) + # changed from stat() as it is deprecated\n  geom_density_ridges_gradient(\n    scale = 3,\n    rel_min_height = 0.01) +\n  scale_fill_viridis_c(name = \"Temp. [F]\",\n                       option = \"C\") +\n  scale_x_continuous(\n    name = \"English grades\",\n    expand = c(0, 0)\n  ) +\n  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +\n  theme_ridges()"
+  },
+  {
+    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#mapping-the-probabilities-directly-into-color",
+    "href": "In-class_Exs/Ex2/In-class_Ex2.html#mapping-the-probabilities-directly-into-color",
+    "title": "In-class Exercise 2: Visualizing distribution",
+    "section": "4.3 Mapping the probabilities directly into color",
+    "text": "4.3 Mapping the probabilities directly into color\nBeside providing additional geom objects to support the need to plot ridgeline plot, ggridges package also provides a stat function called stat_density_ridges() that replaces stat_density() of ggplot2.\nFigure below is plotted by mapping the probabilities calculated by using stat(ecdf) which represent the empirical cumulative density function for the distribution of English score.\n\n\n\n\n\n\nWe are using the probabilities from stat(ecdf) in the fill aesthetic of the plot so the probabilities affect the color fill.\n\n\n\n\n\nShow ggplot2 code\nggplot(exam_df,\n       aes(x = ENGLISH, \n           y = CLASS, \n           fill = 0.5 - abs(0.5-stat(ecdf)))) +\n  stat_density_ridges(geom = \"density_ridges_gradient\", \n                      calc_ecdf = TRUE) +\n  scale_fill_viridis_c(name = \"Tail probability\",\n                       direction = -1) +\n  theme_ridges()"
+  },
+  {
+    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#ridgeline-plots-with-quantile-lines",
+    "href": "In-class_Exs/Ex2/In-class_Ex2.html#ridgeline-plots-with-quantile-lines",
+    "title": "In-class Exercise 2: Visualizing distribution",
+    "section": "4.4 Ridgeline plots with quantile lines",
+    "text": "4.4 Ridgeline plots with quantile lines\nBy using geom_density_ridges_gradient(), we can colour the ridgeline plot by quantile, via the calculated stat(quantile) aesthetic as shown in the figure below.\n\n\nShow ggplot2 code\nggplot(exam_df,\n       aes(x = ENGLISH, \n           y = CLASS, \n           fill = factor(stat(quantile))\n           )) +\n  stat_density_ridges(\n    geom = \"density_ridges_gradient\",\n    calc_ecdf = TRUE, \n    quantiles = 4,\n    quantile_lines = TRUE) +\n  scale_fill_viridis_d(name = \"Quartiles\") +\n  theme_ridges()\n\n\n\n\n\nInstead of using number to define the quantiles, we can also specify quantiles by cut points such as 2.5% and 97.5% tails to colour the ridgeline plot as shown in the figure below.\n\n\nShow ggplot2 code\nggplot(exam_df,\n       aes(x = ENGLISH, \n           y = CLASS, \n           fill = factor(stat(quantile))\n           )) +\n  stat_density_ridges(\n    geom = \"density_ridges_gradient\",\n    calc_ecdf = TRUE, \n    quantiles = c(0.025, 0.975)\n    ) +\n  scale_fill_manual(\n    name = \"Probability\",\n    values = c(\"#FF0000A0\", \"#A0A0A0A0\", \"#0000FFA0\"),\n    labels = c(\"(0, 0.025]\", \"(0.025, 0.975]\", \"(0.975, 1]\")\n  ) +\n  theme_ridges()"
+  },
+  {
+    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#plotting-a-half-eye-plot",
+    "href": "In-class_Exs/Ex2/In-class_Ex2.html#plotting-a-half-eye-plot",
+    "title": "In-class Exercise 2: Visualizing distribution",
+    "section": "5.1 Plotting a Half-eye plot",
+    "text": "5.1 Plotting a Half-eye plot\nWe will plot a Half-Eye graph by using stat_halfeye() of ggdist package.\nIt contains a half-density and slab interval graph.\n\nWith slab intervalWithout slab interval\n\n\nThe slab interval is similar to a box plot and it shows the relevant quantiles of the data.\n\n\nShow ggplot2 code\nggplot(exam_df, \n       aes(x = RACE, \n           y = ENGLISH)) +\n  stat_halfeye(adjust = 0.5,\n               justification = -0.2)\n\n\n\n\n\n\n\nSetting .width = 0, point_colour = NA will remove the slab interval. Slab interval may be useful for some use cases but rendering a box plot or removing it together may be more useful for visualization.\n\n\nShow ggplot2 code\nggplot(exam_df, \n       aes(x = RACE, \n           y = ENGLISH)) +\n  stat_halfeye(adjust = 0.5,\n               justification = -0.2,\n               .width = 0,\n               point_colour = NA)"
+  },
+  {
+    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#adding-a-boxplot",
+    "href": "In-class_Exs/Ex2/In-class_Ex2.html#adding-a-boxplot",
+    "title": "In-class Exercise 2: Visualizing distribution",
+    "section": "5.2 Adding a boxplot",
+    "text": "5.2 Adding a boxplot\nWe can replace the slab interval with a narrow boxplot. It provides more aesthetic presentation of the distribution and fills the gap between the half-eye plot and the gridlines.\n\n\nShow ggplot2 code\nggplot(exam_df, \n       aes(x = RACE, \n           y = ENGLISH)) +\n  stat_halfeye(adjust = 0.5,\n               justification = -0.2,\n               .width = 0,\n               point_colour = NA) +\n  geom_boxplot(width = .20,\n               outlier.shape = NA)"
+  },
+  {
+    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#adding-volume-information",
+    "href": "In-class_Exs/Ex2/In-class_Ex2.html#adding-volume-information",
+    "title": "In-class Exercise 2: Visualizing distribution",
+    "section": "5.3 Adding Volume information",
+    "text": "5.3 Adding Volume information\nThe distribution plot so far gives information on the relative distribution. However, it is hard to know the absolute volume within each bin. We can use stat_dots() of ggdist package to generate this.\nWe will plot it on the same side as the half-eye plot.\n\n\nShow ggplot2 code\nggplot(exam_df, \n       aes(x = RACE, \n           y = ENGLISH)) +\n  stat_halfeye(adjust = 0.5,\n               justification = -0.2,\n               .width = 0,\n               point_colour = NA) +\n  geom_boxplot(width = .20,\n               outlier.shape = NA) +\n  stat_dots(side = \"left\", \n            justification = 1.2, \n            binwidth = .5,\n            dotsize = 2)\n\n\n\n\n\nBy adding the volume dots, we can see that the Others plot actually has less observations that the other Race values, even though the curve looks taller. It reduces misinterpretation of the data."
+  },
+  {
+    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#finishing-touches",
+    "href": "In-class_Exs/Ex2/In-class_Ex2.html#finishing-touches",
+    "title": "In-class Exercise 2: Visualizing distribution",
+    "section": "5.4 Finishing touches",
+    "text": "5.4 Finishing touches\nLastly, we can flip the coordinates and add a theme to make it more presentable.\n\nggplot(exam_df, \n       aes(x = RACE, \n           y = ENGLISH)) +\n  stat_halfeye(adjust = 0.5,\n               justification = -0.2,\n               .width = 0,\n               point_colour = NA) +\n  geom_boxplot(width = .20,\n               outlier.shape = NA) +\n  stat_dots(side = \"left\", \n            justification = 1.2, \n            binwidth = .5,\n            dotsize = 1.5) +\n  coord_flip() +\n  theme_economist()"
   }
 ]
