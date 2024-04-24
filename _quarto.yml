@@ -11,6 +11,21 @@ website:
             href: Hands-on_Exs/Ex1/Hands-on_Ex1.qmd
           - text: "2: Beyond ggplot Fundamentals"
             href: Hands-on_Exs/Ex2/Hands-on_Ex2.qmd
+      - text: In-class Exercises
+        menu:
+          - text: "1: Introduction to Visual Analytics"
+            href: In-class_Exs/Ex1/In-class_Ex1.qmd
+          - text: "2: Visualizing Distribution"
+            href: In-class_Exs/Ex2/In-class_Ex2.qmd
+      - text: Take-home Exercises
+        menu:
+          - text: "1: Creating data visualisation beyond default"
+            href: Take-home_Exs/Ex1/Take-home_Ex1.qmd
+          - text: "2: DataVis Makeover"
+            href: Take-home_Exs/Ex2/Take-home_Ex2.qmd
+    right:
+      - href: index.qmd
+        text: Home
 
 format:
   html:

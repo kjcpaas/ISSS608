@@ -273,7 +273,7 @@ After adding the `QUARTER` and `TXN_ID` columns, there are now 23 variables in t
 ### Column Details
 
 | Column Name                 | Description                                                                                                                                                                  | Action                      | Reason                                                            |
-|-----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------|-------------------------------------------------------------------|
+|-----------------|-----------------------|-----------------|-----------------|
 | PROJECT_NAME                | Name of the project                                                                                                                                                          | [DROP]{style="color:red"}   | Too specific for aggregation                                      |
 | TRANSACTED_PRICE            | Transaction price (SGD)                                                                                                                                                      | [KEEP]{style="color:green"} | Core data for analysis                                            |
 | AREA_SQFT                   | Area of the property in sqft                                                                                                                                                 | [KEEP]{style="color:green"} | Can be useful partitioning data                                   |
@@ -307,6 +307,7 @@ realis <-
   realis %>% select(
     c(
       TXN_ID,
+      PROJECT_NAME,
       QUARTER,
       NUMBER_OF_UNITS,
       TRANSACTED_PRICE,
@@ -466,20 +467,36 @@ write_rds(realis_per_unit, "data/rds/realis_per_unit.rds")
 
 # 4 Data Exploration
 
-```{r}
-ggplot(realis_per_unit, aes(x=QUARTER, fill=TYPE_OF_SALE)) +
-    geom_bar()
-```
+For this exercise, we will focus on exploring and visualizing the **distribution among the different submarkets**.
+
+The points of interest are:
+
+-   2023 and 2024 Q1 prices
+
+-   Trends in sales volume per quarter
+
+-   Distribution across different markets within 2024Q1
 
 ## 4.1 Comparing 2023Q1 and 2024Q1 prices
 
-Credit to [https://akalestale.netlify.app/take-home_ex/take-home_ex01/take-home_ex01](http://127.0.0.1:25657/#0 "https://akalestale.netlify.app/take-home_ex/take-home_ex01/take-home_ex01") for stat_halfeye usage
+First we will compare the prices between the **First Quarter** of 2023 and 2024. This is to compare the prices at the same time of the year.
 
-::: {.callout-important appearance="simple"}
-This section uses ChatGPT to revise the plot headlines and captions.
-:::
+For this visualization, we will use the **Unit Price per Sqft** (`UNIT_PRICE_PSF`) instead of the **Transaction Price** (`TRANSACTED_PRICE`). This is so we can more fairly compare prices with less variables involved. With Transaction Price, the size of the property needs to be considered.
+
+We will use the `TYPE_OF_SALE` column to partition the data so we can compare the trends across the **Resale, New Sale and Sub Sale markets**.
 
 ### 4.1.2 Creating the base Visualization
+
+For the visualization, we will use a **Raincloud Plot** so that we can see the patterns in the price trends, and whether there are clusters of interest within the data set.
+
+We will also add a **boxplot** to accompany the half-density plot so that we can see the quantiles more clearly.
+
+To compare the different quarters, we will use both **left side and right side** visualization to compare the quarters side by side. This is inspired by a [senior's work.](https://akalestale.netlify.app/take-home_ex/take-home_ex01/take-home_ex01)
+
+To visualize the volumes, the 2 options are using `stat_dots()` or `geom_jitter()`.
+
+::: panel-tabset
+#### Raincloud Plot w/ volume plot (chosen)
 
 ```{r}
 #| code-fold: true
@@ -494,6 +511,80 @@ plot_q1_yoy_psf_price <- function() {
       color = QUARTER
     )
   ) +
+    
+    # Generate half-density plot
+    stat_halfeye(
+      aes(
+        justification = ifelse(QUARTER == "2023Q1", 1.20, 0.02),
+        side = ifelse(QUARTER == "2023Q1", "left", "right")
+      ),
+      position = position_nudge(x = 0.1, y = 0),
+      .width = 0,
+      alpha = 0.8,
+      point_color = NA,
+      show.legend = FALSE
+    ) +
+    
+    # Generate boxplot along edge of half-density plot
+    geom_boxplot(
+      outlier.shape = NA,
+      alpha = 0.8,
+      width = .1,
+      color = "black",
+      show.legend = FALSE
+    ) +
+    
+    # Generate volume plots, adjusting sizing so as to not overflow into the other half
+    stat_dots(
+      aes(
+        side = ifelse(QUARTER == "2024Q1", "left", "right"),
+        justification = ifelse(QUARTER == "2024Q1", 1.10,-0.1)
+      ),
+      binwidth = 100,
+      dotsize = 0.005,
+      alpha = 0.2,
+      show.legend = FALSE
+    ) +
+    
+    # Add text about the median price
+    stat_summary(
+      aes(label = paste0("S$", after_stat(y))),
+      geom = "text",
+      fun = "median",
+      position = position_nudge(y = 2500),
+      family = "Roboto Condensed",
+      show.legend = FALSE
+    ) +
+    
+    # Set colors and fill
+    # Keep it simple, and use bright color for 20424Q1 it is the focus of visualization
+    scale_color_manual(values = c("grey45", "blue")) +
+    scale_fill_manual(values = c("grey45", "blue")) +
+    labs(y = "Unit Price Per Sqft ($)") +
+    # Next steps will take care of theme enhancements
+    theme_minimal()
+}
+
+plot_q1_yoy_psf_price()
+```
+
+#### Raincloud Plot w/ jitter plot (alternative)
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show ggplot2 code"
+plot_q1_yoy_psf_price_alt <- function() {
+  ggplot(
+    realis_per_unit %>% filter(QUARTER %in% c("2023Q1", "2024Q1")),
+    aes(
+      x = QUARTER,
+      y = UNIT_PRICE_PSF,
+      fill = QUARTER,
+      color = QUARTER
+    )
+  ) +
+    
+    # Generate half-density plot
     stat_halfeye(
       aes(
         fill = QUARTER,
@@ -502,163 +593,315 @@ plot_q1_yoy_psf_price <- function() {
       ),
       position = position_nudge(x = 0.1, y = 0),
       .width = 0,
-      alpha = .8,
+      alpha = 0.8,
       point_color = NA,
       show.legend = FALSE
     ) +
+    
+    # Generate jitter plot under the geom plot so the dots don't overpower the boxplot
     geom_jitter(
       width = 0.08,
       size = 0.01,
       alpha = 0.2,
       show.legend = FALSE
     ) +
+    
+    # Generate boxplot along edge of half-density plot
     geom_boxplot(
       outlier.shape = NA,
       alpha = 0,
-      width = .1,
+      width = 0.1,
       color = "black",
       show.legend = FALSE
     ) +
+    
+    # Add text about the median price
     stat_summary(
-      aes(label = paste0("$", after_stat(y))),
+      aes(label = paste0("S$", after_stat(y))),
       geom = "text",
       fun = "median",
       position = position_nudge(y = 2500),
       family = "Roboto Condensed",
       show.legend = FALSE
     )+
+    
+    # Set colors and fill
+    # Keep it simple, and use bright color for 20424Q1 it is the focus of visualization
     scale_fill_manual(values = c("grey50", "blue")) +
     scale_color_manual(values = c("grey50", "blue")) +
     labs(y = "Unit Price Per Sqft ($)") +
+    # Next steps will take care of theme enhancements
     theme_minimal()
 }
 
-plot_q1_yoy_psf_price()
+plot_q1_yoy_psf_price_alt()
 ```
+:::
 
-### 4.2.2 Generating the visualization
+::: callout-important
+#### Winner: stat_dots()
+
+Using `stat_dots()` is better than `geom_jitter()` as the purpose of providing volume information here is to **accompany the half-density plot** and provide a tool to compare the volume of each submarket.
+
+Comparing the length of each horizontal line is much easier to do than comparing how dark each area is in a jitter plot.
+:::
+
+Now that we have the base visualization, we will generate the final visualization.
+
+### 4.1.2 Generating the visualization
+
+We want to compare the 2023 and 2024 Q1 sales for different submarkets. To do this, we will use `facet_wrap()` on `TYPE_OF_SALE`.
+
+In addition, we will add another facet for **All Markets** for the overall comparison.
+
+These 2 plots will be shown side by side using `patchwork`.
+
+::: {.callout-note appearance="simple"}
+#### facet_grid(margin = TRUE) as alternative
+
+We can also use `facet_grid(margin = TRUE)` to generate a facet with all the data, instead of generating 2 separate plots.
+
+However, I would like to change the panel color for the overall plot to highlight it but I couldn't find a way to do it within `facet_grid()`.
+:::
 
 ```{r}
 #| code-fold: true
 #| code-summary: "Show ggplot2 code"
-
 q1_yoy_psf_price_submarkets_graph <- plot_q1_yoy_psf_price() +
-  facet_wrap(~ TYPE_OF_SALE, strip.position = "bottom") +
+  facet_wrap(~ TYPE_OF_SALE,
+             strip.position = "bottom",
+             labeller = labeller(
+               TYPE_OF_SALE = c(
+                 "New Sale" = "New Sale (<span style='color:brown;'>**-7.6%**</span>)",
+                 "Sub Sale" = "Sub Sale (<span style='color:brown;'>**-0.5%**</span>)",
+                 "Resale" = "Resale (<span style='color:darkgreen;'>**+3.3%**</span>)"
+               )
+             )) +
   theme_minimal() +
-  theme(
-        axis.title.y = element_blank(),
-    axis.text.y = element_blank())
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank())
 
 q1_yoy_psf_price_all_markets_graph <- plot_q1_yoy_psf_price() +
-  facet_wrap(~ NUMBER_OF_UNITS, strip.position = "bottom", labeller = as_labeller(function(l) {"All Sales"})) +
+  facet_wrap(~ NUMBER_OF_UNITS,
+             strip.position = "bottom",
+             labeller = as_labeller(function(l) {
+               "All Markets (<span style='color:darkgreen;'>**+1.7%**</span>)"
+             })) +
   labs(x = "Transaction Price (,000 SGD)") +
-  theme(
-    panel.background = element_rect(fill = "aliceblue", linewidth=0)
-  )
+  theme(panel.background = element_rect(fill = "aliceblue", linewidth =
+                                          0))
 
-(q1_yoy_psf_price_all_markets_graph | q1_yoy_psf_price_submarkets_graph ) +
-  plot_layout(widths=c(1, 3)) +
-  plot_annotation(
-    title="Singapore Median Private Property Prices Up 2% from Q1 2023 to Q1 2024.",
-    subtitle="In the **New Sales** market, prices decrease by <span style='color:brown;'>**7.1%**</span>, while **Resale** and **Sub Sale** markets see increases of <span style='color:darkgreen;'>**4.5%**</span> and <span style='color:darkgreen;'>**8.5%**</span>, respectively."
-  ) &
+viz1 <- (q1_yoy_psf_price_all_markets_graph |
+           q1_yoy_psf_price_submarkets_graph) +
+  plot_layout(widths = c(1, 3)) +
+  plot_annotation(title = "Singapore Private Property Prices by Sales Market",
+                  subtitle = "Overall prices slightly increased by <span style='color:darkgreen;'>**1.7%**</span> but the New Sales market experienced <span style='color:brown;'>**7.6%**</span> decrease.") &
   theme(
     text = element_text(family = "Roboto Condensed"),
     axis.line.x = element_line(),
     axis.title.x = element_blank(),
     axis.ticks.y = element_blank(),
-    plot.title = element_text(face="bold", color="blue"),
-    plot.subtitle = element_markdown(color="grey50", size=rel(0.9)),
+    plot.title = element_text(face = "bold"),
+    plot.subtitle = element_markdown(color = "grey50", size = rel(0.9)),
     strip.placement = "outside",
-    strip.text = element_text(size = rel(1))
+    strip.text = element_markdown(size = rel(1))
   )
+viz1
 ```
 
 ::: callout-tip
-### Insights
+#### Insights
 
-Although there is an overall increase in market prices, the New Sale market experienced a decrease due to the increase in supply
+Although there is an overall slight increase in market unit prices compared to Q1 2023, the **New Sale** market experienced a decrease, with notable groups in the graph. This indicates cluster of sales in certain price points, which may be influenced by factors such as **developer pricing** and **location of New Launches.**
+
+The New Sales Market is composed of **New Launch** properties. Groups are expected to appear in the density map as new projects are expected in new estates, while less projects are expected in mature estates. According to [99.co](https://www.99.co/singapore/new-launches), there are **less than 10 New Launches** in 2024. Prices are set by the developers so there is **less variation in unit price within each project**. Hence, it is expected to see groups around these New Launches. This effect is also observed to a smaller extent in the Sub Sale Market.
+
+In the Resale Market, the available market is **all properties that have already been turned over by developers**. Price is set based on agreement between the buyer and seller, and is not limited to certain projects. Hence, there is more variation in the prices, which is why the distribution appears smoother.
 :::
 
-## 4.2 Sales Volume
+However, it is important to note that visualization can be very **misleading** especially on the New Sale Market. Generalizing that the trends when there are notable cluster may not be representative of the real state of the market.
+
+Hence, we need to look more deeply into these groups and present it as a visualizations so it can be better understood why there are groups that formed.
+
+## 4.2 Comparing 2023Q1 and 2024Q1 Sales Volume
+
+### 4.2.1 Understanding the groups in New Sales Market
+
+We hypothesized that the groups that are present in the **New Sales** plot is due to the sales of **newly-launched projects**.
+
+We will check the aggregated data by `PROJECT_NAME` and `POSTAL_DISTRICT` to verify our hypothesis that the sales are clustered by newly launched projects and their respective districts
+
+::: panel-tabset
+#### By Project Name
+
+We will aggregate the **number of sales** and **median unit price** by projects. We will also add `POSTAL_DISTRICT` to the aggregation group as property prices depend on which district a property is in.
+
+```{r}
+realis_per_unit %>% filter(TYPE_OF_SALE == "New Sale", QUARTER == "2024Q1") %>% 
+  group_by(POSTAL_DISTRICT, PROJECT_NAME) %>%
+  summarize(
+    MEDIAN_PRICE_PSF = median(UNIT_PRICE_PSF),
+    NUMBER_OF_SALES = n()
+  ) %>%
+  arrange(desc(NUMBER_OF_SALES)) %>%
+  head(10) %>% kable(row.name = TRUE)
+```
+
+We can see that **8 out of 10** projects with highest number of sales are in **Districts 23 and 26.** This is consistent with our previous observation that there are 2 groups in the New Sales density graph.
+
+Furthermore, in [99.co's New Launches page](https://www.99.co/singapore/new-launches), [Lentor Mansion](https://www.99.co/singapore/condos-apartments/lentor-mansion) (D26) and [Lumina Grand](https://www.99.co/singapore/condos-apartments/lumina-grand) (D23) are the biggest projects with the highest number of units sold.
+
+Hence, the density graph could reflected the groups that formed from the sales of properties within these 2 projects.
+
+#### By District
+
+```{r}
+realis_per_unit %>% filter(TYPE_OF_SALE == "New Sale", QUARTER == "2024Q1") %>% 
+  group_by(POSTAL_DISTRICT) %>%
+  summarize(
+    MEDIAN_PRICE_PSF = median(UNIT_PRICE_PSF),
+    NUMBER_OF_SALES = n()
+  ) %>%
+  arrange(desc(NUMBER_OF_SALES)) %>%
+  kable(row.names = TRUE)
+```
+
+Although there are new units across all districts, the big, newly launched projects contributed the most to the New Sales Market.
+
+This is hinted by the fact that after aggregating all property sales by district, D23 and D26 where [Lumina Grand](https://www.99.co/singapore/condos-apartments/lumina-grand) and [Lentor Mansion](https://www.99.co/singapore/condos-apartments/lentor-mansion) stand out. More than 60% of sales from each of these district also come from these 2 projects.
+:::
+
+Based on the findings from this deep dive, we will visualize the sales volume by district.
+
+### 4.2.2. Creating the base visualization
+
+Some of the options we have to visualize the sales by district are:
+
+-   Bar graph of number of sales for **all** district, or
+
+-   Bar graph of number of sales for **most popular** districts
+
+::: panel-tabset
+#### All districts
+
+```{r}
+plot_q1_yoy_sale_vol <- function() {
+ggplot(
+  realis_per_unit %>% filter(QUARTER %in% c("2023Q1", "2024Q1")),
+  aes(x = POSTAL_DISTRICT, fill = QUARTER)
+) +
+  geom_bar(position="dodge", show.legend = FALSE) +
+  coord_flip() +
+  scale_fill_manual(values = c("grey45", "blue")) +
+  theme_minimal()
+}
+
+plot_q1_yoy_sale_vol()
+```
+
+#### Most popular districts (chosen)
+
+This visualization needs some pre-processing so we can determine the Top 5 most popular districts in each submarket.
+
+```{r}
+popular_districts <- realis_per_unit %>% filter(QUARTER %in% c("2023Q1", "2024Q1")) %>% 
+  group_by(QUARTER, POSTAL_DISTRICT, TYPE_OF_SALE) %>%
+  summarize(
+    MEDIAN_PRICE_PSF = median(UNIT_PRICE_PSF),
+    NUMBER_OF_SALES = n()
+  ) %>%
+  group_by(QUARTER, TYPE_OF_SALE) %>%
+  arrange(desc(NUMBER_OF_SALES)) %>%
+  mutate(RANK = order(NUMBER_OF_SALES, decreasing=TRUE)) %>%
+  filter(RANK <= 5) %>%
+  select(c(QUARTER, TYPE_OF_SALE, RANK, POSTAL_DISTRICT, NUMBER_OF_SALES, MEDIAN_PRICE_PSF)) %>%
+  arrange(QUARTER)
+
+kable(popular_districts, row.names = TRUE)
+```
+
+Now that we have this aggregated dataset, we can use this to plot the ranked data. For example, we can plot the most popular districts in the New Sales Market.
+
+```{r}
+ggplot(popular_districts %>% filter(TYPE_OF_SALE =="New Sale"),
+       aes(x = reorder(RANK, -RANK), y = NUMBER_OF_SALES, fill = QUARTER))+
+  geom_bar(stat="identity", position = "dodge", show.legend = FALSE, alpha =0.8) +
+  geom_text(aes(y = 10, hjust=0, label=paste0("D", POSTAL_DISTRICT, ": ", NUMBER_OF_SALES))) +
+  coord_flip(ylim= c(0, 600)) +
+  scale_fill_manual(values = c("grey45", "blue")) +
+  facet_wrap(~QUARTER)
+```
+
+With this visualization, we can compare the top districts from 2 quarters side by side.
+:::
+
+From the 2 options, plotting the **Most Popular Districts** is more appropriate for our use case. This is because we would like the user to recognize which districts are driving the price trends.
+
+When we plot all the districts, it is more difficult to identify by sight which districts are popular in a quarter and the other. This is because this plot has a lot of noise, which may not be that relevant to connect to the previous visualization.
+
+### 4.2.3 Generating the visualization
 
 ```{r}
 #| code-fold: true
 #| code-summary: "Show ggplot2 code"
-
-q1 <- realis_per_unit %>% filter(QUARTER %in% c("2023Q1", "2024Q1"))
-get_sale_subset <- function(type) {
-  if (type == "All Sales") {
-    return(q1)
-  }
-  q1 %>% filter(TYPE_OF_SALE == type)
-}
-plot_volume_by_sale_type <- function(type,
-                                     bg = element_blank(),
-                                     ylabel = NULL,
-                                     yaxis_text = element_blank(),
-                                     percent_change = "") {
-  subset = get_sale_subset(type)
-  ggplot(subset, aes(x = QUARTER, fill = QUARTER)) +
-    geom_bar(
-      aes(color = NULL),
-      alpha = 0.8,
-      show.legend = FALSE,
-      size = 0,
-      width = 0.5
-    ) +
-    ylim(c(0, 6000)) +
-    geom_text(
-      stat = "count",
-      aes(
-        label = after_stat(count),
-        y = after_stat(count) + 150,
-        color = QUARTER,
-        family = "Roboto Condensed"
-      ),
-      show.legend = FALSE
-    ) +
-    scale_fill_manual(values = c("darkgrey", "blue")) +
-    scale_color_manual(values = c("darkgrey", "blue")) +
-    # Add market and the percent change
-    labs(x = paste0(type, percent_change), y = ylabel) +
-    theme_minimal() +
-    theme(axis.text.y = yaxis_text,
-          panel.background = bg)
-}
-
-# Combine plots for visualization
-# NOTE: Ideally, the percentages are generated dynamically. However, setting the color in visualization and revising the headlines and subtitles are not straightforward to do dynamically
-q1_all_sales_vol <-
-  plot_volume_by_sale_type(
-    "All Sales",
-    ylabel = "No. of Sales",
-    yaxis_text = element_text(),
-    bg = element_rect(fill = "aliceblue", linewidth = 0),
-    percent_change = " (<span style='color:darkgreen;'>**+1.5%**</span>)"
-  )
-q1_new_sale_vol <-
-  plot_volume_by_sale_type("New Sale", percent_change = " (<span style='color:darkgreen;'>**+15.2%**</span>)")
-q1_resale_vol <-
-  plot_volume_by_sale_type("Resale", percent_change = " (<span style='color:brown;'>**-6.1**%</span>)")
-q1_sub_sale_vol <-
-  plot_volume_by_sale_type("Sub Sale", percent_change = " (<span style='color:darkgreen;'>**+25.7%**</span>)")
-
-(q1_all_sales_vol |
-    q1_new_sale_vol | q1_resale_vol | q1_sub_sale_vol) +
-  #Add headline and subtitle
-  plot_annotation(title = "Singapore Private Property Sales Volume Up 1.5% from Q1 2023 to Q1 2024.",
-                  subtitle = "Among the markets, **Sub Sale** showed the highest percentage growth with a <span style='color:darkgreen;'>**25.7%**</span> increase, while the **Resale** market<br/>experienceda decline of <span style='color:brown;'>**6.1%**</span>.") &
-  # Set universal styles
+viz2 <- ggplot(popular_districts,
+               aes(
+                 x = reorder(RANK, -RANK),
+                 y = NUMBER_OF_SALES,
+                 fill = QUARTER
+               )) +
+  geom_bar(
+    stat = "identity",
+    position = "dodge",
+    show.legend = FALSE,
+    alpha = 0.8
+  ) +
+  geom_text(aes(
+    y = 10,
+    hjust = 0,
+    label = paste0(
+      "D",
+      POSTAL_DISTRICT,
+      ": ",
+      NUMBER_OF_SALES,
+      " units sold at S$",
+      MEDIAN_PRICE_PSF,
+      " psf"
+    )
+  ), family = "Roboto Condensed") +
+  coord_flip(ylim = c(0, 600)) +
+  scale_fill_manual(values = c("grey45", "blue")) +
+  facet_grid(TYPE_OF_SALE ~ QUARTER, switch = "both") +
+  theme_minimal() +
+  plot_annotation(title = "Districts With Highest Units Sold for each Submarket",
+                  subtitle = "New Sale Market is heavily influenced by the newly-launched projects in **D23** (Lumina Grand) and **D26** (Lentor Mansion).",
+                  caption = "Prices shown are **median unit price** per sqft") &
   theme(
     text = element_text(family = "Roboto Condensed"),
-    plot.title = element_text(face = "bold", color = "blue"),
-    plot.subtitle = element_markdown(color = "#464646", size = rel(0.9)),
-    axis.title.x = element_markdown(),
     axis.line.x = element_line(),
-    axis.ticks.y = element_blank()
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank(),
+    plot.title = element_text(face = "bold"),
+    plot.subtitle = element_markdown(color = "grey50", size = rel(0.9)),
+    plot.caption = element_markdown(color = "grey50"),
+    strip.placement = "outside",
+    strip.text = element_text(size = rel(1))
   )
+viz2
 ```
+
+::: callout-tip
+#### Insights
+
+Plotting the most popular districts for each submarket reveals that the Top 5 districts in the **New Sale** market, differs for the 2 quarters.
+
+In 2023Q1, the distribution is more balanced and there were a lot of units sold in expensive districts like **Districts 9** and **10**. However, In 2024Q1, the number of units sold were skewed towards cheaper districts like **Districts 23** and **26** where big projects like [Lumina Grand](https://www.99.co/singapore/condos-apartments/lumina-grand) and [Lentor Mansion](https://www.99.co/singapore/condos-apartments/lentor-mansion), respectively, were launched.
+
+This is why the overall prices in the New Sale market appear to be much cheaper than the previous year, when in fact the new projects that launched are in **cheaper districts**.
+
+On the contrary, the top districts in the Resale and Sub Sale markets have much less difference. This smaller change also resulted in a smaller impact on the overall median price in these markets.
+:::
 
 ## 4.3 Diving deep into the 2024 Q1 Market
 
@@ -680,7 +923,7 @@ ggplot(q12024, aes(x=PROPERTY_TYPE, y=TRANSACTED_PRICE/1000, fill=PROPERTY_TYPE)
 ```
 
 ```{r}
-q1_2024_aggregated = q12024 %>% group_by(TYPE_OF_SALE, PROPERTY_TYPE) %>% summarise(
+q1_2024_aggregated = q12024 %>% group_by(TYPE_OF_SALE, PROPERTY_TYPE) %>% summarize(
   COUNT = n(),
   MEDIAN_PRICE = median(TRANSACTED_PRICE),
   MEAN_PRICE = mean(TRANSACTED_PRICE),
@@ -709,3 +952,5 @@ Trading Economics. (2024). *Home Ownership Rate \| G20*. <https://tradingeconomi
 <https://akalestale.netlify.app/take-home_ex/take-home_ex01/take-home_ex01> (stat_halfeye usage)
 
 <https://sape.inf.usi.ch/quick-reference/ggplot2/colour>
+
+<https://www.redbrick.sg/blog/landed-property-singapore/>
