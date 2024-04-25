@@ -83,7 +83,7 @@ Aside from these, we will also include other packages that will help us present 
 
 ```{r}
 #| label: setup
-pacman::p_load(knitr, tidyverse, patchwork, ggdist, ggtext, ggpubr, treemapify)
+pacman::p_load(knitr, tidyverse, patchwork, ggdist, ggtext, ggpubr, ggrepel, ggridges, scales)
 ```
 
 ## 2.2 Data Checkpoints
@@ -691,8 +691,8 @@ q1_yoy_psf_price_all_markets_graph <- plot_q1_yoy_psf_price() +
   theme(panel.background = element_rect(fill = "aliceblue", linewidth =
                                           0))
 
-viz1 <- (q1_yoy_psf_price_all_markets_graph |
-           q1_yoy_psf_price_submarkets_graph) +
+(q1_yoy_psf_price_all_markets_graph |
+    q1_yoy_psf_price_submarkets_graph) +
   plot_layout(widths = c(1, 3)) +
   plot_annotation(title = "Singapore Private Property Prices by Sales Market",
                   subtitle = "Overall prices slightly increased by <span style='color:darkgreen;'>**1.7%**</span> but the New Sales market experienced <span style='color:brown;'>**7.6%**</span> decrease.") &
@@ -706,7 +706,6 @@ viz1 <- (q1_yoy_psf_price_all_markets_graph |
     strip.placement = "outside",
     strip.text = element_markdown(size = rel(1))
   )
-viz1
 ```
 
 ::: callout-tip
@@ -841,21 +840,30 @@ When we plot all the districts, it is more difficult to identify by sight which 
 
 ### 4.2.3 Generating the visualization
 
+We will generate the visualization such that `QUARTER` is in column and `TYPE_OF_SALE` is in rows.
+
+We will using `facet_grid()` to generate the visualization and adjust the theme elements as needed to make the plot more presentable.
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show ggplot2 code"
-viz2 <- ggplot(popular_districts,
+ggplot(popular_districts,
                aes(
+                 # Order the axis elements by rank
                  x = reorder(RANK, -RANK),
                  y = NUMBER_OF_SALES,
                  fill = QUARTER
                )) +
+  
+  # Generate bar graph based on number of sales
   geom_bar(
     stat = "identity",
     position = "dodge",
     show.legend = FALSE,
     alpha = 0.8
   ) +
+  
+  # Add descriptive label
   geom_text(aes(
     y = 10,
     hjust = 0,
@@ -869,13 +877,22 @@ viz2 <- ggplot(popular_districts,
       " psf"
     )
   ), family = "Roboto Condensed") +
+  
+  # Generate horizontal bar
   coord_flip(ylim = c(0, 600)) +
+  
+  # Set colors consistent with previous visualization
   scale_fill_manual(values = c("grey45", "blue")) +
+  
+  # Generate facets, with labels to the left and at the bottom
   facet_grid(TYPE_OF_SALE ~ QUARTER, switch = "both") +
-  theme_minimal() +
+
+  # Set plot texts
   plot_annotation(title = "Districts With Highest Units Sold for each Submarket",
                   subtitle = "New Sale Market is heavily influenced by the newly-launched projects in **D23** (Lumina Grand) and **D26** (Lentor Mansion).",
                   caption = "Prices shown are **median unit price** per sqft") &
+  # Set theme
+  theme_minimal() +
   theme(
     text = element_text(family = "Roboto Condensed"),
     axis.line.x = element_line(),
@@ -883,13 +900,23 @@ viz2 <- ggplot(popular_districts,
     axis.title.y = element_blank(),
     axis.text.y = element_blank(),
     plot.title = element_text(face = "bold"),
+    # Use element_markdown so we can style the text 
     plot.subtitle = element_markdown(color = "grey50", size = rel(0.9)),
     plot.caption = element_markdown(color = "grey50"),
     strip.placement = "outside",
     strip.text = element_text(size = rel(1))
   )
-viz2
 ```
+
+::: {.callout-note collapse="true" appearance="simple"}
+#### About the texts in the visualization
+
+Texts such as *xx units sold at \$xxxx.xx* were added in the plot so the information is easily digestible.
+
+However, it made the plot messy, and not aesthetically pleasing. Ideally, the full text should be rendered when interacting with the graph. I do not know how to do that right now, but it will be how I will present this visualization in the future.
+
+Given this limit in my present abilities, I prioritized **clarity of information** over aesthetic considerations.
+:::
 
 ::: callout-tip
 #### Insights
@@ -905,35 +932,194 @@ On the contrary, the top districts in the Resale and Sub Sale markets have much 
 
 ## 4.3 Diving deep into the 2024 Q1 Market
 
-```{r}
-q12024 <- realis_per_unit %>% filter(QUARTER=="2024Q1")
+### 4.3.1 Checking price trends by property type
 
-ggplot(q12024, aes(x=PROPERTY_TYPE, fill=TYPE_OF_SALE)) +
-  geom_bar() +
-  coord_flip()
-```
+Previous visualizations focused on comparisons between the Q1 of 2023 and 2024, and based on the different markets.
 
-```{r}
-ggplot(q12024, aes(x=PROPERTY_TYPE, y=TRANSACTED_PRICE/1000, fill=PROPERTY_TYPE)) +
-  geom_violin() +
-  geom_hline(yintercept=median(q12024$TRANSACTED_PRICE)/1000, color = "red") +
-  geom_hline(yintercept=mean(q12024$TRANSACTED_PRICE)/1000) +
-  scale_y_log10() +
-  coord_flip()
-```
+For the next visualization, we will first explore the data with **2024Q1**, based on the property type.
+
+Let us group the data by **TYPE_OF_SALE** and **PROPERTY_TYPE** if we can gain new insights based on the size of property. We will get the aggregated median values for price and area columns.
 
 ```{r}
-q1_2024_aggregated = q12024 %>% group_by(TYPE_OF_SALE, PROPERTY_TYPE) %>% summarize(
-  COUNT = n(),
-  MEDIAN_PRICE = median(TRANSACTED_PRICE),
-  MEAN_PRICE = mean(TRANSACTED_PRICE),
-  MIN_PRICE = min(TRANSACTED_PRICE),
-  MAX_PRICE = max(TRANSACTED_PRICE),
-)
-ggplot(q1_2024_aggregated, aes(area=COUNT, fill = TYPE_OF_SALE,
-               label = TYPE_OF_SALE, subgroup = PROPERTY_TYPE)) +
-  geom_treemap()
+realis_per_unit %>% filter(QUARTER == "2024Q1") %>%
+  group_by(TYPE_OF_SALE, PROPERTY_TYPE) %>%
+  summarize(
+    UNIT_PRICE_PSF = median(UNIT_PRICE_PSF),
+    TRANSACTED_PRICE = median(TRANSACTED_PRICE),
+    AREA_SQFT = median(AREA_SQFT),
+    UNITS_SOLD = n()
+  ) %>% arrange(desc(UNITS_SOLD), .by_group = TRUE) %>%
+  kable
 ```
+
+From this aggregated data, we can see that **Executive Condominiums** are relatively cheaper than **Condominiums** and **Apartments**, which are of similar area. From my research, Executive Condominiums are under [HDB](https://www.hdb.gov.sg/residential/buying-a-flat/executive-condominium), but are built and sold by property developers. This is why it is much cheaper.
+
+We can also notice that there are much lower sales for some property types, like **Terrace House**, **Semi-Detached House**, and **Detached House.** These are landed properties, which are quite rare in Singapore so it is logical to see much fewer sales of these properties.
+
+### 4.3.2 Creating base visualizations
+
+From the insights gained from our initial exploration, we observed that prices differ by property types and that there are less sales on some property prices.
+
+::: panel-tabset
+#### Unit Price
+
+For the unit price, we will use **boxplot** instead of density plots as we can see the distribution for different markets. If we use density plots, it is harder to present partitioned data in an easy to understand way.
+
+Lastly, we will generate some reference lines for statistics (mean and median).
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show ggplot2 code"
+# Calculate stats for reference lines
+q12024 <- realis_per_unit %>% filter(QUARTER == "2024Q1")
+median_q1 <- median(q12024$UNIT_PRICE_PSF)
+mean_q1 <- mean(q12024$UNIT_PRICE_PSF)
+
+unit_price_by_prop_type <- ggplot(q12024,
+                                  aes(x = PROPERTY_TYPE, y = UNIT_PRICE_PSF, fill = TYPE_OF_SALE)) +
+  
+  # Generate different boxplots for each market and property type
+  geom_boxplot(outliers = FALSE,
+               width = 0.4,
+               alpha = 0.8) +
+  
+  # Render median reference line
+  geom_hline(aes(yintercept = median_q1, color = "Median"),
+             linetype = "dashed",
+             alpha = 0.8) +
+  annotate(
+    geom = "text",
+    x = 6.6,
+    y = ifelse(median_q1 < mean_q1, median_q1 - 200, median_q1 + 250),
+    label = paste0("Median =\n$", median_q1),
+    family = "Roboto Condensed",
+    color = "brown",
+    size = 3,
+    alpha = 0.8
+  ) +
+  
+  # Render mean reference line
+  geom_hline(aes(yintercept = mean_q1, color = "Mean"),
+             linetype = "dashed",
+             alpha = 0.8) +
+  annotate(
+    geom = "text",
+    x = 6.6,
+    y = ifelse(mean_q1 < median_q1, mean_q1 - 200, mean_q1 + 250),
+    label = paste0("Mean =\n$", round(mean_q1, 0)),
+    family = "Roboto Condensed",
+    color = "darkgreen",
+    size = 3,
+    alpha = 0.8
+  ) +
+  
+  # Set labels
+  labs(x = "Property Type",
+       y = "Unit Price Per Sqft ($)",
+       fill = "Market",
+       color = "Statistics") +
+  
+  # Wrap long labels using `wrap_format()` from `scale` package
+  # Add some space to the right for Statistics annotations
+  scale_x_discrete(labels = wrap_format(10), expand = expansion(add = c(0.6, 1))) +
+  
+  # Set colors
+  scale_fill_manual(values = c("darkorange", "blue", "gold3")) +
+  scale_color_manual(values = c("darkgreen", "brown")) +
+  theme_minimal() +
+  theme(
+    # Remove axis text. Combining this with the price visualization will stack the 2 graphs
+    axis.text.x = element_blank()
+  )
+
+unit_price_by_prop_type
+```
+
+We can see from the graph that some box plots are very short, which is especially true for **Landed** properties as there are few units sold for these property types.
+
+#### Volume
+
+As companion to the unit price graph, we will also generate a simple bar graph for the volume.
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show ggplot2 code"
+sales_volume_by_prop_type <-
+  ggplot(
+    realis_per_unit %>% filter(QUARTER == "2024Q1"),
+    aes(x = PROPERTY_TYPE, fill = TYPE_OF_SALE)
+  ) +
+  
+  # Generate stacked bar graph by TYPE_OF_SALE
+  # Do not show label as the price graph will show it
+  geom_bar(alpha = 0.8, width = 0.5, show.legend = FALSE) +
+  
+  # Generate labels for stacked bar areas
+  # Do not show label as the price graph will show it
+  geom_label_repel(
+    aes(label = after_stat(count)),
+    stat = "count",
+    position = "stack",
+    family = "Roboto Condensed",
+    size = 2.5,
+    alpha = 0.8,
+    color = "white",
+    show.legend = FALSE
+  ) +
+  
+  # Apply colors
+  scale_fill_manual(values = c("darkorange", "blue", "gold3")) +
+  labs(y = "Units Sold") +
+  
+  # Wrap long titles
+  # Apply same "expand" so axes align
+  scale_x_discrete(labels = wrap_format(10), expand = expansion(add = c(0.6, 1))) +
+  
+  # Appply theme
+  theme_minimal() +
+  theme()
+
+sales_volume_by_prop_type
+```
+
+The volume graph provides additional information about sales by property type. Some property types with lower sales volume may show a longer boxplot, which may be interpreted as more units sold.
+
+With this companion graph, it is easier to cross-reference the price with the volume to better judge how representative of the market the unit prices are.
+:::
+
+### 4.3.3 Generating the visualization
+
+Finally, we will generate the visualization by stacking the 2 graphs and doing final touches on the styling and texts.
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show ggplot2 code"
+(unit_price_by_prop_type / sales_volume_by_prop_type ) +
+  plot_layout(heights = c(5,1)) +
+  plot_annotation(title = "Private Property Sales by Property Type for 2024 Q1",
+                  subtitle = "**Executive Condiminiums** sold at the lowest unit prices, while **Apartments** and **Condominiums** sold at the highest unit prices.") &
+  theme(
+    text = element_text(family = "Roboto Condensed"),
+    axis.title.x = element_blank(),
+    legend.position = "top",
+    legend.justification = "left",
+    legend.location = "plot",
+    plot.title = element_text(face = "bold"),
+    plot.subtitle = element_markdown(color = "grey50", size = rel(0.9)),
+  )
+```
+
+::: callout-tip
+#### Insights
+
+From our initial exploration, we have already established that **Executive Condominiums are cheapest** in terms of unit price.
+
+Another surprising observation is that despite having more sales of Executive Condominiums, its boxplot is much shorter than those of **Detached House** and **Semi-Detached House**. This observation applies in both New Sale and Resale Market.
+
+A possible explanation for this is that HDB **regulates the price** of Executive Condominiums so there is much less variation of price compared to other property types.
+
+It can also be observed that there are much fewer sales in the **New Sales** market of landed properties. It could be due to the fact that compared to Strata developments, Landed properties are usually bespoke to their owner's use. In addition to the fact that landed properties are rare in Singapore, is it expected to see less New Sales in this category.
+:::
 
 # 5 Summary
 
@@ -954,3 +1140,5 @@ Trading Economics. (2024). *Home Ownership Rate \| G20*. <https://tradingeconomi
 <https://sape.inf.usi.ch/quick-reference/ggplot2/colour>
 
 <https://www.redbrick.sg/blog/landed-property-singapore/>
+
+<https://www.hdb.gov.sg/residential/buying-a-flat/executive-condominium>
