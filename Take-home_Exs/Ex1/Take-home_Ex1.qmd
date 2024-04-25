@@ -55,13 +55,13 @@ Next, we need to decide on what data we would like to look at closely. For the p
 
 -   Total units sold by quarter
 
--   Units sold by submarkets such as property type (e.g. landed, strata), sale type (e.g. resale, new sale, subsale), etc.
+-   Units sold by submarkets such as property type (e.g. condominium, terrace house, apartment, detached house), sale type (e.g. resale, new sale, subsale), etc.
 
--   Transaction price by submarkets such property type (e.g. landed, strata), sale type (e.g. resale, new sale, subsale), etc.
+-   Transaction price by submarkets such property type (e.g. condominium, terrace house, apartment, detached house, etc), sale type (e.g. resale, new sale, subsale), etc.
 
 Finally, we will do data exploration and visualize the insights gained from the data. Some of the questions we would ask are:
 
--   What is the general quarterly trend of private residential property sales prices?
+-   What is the general trend of private residential property sales prices?
 
 -   Is this trend consistent among all submarkets?
 
@@ -71,19 +71,28 @@ Finally, we will do data exploration and visualize the insights gained from the 
 
 ## 2.1 Loading the R packages
 
-For this exercise, we will mainly use the following packages:
+For this exercise, we will mainly use the following packages for data analysis:
 
--   [tidyverse](https://www.tidyverse.org/): collection of R packages used in data science, which includes [ggplot2](https://ggplot2.tidyverse.org/), [tibble](https://tibble.tidyverse.org/), [readr](https://readr.tidyverse.org/), among others
--   ggtext: Enhanced text formating
--   ggdist: half_eye plot
+-   [tidyverse](https://www.tidyverse.org/): A collection of R packages used in data science, which includes [ggplot2](https://ggplot2.tidyverse.org/), [tibble](https://tibble.tidyverse.org/), [readr](https://readr.tidyverse.org/), among others
+-   [ggdist](https://mjskay.github.io/ggdist/): Provides functions for presenting distributions in `ggplot2`. `stat_halfeye()` and `stat_dots()` will be used the most.
+-   [ggtext](https://wilkelab.org/ggtext/): Enhances text rendering for `ggplot2`. `element_markdown()` is most notable function used for markdown rendering so we can highlight important information in text.
+-   [ggrepel](https://ggrepel.slowkow.com/): Manages overlapping texts and labels on `ggplot2`. We will use this to render labels on dense plots.
+-   [patchwork](https://patchwork.data-imaginist.com/): Allows composition of multiple graphs into a single plot
 
 Aside from these, we will also include other packages that will help us present the data better.
 
--   [knitr](https://www.rdocumentation.org/packages/knitr/versions/1.45): used for dynamic report generation in R. For this exercise, we will use this package to render our tables better.
+-   [knitr](https://www.rdocumentation.org/packages/knitr/versions/1.45): Provides tools for dynamic report generation in R. For this exercise, we will use this package to render our tables better.
+-   [scales](https://scales.r-lib.org/): Extends functions to operate on `ggplot2` scales. For this exercise, we will use `wrap_format()` to wrap long texts.
 
 ```{r}
 #| label: setup
-pacman::p_load(knitr, tidyverse, patchwork, ggdist, ggtext, ggpubr, ggrepel, ggridges, scales)
+pacman::p_load(knitr,
+               tidyverse,
+               patchwork,
+               ggdist,
+               ggtext,
+               ggrepel,
+               scales)
 ```
 
 ## 2.2 Data Checkpoints
@@ -1056,6 +1065,7 @@ sales_volume_by_prop_type <-
   
   # Generate labels for stacked bar areas
   # Do not show label as the price graph will show it
+  # Use ggrepel as some areas in the bar graph are too small to render th text inside
   geom_label_repel(
     aes(label = after_stat(count)),
     stat = "count",

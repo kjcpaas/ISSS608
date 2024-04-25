@@ -312,12 +312,12 @@ File Structure
 <p>Next, we need to decide on what data we would like to look at closely. For the purposes of this exercise, these are the data we can look at that can potentially give valuable insights:</p>
 <ul>
 <li><p>Total units sold by quarter</p></li>
-<li><p>Units sold by submarkets such as property type (e.g.&nbsp;landed, strata), sale type (e.g.&nbsp;resale, new sale, subsale), etc.</p></li>
-<li><p>Transaction price by submarkets such property type (e.g.&nbsp;landed, strata), sale type (e.g.&nbsp;resale, new sale, subsale), etc.</p></li>
+<li><p>Units sold by submarkets such as property type (e.g.&nbsp;condominium, terrace house, apartment, detached house), sale type (e.g.&nbsp;resale, new sale, subsale), etc.</p></li>
+<li><p>Transaction price by submarkets such property type (e.g.&nbsp;condominium, terrace house, apartment, detached house, etc), sale type (e.g.&nbsp;resale, new sale, subsale), etc.</p></li>
 </ul>
 <p>Finally, we will do data exploration and visualize the insights gained from the data. Some of the questions we would ask are:</p>
 <ul>
-<li><p>What is the general quarterly trend of private residential property sales prices?</p></li>
+<li><p>What is the general trend of private residential property sales prices?</p></li>
 <li><p>Is this trend consistent among all submarkets?</p></li>
 <li><p>How affordable are private residential properties for Singaporean households?</p></li>
 </ul>
@@ -327,18 +327,27 @@ File Structure
 <h1>2 Setup</h1>
 <section id="loading-the-r-packages" class="level2">
 <h2 class="anchored" data-anchor-id="loading-the-r-packages">2.1 Loading the R packages</h2>
-<p>For this exercise, we will mainly use the following packages:</p>
+<p>For this exercise, we will mainly use the following packages for data analysis:</p>
 <ul>
-<li><a href="https://www.tidyverse.org/">tidyverse</a>: collection of R packages used in data science, which includes <a href="https://ggplot2.tidyverse.org/">ggplot2</a>, <a href="https://tibble.tidyverse.org/">tibble</a>, <a href="https://readr.tidyverse.org/">readr</a>, among others</li>
-<li>ggtext: Enhanced text formating</li>
-<li>ggdist: half_eye plot</li>
+<li><a href="https://www.tidyverse.org/">tidyverse</a>: A collection of R packages used in data science, which includes <a href="https://ggplot2.tidyverse.org/">ggplot2</a>, <a href="https://tibble.tidyverse.org/">tibble</a>, <a href="https://readr.tidyverse.org/">readr</a>, among others</li>
+<li><a href="https://mjskay.github.io/ggdist/">ggdist</a>: Provides functions for presenting distributions in <code>ggplot2</code>. <code>stat_halfeye()</code> and <code>stat_dots()</code> will be used the most.</li>
+<li><a href="https://wilkelab.org/ggtext/">ggtext</a>: Enhances text rendering for <code>ggplot2</code>. <code>element_markdown()</code> is most notable function used for markdown rendering so we can highlight important information in text.</li>
+<li><a href="https://ggrepel.slowkow.com/">ggrepel</a>: Manages overlapping texts and labels on <code>ggplot2</code>. We will use this to render labels on dense plots.</li>
+<li><a href="https://patchwork.data-imaginist.com/">patchwork</a>: Allows composition of multiple graphs into a single plot</li>
 </ul>
 <p>Aside from these, we will also include other packages that will help us present the data better.</p>
 <ul>
-<li><a href="https://www.rdocumentation.org/packages/knitr/versions/1.45">knitr</a>: used for dynamic report generation in R. For this exercise, we will use this package to render our tables better.</li>
+<li><a href="https://www.rdocumentation.org/packages/knitr/versions/1.45">knitr</a>: Provides tools for dynamic report generation in R. For this exercise, we will use this package to render our tables better.</li>
+<li><a href="https://scales.r-lib.org/">scales</a>: Extends functions to operate on <code>ggplot2</code> scales. For this exercise, we will use <code>wrap_format()</code> to wrap long texts.</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(knitr, tidyverse, patchwork, ggdist, ggtext, ggpubr, ggrepel, ggridges, scales)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(knitr,</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>               tidyverse,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>               patchwork,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>               ggdist,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>               ggtext,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>               ggrepel,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>               scales)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="data-checkpoints" class="level2">
@@ -4134,30 +4143,31 @@ Insights
 <span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Generate labels for stacked bar areas</span></span>
 <span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Do not show label as the price graph will show it</span></span>
-<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label_repel</span>(</span>
-<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">after_stat</span>(count)),</span>
-<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">stat =</span> <span class="st">"count"</span>,</span>
-<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">position =</span> <span class="st">"stack"</span>,</span>
-<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">family =</span> <span class="st">"Roboto Condensed"</span>,</span>
-<span id="cb39-18"><a href="#cb39-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="fl">2.5</span>,</span>
-<span id="cb39-19"><a href="#cb39-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.8</span>,</span>
-<span id="cb39-20"><a href="#cb39-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"white"</span>,</span>
-<span id="cb39-21"><a href="#cb39-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">show.legend =</span> <span class="cn">FALSE</span></span>
-<span id="cb39-22"><a href="#cb39-22" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb39-23"><a href="#cb39-23" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb39-24"><a href="#cb39-24" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Apply colors</span></span>
-<span id="cb39-25"><a href="#cb39-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"darkorange"</span>, <span class="st">"blue"</span>, <span class="st">"gold3"</span>)) <span class="sc">+</span></span>
-<span id="cb39-26"><a href="#cb39-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Units Sold"</span>) <span class="sc">+</span></span>
-<span id="cb39-27"><a href="#cb39-27" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb39-28"><a href="#cb39-28" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Wrap long titles</span></span>
-<span id="cb39-29"><a href="#cb39-29" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Apply same "expand" so axes align</span></span>
-<span id="cb39-30"><a href="#cb39-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">labels =</span> <span class="fu">wrap_format</span>(<span class="dv">10</span>), <span class="at">expand =</span> <span class="fu">expansion</span>(<span class="at">add =</span> <span class="fu">c</span>(<span class="fl">0.6</span>, <span class="dv">1</span>))) <span class="sc">+</span></span>
-<span id="cb39-31"><a href="#cb39-31" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb39-32"><a href="#cb39-32" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Appply theme</span></span>
-<span id="cb39-33"><a href="#cb39-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb39-34"><a href="#cb39-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>()</span>
-<span id="cb39-35"><a href="#cb39-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-36"><a href="#cb39-36" aria-hidden="true" tabindex="-1"></a>sales_volume_by_prop_type</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Use ggrepel as some areas in the bar graph are too small to render th text inside</span></span>
+<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label_repel</span>(</span>
+<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">after_stat</span>(count)),</span>
+<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">stat =</span> <span class="st">"count"</span>,</span>
+<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">position =</span> <span class="st">"stack"</span>,</span>
+<span id="cb39-18"><a href="#cb39-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">family =</span> <span class="st">"Roboto Condensed"</span>,</span>
+<span id="cb39-19"><a href="#cb39-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="fl">2.5</span>,</span>
+<span id="cb39-20"><a href="#cb39-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.8</span>,</span>
+<span id="cb39-21"><a href="#cb39-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"white"</span>,</span>
+<span id="cb39-22"><a href="#cb39-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">show.legend =</span> <span class="cn">FALSE</span></span>
+<span id="cb39-23"><a href="#cb39-23" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb39-24"><a href="#cb39-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb39-25"><a href="#cb39-25" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Apply colors</span></span>
+<span id="cb39-26"><a href="#cb39-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"darkorange"</span>, <span class="st">"blue"</span>, <span class="st">"gold3"</span>)) <span class="sc">+</span></span>
+<span id="cb39-27"><a href="#cb39-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Units Sold"</span>) <span class="sc">+</span></span>
+<span id="cb39-28"><a href="#cb39-28" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb39-29"><a href="#cb39-29" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Wrap long titles</span></span>
+<span id="cb39-30"><a href="#cb39-30" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Apply same "expand" so axes align</span></span>
+<span id="cb39-31"><a href="#cb39-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">labels =</span> <span class="fu">wrap_format</span>(<span class="dv">10</span>), <span class="at">expand =</span> <span class="fu">expansion</span>(<span class="at">add =</span> <span class="fu">c</span>(<span class="fl">0.6</span>, <span class="dv">1</span>))) <span class="sc">+</span></span>
+<span id="cb39-32"><a href="#cb39-32" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb39-33"><a href="#cb39-33" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Appply theme</span></span>
+<span id="cb39-34"><a href="#cb39-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb39-35"><a href="#cb39-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>()</span>
+<span id="cb39-36"><a href="#cb39-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-37"><a href="#cb39-37" aria-hidden="true" tabindex="-1"></a>sales_volume_by_prop_type</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <p><img src="Take-home_Ex1_files/figure-html/unnamed-chunk-36-1.png" class="img-fluid" width="672"></p>
