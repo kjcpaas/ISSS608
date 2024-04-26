@@ -282,7 +282,7 @@ After adding the `QUARTER` and `TXN_ID` columns, there are now 23 variables in t
 ### Columns Retained
 
 | Column Name      | Description                                                                                                                | Reason                                   |
-|------------------|------------------------|------------------------------|
+|------------------|----------------------------------------------------------------------------------------------------------------------------|------------------------------------------|
 | TXN_ID           | Identifier for the transaction                                                                                             | It is an identifier                      |
 | QUARTER          | Quarter when the property was sold                                                                                         | Core data for aggregation                |
 | PROJECT_NAME     | Name of the project                                                                                                        | Can be used to pinpoint popular projects |
@@ -299,7 +299,7 @@ After adding the `QUARTER` and `TXN_ID` columns, there are now 23 variables in t
 ### Columns Dropped
 
 | Column Name                 | Description                                                                                                                                                                  | Reason                                                                                                   |
-|------------------|------------------------|------------------------------|
+|-----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|
 | SALE_DATE                   | Date when the sale was made                                                                                                                                                  | We will aggregate **by quarter**, no need to know the specific dates.                                    |
 | ADDRESS                     | Property Address                                                                                                                                                             | Will use `PROJECT_NAME` if needed to pinpoint projects                                                   |
 | AREA_SQM                    | Price per sqm                                                                                                                                                                | `AREA_SFT` is adequate                                                                                   |
