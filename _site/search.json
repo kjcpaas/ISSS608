@@ -611,49 +611,49 @@
   {
     "objectID": "Hands-on_Exs/Ex3B/Hands-on_Ex3B.html",
     "href": "Hands-on_Exs/Ex3B/Hands-on_Ex3B.html",
-    "title": "Programming Animated Statistical Graphics with R",
+    "title": "Hands-on Exercise 3B: Programming Animated Statistical Graphics with R",
     "section": "",
     "text": "This hands-on exercise covers Chapter 4: Programming Animated Statistical Graphics with R.\nI learned about the following:\n\nBasic concepts of animation, in the context of data visualization, 1 plot = 1 frame. We can adjust animation attributes like duration of the frame\nAnimating graphics using plotly and gganimate"
   },
   {
     "objectID": "Hands-on_Exs/Ex3B/Hands-on_Ex3B.html#loading-the-required-packages",
     "href": "Hands-on_Exs/Ex3B/Hands-on_Ex3B.html#loading-the-required-packages",
-    "title": "Programming Animated Statistical Graphics with R",
+    "title": "Hands-on Exercise 3B: Programming Animated Statistical Graphics with R",
     "section": "2.1 Loading the required packages",
     "text": "2.1 Loading the required packages\nFor this exercise we will use the following R packages:\n\nplotly, R library for plotting interactive statistical graphs.\ngganimate, an ggplot extension for creating animated statistical graphs.\ngifski converts video frames to GIF animations using pngquant’s fancy features for efficient cross-frame palettes and temporal dithering. It produces animated GIFs that use thousands of colors per frame.\ngapminder: An excerpt of the data available at Gapminder.org. We just want to use its country_colors scheme.\ntidyverse, a family of modern R packages specially designed to support data science, analysis and communication task including creating static statistical graphs.\n\n\npacman::p_load(readxl, gifski, gapminder,\n               plotly, gganimate, tidyverse)"
   },
   {
     "objectID": "Hands-on_Exs/Ex3B/Hands-on_Ex3B.html#loading-the-data",
     "href": "Hands-on_Exs/Ex3B/Hands-on_Ex3B.html#loading-the-data",
-    "title": "Programming Animated Statistical Graphics with R",
+    "title": "Hands-on Exercise 3B: Programming Animated Statistical Graphics with R",
     "section": "2.2 Loading the data",
     "text": "2.2 Loading the data\nWe will use the same `GlobalPopulation` dataset from eLearn and load it into the RStudio environment using read_xls().\n\nglobalPop &lt;- read_xls(\"data/GlobalPopulation.xls\",\n                      sheet=\"Data\") %&gt;%\n  mutate(across(.cols = c(\"Country\", \"Continent\"), .fns = as.factor)) %&gt;%\n  mutate(Year = as.integer(Year))\n\nglimpse(globalPop)\n\nRows: 6,204\nColumns: 6\n$ Country    &lt;fct&gt; \"Afghanistan\", \"Afghanistan\", \"Afghanistan\", \"Afghanistan\",…\n$ Year       &lt;int&gt; 1996, 1998, 2000, 2002, 2004, 2006, 2008, 2010, 2012, 2014,…\n$ Young      &lt;dbl&gt; 83.6, 84.1, 84.6, 85.1, 84.5, 84.3, 84.1, 83.7, 82.9, 82.1,…\n$ Old        &lt;dbl&gt; 4.5, 4.5, 4.5, 4.5, 4.5, 4.6, 4.6, 4.6, 4.6, 4.7, 4.7, 4.7,…\n$ Population &lt;dbl&gt; 21559.9, 22912.8, 23898.2, 25268.4, 28513.7, 31057.0, 32738…\n$ Continent  &lt;fct&gt; Asia, Asia, Asia, Asia, Asia, Asia, Asia, Asia, Asia, Asia,…\n\n\nThere are a total of 6 attributes in the globalPop tibble data frame. Two of them are categorical data type and the other three are numeric.\n\nThe categorical attributes are: Country, and Continent.\nThe numeris attributes are: Year, Young, Old, and Population."
   },
   {
     "objectID": "Hands-on_Exs/Ex3B/Hands-on_Ex3B.html#building-a-static-population-bubble-plot",
     "href": "Hands-on_Exs/Ex3B/Hands-on_Ex3B.html#building-a-static-population-bubble-plot",
-    "title": "Programming Animated Statistical Graphics with R",
+    "title": "Hands-on Exercise 3B: Programming Animated Statistical Graphics with R",
     "section": "3.1 Building a static population bubble plot",
     "text": "3.1 Building a static population bubble plot\nWe will first plot a static bubble plot using geom_dots().\n\nggplot(globalPop, aes(x = Old, y = Young, \n                      size = Population, \n                      colour = Country)) +\n  geom_point(alpha = 0.7, \n             show.legend = FALSE) +\n  scale_colour_manual(values = country_colors) +\n  scale_size(range = c(2, 12)) +\n  labs(title = 'Year: {frame_time}', \n       x = '% Aged', \n       y = '% Young')\n\n\n\n\nThe title has Year: {frame time} as we will use the year plots as the frames in animation."
   },
   {
     "objectID": "Hands-on_Exs/Ex3B/Hands-on_Ex3B.html#building-the-animated-bubble-plot",
     "href": "Hands-on_Exs/Ex3B/Hands-on_Ex3B.html#building-the-animated-bubble-plot",
-    "title": "Programming Animated Statistical Graphics with R",
+    "title": "Hands-on Exercise 3B: Programming Animated Statistical Graphics with R",
     "section": "3.2 Building the animated bubble plot",
     "text": "3.2 Building the animated bubble plot\nWe will now animate the plot by year by adding the following functions to the existing plot:\n\ntransition_time() of gganimate is used to create transition through distinct states in time (i.e. Year).\nease_aes() is used to control easing of aesthetics. The default is linear. Other methods are: quadratic, cubic, quartic, quintic, sine, circular, exponential, elastic, back, and bounce.\n\n\nggplot(globalPop, aes(x = Old, y = Young, \n                      size = Population, \n                      colour = Country)) +\n  geom_point(alpha = 0.7, \n             show.legend = FALSE) +\n  scale_colour_manual(values = country_colors) +\n  scale_size(range = c(2, 12)) +\n  labs(title = 'Year: {frame_time}', \n       x = '% Aged', \n       y = '% Young') +\n  transition_time(Year) +       \n  ease_aes('linear')\n\n\n\n\nThis generates a gif image of the animation."
   },
   {
     "objectID": "Hands-on_Exs/Ex3B/Hands-on_Ex3B.html#building-animated-bubble-plot-using-ggplotly",
     "href": "Hands-on_Exs/Ex3B/Hands-on_Ex3B.html#building-animated-bubble-plot-using-ggplotly",
-    "title": "Programming Animated Statistical Graphics with R",
+    "title": "Hands-on Exercise 3B: Programming Animated Statistical Graphics with R",
     "section": "4.1 Building animated bubble plot using ggplotly()",
     "text": "4.1 Building animated bubble plot using ggplotly()\n\n\n\n\n\n\nLong-running code chunk\n\n\n\nThis code chunk takes a few minutes to run, so adding eval: false here so it does not re-evaluate all the time and I can just run it manually when needed.\n\n\n\ngg &lt;- ggplot(globalPop, \n       aes(x = Old, \n           y = Young, \n           size = Population, \n           colour = Country)) +\n  geom_point(aes(size = Population,\n                 frame = Year),\n             alpha = 0.7, \n             show.legend = FALSE) +\n  scale_colour_manual(values = country_colors) +\n  scale_size(range = c(2, 12)) +\n  labs(x = '% Aged', \n       y = '% Young')\n\nggplotly(gg)\n\nIt generates an interactive animation, and unlike what gganimate can produce. However, it takes quite a while to render so I have to use this method sparingly."
   },
   {
     "objectID": "Hands-on_Exs/Ex3B/Hands-on_Ex3B.html#building-animated-bubble-plot-using-plot_ly",
     "href": "Hands-on_Exs/Ex3B/Hands-on_Ex3B.html#building-animated-bubble-plot-using-plot_ly",
-    "title": "Programming Animated Statistical Graphics with R",
+    "title": "Hands-on Exercise 3B: Programming Animated Statistical Graphics with R",
     "section": "4.2 Building animated bubble plot using plot_ly()",
     "text": "4.2 Building animated bubble plot using plot_ly()\nWe can also use plotly() by specifying frame in the plot.\n\nbp &lt;- globalPop %&gt;%\n  plot_ly(x = ~Old, \n          y = ~Young, \n          size = ~Population, \n          color = ~Continent,\n          sizes = c(2, 100),\n          frame = ~Year, \n          text = ~Country, \n          hoverinfo = \"text\",\n          type = 'scatter',\n          mode = 'markers'\n          ) %&gt;%\n  layout(showlegend = FALSE)\nbp\n\n\n\n\n\nUnlike the ggplotly() method, this does not render interactive legends and the zoom and pan fuctions. Hoever, it renders much faster so this is a good alternative to previous visualization."
   }

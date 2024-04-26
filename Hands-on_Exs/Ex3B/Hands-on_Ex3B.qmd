@@ -1,5 +1,5 @@
 ---
-title: "Programming Animated Statistical Graphics with R"
+title: "Hands-on Exercise 3B: Programming Animated Statistical Graphics with R"
 author: "Kristine Joy Paas"
 date: "26 April 2024"
 date-modified: "last-modified"
@@ -176,7 +176,7 @@ bp
 
 Unlike the `ggplotly()` method, this does not render interactive legends and the zoom and pan fuctions. Hoever, it renders much faster so this is a good alternative to previous visualization.
 
-# Reflections
+# 5 Reflections
 
 I want to keep things simple so right now, I am leaning towards using `gganimate`. However, `ggplotly` provides interactivity, which can be useful especially if there are many frames as the audience can pause to inspect a frame more closely. It comes at a cost of the page being heavy, and if there are a lot of interactive plots in the page, the page may run sluggish for less powerful computers.
 
