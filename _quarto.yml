@@ -19,7 +19,7 @@ website:
             href: In-class_Exs/Ex2/In-class_Ex2.qmd
       - text: Take-home Exercises
         menu:
-          - text: "1: Creating data visualisation beyond default"
+          - text: "1: Singapore Private Residential Property Market for 2024 Q1"
             href: Take-home_Exs/Ex1/Take-home_Ex1.qmd
           - text: "2: DataVis Makeover"
             href: Take-home_Exs/Ex2/Take-home_Ex2.qmd

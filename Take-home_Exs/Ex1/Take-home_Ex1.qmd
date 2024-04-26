@@ -1,5 +1,5 @@
 ---
-title: "Take-home Exercise 1: Creating Visualization Beyond Default - Singapore Private Residential Property Market for 2024 Q1"
+title: "Take-home Exercise 1: Singapore Private Residential Property Market for 2024 Q1"
 author: "Kristine Joy Paas"
 date: "16 April 2024"
 date-modified: "last-modified"
@@ -59,7 +59,7 @@ As part of wrangling, we need to decide on what data we would like to look at cl
 
 -   Transaction price by submarkets such property type (e.g. condominium, terrace house, apartment, detached house, etc), sale type (e.g. resale, new sale, subsale), etc.
 
-Finally, we will do data exploration and visualize the insights gained from the data. Some of the questions we would ask are:
+Finally, we will do **data exploration** and **visualize** the insights gained from the data. Some of the questions we would ask are:
 
 -   What is the general trend of private residential property sales prices?
 
@@ -282,7 +282,7 @@ After adding the `QUARTER` and `TXN_ID` columns, there are now 23 variables in t
 ### Columns Retained
 
 | Column Name      | Description                                                                                                                | Reason                                   |
-|------------------|------------------------|-------------------------------|
+|------------------|------------------------|------------------------------|
 | TXN_ID           | Identifier for the transaction                                                                                             | It is an identifier                      |
 | QUARTER          | Quarter when the property was sold                                                                                         | Core data for aggregation                |
 | PROJECT_NAME     | Name of the project                                                                                                        | Can be used to pinpoint popular projects |
@@ -299,7 +299,7 @@ After adding the `QUARTER` and `TXN_ID` columns, there are now 23 variables in t
 ### Columns Dropped
 
 | Column Name                 | Description                                                                                                                                                                  | Reason                                                                                                   |
-|------------------|------------------------|-------------------------------|
+|------------------|------------------------|------------------------------|
 | SALE_DATE                   | Date when the sale was made                                                                                                                                                  | We will aggregate **by quarter**, no need to know the specific dates.                                    |
 | ADDRESS                     | Property Address                                                                                                                                                             | Will use `PROJECT_NAME` if needed to pinpoint projects                                                   |
 | AREA_SQM                    | Price per sqm                                                                                                                                                                | `AREA_SFT` is adequate                                                                                   |
@@ -741,7 +741,7 @@ Now that we have the base visualization, we will generate the final visualizatio
 
 When generating the facet name, we also can add the % change so that it is clear for the audience how much the prices change.
 
-We will use the following function to render the % change, which will show as <span style='color:darkgreen'>**+x.x%**</span> when there is an increase, and <span style='color:brown'>**-x.x%**</span> when there is a decrease.
+We will use the following function to render the % change, which will show as [**+x.x%**]{style="color:darkgreen"} when there is an increase, and [**-x.x%**]{style="color:brown"} when there is a decrease.
 
 ```{r}
 show_price_pc_change <- function(market = "1") {
@@ -1054,7 +1054,7 @@ On the contrary, the top districts in the Resale and Sub Sale markets have much 
 
 ## 4.4 Visualization 3: 2024 Q1 Market by Property Type
 
-### 4.3.1 Checking price trends by property type
+### 4.4.1 Checking price trends by property type
 
 Previous visualizations focused on comparisons between the Q1 of 2023 and 2024, and based on the different markets.
 
@@ -1078,7 +1078,7 @@ From this aggregated data, we can see that **Executive Condominiums** are relati
 
 We can also notice that there are much lower sales for some property types, like **Terrace House**, **Semi-Detached House**, and **Detached House.** These are landed properties, which are quite rare in Singapore so it is logical to see much fewer sales of these properties.
 
-### 4.3.2 Creating base visualizations
+### 4.4.2 Creating base visualizations
 
 From the insights gained from our initial exploration, we observed that prices differ by property types and that there are less sales on some property prices.
 
@@ -1209,7 +1209,7 @@ The volume graph provides additional information about sales by property type. S
 With this companion graph, it is easier to cross-reference the price with the volume to better judge how representative of the market the unit prices are.
 :::
 
-### 4.3.3 Generating the visualization
+### 4.4.3 Generating the visualization
 
 Finally, we will generate the visualization by stacking the 2 graphs and doing final touches on the styling and texts.
 
@@ -1279,7 +1279,7 @@ Another very interesting insight is that different property prices experience bi
 
 Hence, a prospective buyer must take generalizations in the housing market with the grain of salt as overall market trends may not reflect the situation in the market they are interested in. This is why when thinking of buying a property, it is important to be more **specific on the kind of property you are looking for** (e.g. which district, property type, new or resale, etc) and narrow down on the trends for each of those. They must do their own due diligence in researching the market they are interested in to make a sound decision on their purchase.
 
-## 5.2 Reflections
+## 5.3 Reflections
 
 When choosing how to visualize the data, I had to make hard decisions on what data subsets to select. At first I was wary that I will be presenting misleading data. My own bias and limitations also reflect the output as I had to limit myself to looking at 2 quarters as I cannot imagine how to present data from all 5 quarters effectively with the level of detail in the different submarkets and property type.
 
