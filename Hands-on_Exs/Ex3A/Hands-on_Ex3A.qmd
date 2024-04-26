@@ -429,7 +429,7 @@ crosstalk::bscols(gg,
 
 The scatterplot is rendered beside datatable.
 
-# Reflections
+# 6 Reflections
 
 In Take-Home Exercise 1, I was frustrated because I wanted to add interactive elements to my plot, which was beyond my capabilities then.
 

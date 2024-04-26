@@ -12,6 +12,7 @@ website:
           - text: "2: Beyond ggplot Fundamentals"
             href: Hands-on_Exs/Ex2/Hands-on_Ex2.qmd
           - text: "3A: Programming Interactive Data Visualisation with R"
+            href: Hands-on_Exs/Ex3A/Hands-on_Ex3A.qmd
       - text: In-class Exercises
         menu:
           - text: "1: Introduction to Visual Analytics"
