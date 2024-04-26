@@ -516,5 +516,96 @@
     "title": "Take-home Exercise 1: Singapore Private Residential Property Market for 2024 Q1",
     "section": "5.3 Reflections",
     "text": "5.3 Reflections\nWhen choosing how to visualize the data, I had to make hard decisions on what data subsets to select. At first I was wary that I will be presenting misleading data. My own bias and limitations also reflect the output as I had to limit myself to looking at 2 quarters as I cannot imagine how to present data from all 5 quarters effectively with the level of detail in the different submarkets and property type.\nHowever, I realized that with the details available to us, it is impossible to cover everything. It is more important to tailor the visualization to our target audience, and even then we may not be able to provide everything they need.\nI am now more aware that as a data visualization consumer, I must do my on due diligence to dive deep into the details as the visualizations may be too general or too detailed for our own needs. Some data may be omitted or data due to various limitations.\nAs a student, there were also some frustrating moments as I wanted to present data in a certain way but my current abilities limit me from presenting data in such a way (especially on Visualization 2). As I progress in this course, I will challenge myself to implement those ideas as I expand my own learning."
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html",
+    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html",
+    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
+    "section": "",
+    "text": "This hands-on exercise covers Chapter 3: Programming Interactive Data Visualisation with R.\nI learned about the following:\n\nCreating interactive data visualizations"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#loading-the-required-packages",
+    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#loading-the-required-packages",
+    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
+    "section": "2.1 Loading the required packages",
+    "text": "2.1 Loading the required packages\nFor this exercise we will use the following R packages:\n\nggiraph for making ‘ggplot’ graphics interactive.\nplotly, R library for plotting interactive statistical graphs.\nDT provides an R interface to the JavaScript library DataTables that create interactive table on html page.\ntidyverse, a family of modern R packages specially designed to support data science, analysis and communication task including creating static statistical graphs.\npatchwork for combining multiple ggplot2 graphs into one figure.\n\n\npacman::p_load(ggiraph, plotly, \n               DT, patchwork,\n               tidyverse)"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#loading-the-data",
+    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#loading-the-data",
+    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
+    "section": "2.2 Loading the data",
+    "text": "2.2 Loading the data\nWe will use the same exam_data dataset from Hands-on Ex 1 and load it into the RStudio environment using read_csv().\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")\nglimpse(exam_data)\n\nRows: 322\nColumns: 7\n$ ID      &lt;chr&gt; \"Student321\", \"Student305\", \"Student289\", \"Student227\", \"Stude…\n$ CLASS   &lt;chr&gt; \"3I\", \"3I\", \"3H\", \"3F\", \"3I\", \"3I\", \"3I\", \"3I\", \"3I\", \"3H\", \"3…\n$ GENDER  &lt;chr&gt; \"Male\", \"Female\", \"Male\", \"Male\", \"Male\", \"Female\", \"Male\", \"M…\n$ RACE    &lt;chr&gt; \"Malay\", \"Malay\", \"Chinese\", \"Chinese\", \"Malay\", \"Malay\", \"Chi…\n$ ENGLISH &lt;dbl&gt; 21, 24, 26, 27, 27, 31, 31, 31, 33, 34, 34, 36, 36, 36, 37, 38…\n$ MATHS   &lt;dbl&gt; 9, 22, 16, 77, 11, 16, 21, 18, 19, 49, 39, 35, 23, 36, 49, 30,…\n$ SCIENCE &lt;dbl&gt; 15, 16, 16, 31, 25, 16, 25, 27, 15, 37, 42, 22, 32, 36, 35, 45…\n\n\nThere are a total of seven attributes in the exam_data tibble data frame. Four of them are categorical data type and the other three are in continuous data type.\n\nThe categorical attributes are: ID, CLASS, GENDER and RACE.\nThe continuous attributes are: MATHS, ENGLISH and SCIENCE."
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#tooltips",
+    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#tooltips",
+    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
+    "section": "3.1 Tooltips",
+    "text": "3.1 Tooltips\n\n3.1.2 Adding tooltips\nInstead of geom_dotplot() provided by ggplot2, we will use ggiraph’s geom_dotplot_interactive() with the tooltip aesthetic to add the label in the content.\nAfter defining the plot, we will pass this to girafe() to generate the interactive element in our webpage.\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(\n    aes(tooltip = ID),\n    stackgroups = TRUE, \n    binwidth = 1, \n    method = \"histodot\") +\n  scale_y_continuous(NULL, \n                     breaks = NULL)\ngirafe(\n  ggobj = p,\n  width_svg = 6,\n  height_svg = 6*0.618\n)\n\n\n\n\n\nHovering on a dot in a plot shows the ID, which we set as the tooltip content.\n\n\n3.1.2 Adding multiple information in tooltip\nOne way we can add multiple information in tooltip is by setting tooltip value in dataframe with the data to be presented.\n\nexam_data$tooltip &lt;- c(paste0(     \n  \"Name = \", exam_data$ID,         \n  \"\\n Class = \", exam_data$CLASS)) \n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(\n    aes(tooltip = exam_data$tooltip), \n    stackgroups = TRUE,\n    binwidth = 1,\n    method = \"histodot\") +\n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(\n  ggobj = p,\n  width_svg = 8,\n  height_svg = 8*0.618\n)\n\n\n\n\n\nThe tooltip now has the student Name and Class when hovering on the dots.\n\n\n3.1.3 Styling the tooltip\nThe tooltip can be styled using CSS as the rendering is done on the webpage, and no processing of style by ggplot2. This style is passed to the girafe() function.\nFor example, we can change the background to white, instead of the default black. We will also change the font to Arial.\n\ntooltip_css &lt;- \"background-color:white; #&lt;&lt;\nfont-style:bold; color:black; font-family: Arial\" #&lt;&lt;\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(              \n    aes(tooltip = ID),                   \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") +               \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(                                  \n  ggobj = p,                             \n  width_svg = 6,                         \n  height_svg = 6*0.618,\n  options = list(    #&lt;&lt;\n    opts_tooltip(    #&lt;&lt;\n      css = tooltip_css)) #&lt;&lt;\n)"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#hover",
+    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#hover",
+    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
+    "section": "3.2 Hover",
+    "text": "3.2 Hover\n\n3.2.1 Adding hover effect\nWe can add hover effect by adding data_id aesthetic to geom_dotplot_interactive().\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(           \n    aes(data_id = CLASS),             \n    stackgroups = TRUE,               \n    binwidth = 1,                        \n    method = \"histodot\") +               \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(                                  \n  ggobj = p,                             \n  width_svg = 6,                         \n  height_svg = 6*0.618                      \n)\n\n\n\n\n\nHovering on a dot show the other dots with the same value in CLASS. This is useful for highlight plot elements related to the data.\n\n\n3.2.2 Styling hover effect\nWe can also use CSS to style the hover effect. The styles are passed to the girafe() function.\nopts_hover - style of the hovered and related data\nopts_hover_inv - style of unrelated data\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(              \n    aes(data_id = CLASS),              \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") +               \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(                                  \n  ggobj = p,                             \n  width_svg = 6,                         \n  height_svg = 6*0.618,\n  options = list(                        \n    opts_hover(css = \"fill: blue;\"),  \n    opts_hover_inv(css = \"opacity:0.4;\") \n  )                                        \n)\n\n\n\n\n\n\n\n3.2.3 Combining tooltip and hover\nWe can also combine both tooltips and hover effect to highlight related data and provide guiding text on the tootltip.\nThis can be done by setting both tooltip and data_id aesthetics on geom_dotplot_interactive().\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(              \n    aes(tooltip = paste(\"Class:\", CLASS), \n        data_id = CLASS),              \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") +               \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(                                  \n  ggobj = p,                             \n  width_svg = 6,                         \n  height_svg = 6*0.618,\n  options = list(                        \n    opts_tooltip(css = \"background-color:white; font-style:bold; color:black; font-family: Arial\"),\n    opts_hover(css = \"fill: blue;\"),  \n    opts_hover_inv(css = \"opacity:0.4;\") \n  )                                        \n)\n\n\n\n\n\nWith this, the tooltip shows the class and highlights the other dots associated with the class."
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#onclick-effect",
+    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#onclick-effect",
+    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
+    "section": "3.3 onclick() effect",
+    "text": "3.3 onclick() effect\nThis provides functionality to run Javascript code when clicking on a plot element.\n\nexam_data$onclick &lt;- sprintf(\"window.open(\\\"%s%s\\\")\",\n\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20school\",\nas.character(exam_data$ID))\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(              \n    aes(onclick = onclick),              \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") +               \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(                                  \n  ggobj = p,                             \n  width_svg = 6,                         \n  height_svg = 6*0.618)\n\n\n\n\n\nIn this example, clicking a dot opens MOE page of the student. This is triggered by the window.open() javascript.\n\n\n\n\n\n\nPreventing XSS attacks\n\n\n\nWhen running javascript functions, using data not generated by our system, it is important to escape the data for Javascript safety to prevent Cross-Site Scripting attacks.\nOne example is if CLASS has some values such as ;stealYoInfo();, it can potentially make users vulnerable. Even if there is no malicious intent, if some values have text that can affect Javascript parsing, the interactive plot may not work as expected.\nThis particular dataset and Singapore Open Data datasets are trusted so there is less concern for this happening. However, some caution is needed when using untrusted sources.\nI will do some tests at a later time to check if ggiraph is vulnerable to such attacks so that I can apply measures to prevent XSS."
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#coordinating-multiple-views",
+    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#coordinating-multiple-views",
+    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
+    "section": "3.4 Coordinating multiple views",
+    "text": "3.4 Coordinating multiple views\nWe can pass the patchwork plot to girafe() to coordinate the interactions of the two plots.\n\np1 &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(              \n    aes(data_id = ID),              \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") +  \n  coord_cartesian(xlim=c(0,100)) + \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\n\np2 &lt;- ggplot(data=exam_data, \n       aes(x = ENGLISH)) +\n  geom_dotplot_interactive(              \n    aes(data_id = ID),              \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") + \n  coord_cartesian(xlim=c(0,100)) + \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\n\ngirafe(code = print(p1 + p2), \n       width_svg = 6,\n       height_svg = 3,\n       options = list(\n         opts_hover(css = \"fill: #202020;\"),\n         opts_hover_inv(css = \"opacity:0.2;\")\n         )\n       )\n\n\n\n\n\nIn the example above, hovering a dot in the Maths plot, highlights the corresponding dot in English.\nThis is useful for seeing how the student scored in both subjects."
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#creating-an-interactive-scatterplot",
+    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#creating-an-interactive-scatterplot",
+    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
+    "section": "4.1 Creating an interactive scatterplot",
+    "text": "4.1 Creating an interactive scatterplot\n\nplot_ly(data = exam_data, \n             x = ~MATHS, \n             y = ~ENGLISH)\n\n\n\n\n\nWith a few lines of code, it generated an interactive plot with tooltips and with varioous functions like zoom and pan."
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#adding-color-to-plotly-visualization",
+    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#adding-color-to-plotly-visualization",
+    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
+    "section": "4.2 Adding color to plotly visualization",
+    "text": "4.2 Adding color to plotly visualization\n\nplot_ly(data = exam_data, \n             x = ~MATHS, \n             y = ~ENGLISH,\n             color = ~RACE)\n\n\n\n\n\nAdding the color also added an interactive legend, and each race can clicked to hide and unhide dots from the plot."
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#creating-an-interactive-scatetrplot-using-ggplotly",
+    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#creating-an-interactive-scatetrplot-using-ggplotly",
+    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
+    "section": "4.3 Creating an interactive scatetrplot using ggplotly",
+    "text": "4.3 Creating an interactive scatetrplot using ggplotly\nWe can make an existing ggplot visualization interactive by passing the plot using ggplotly()\n\np &lt;- ggplot(data=exam_data, \n            aes(x = MATHS,\n                y = ENGLISH)) +\n  geom_point(size=1) +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100))\nggplotly(p)"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#coordinating-multiple-views-1",
+    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#coordinating-multiple-views-1",
+    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
+    "section": "4.4 Coordinating multiple views",
+    "text": "4.4 Coordinating multiple views\nCoordinating views is done by the following:\n\nhighlight_key() of plotly package is used as shared data.\ntwo scatterplots will be created by using ggplot2 functions.\nlastly, subplot() of plotly package is used to place them next to each other side-by-side. (similar to patchwork)\n\n\nd &lt;- highlight_key(exam_data)\np1 &lt;- ggplot(data=d, \n            aes(x = MATHS,\n                y = ENGLISH)) +\n  geom_point(size=1) +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100))\n\np2 &lt;- ggplot(data=d, \n            aes(x = MATHS,\n                y = SCIENCE)) +\n  geom_point(size=1) +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100))\nsubplot(ggplotly(p1),\n        ggplotly(p2))"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#interactive-data-table-dt-package",
+    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#interactive-data-table-dt-package",
+    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
+    "section": "5.1 Interactive Data Table: DT Package",
+    "text": "5.1 Interactive Data Table: DT Package\nIt is a wrapper of DataTables Javascript library. Data objects in R can be rendered as HTML tables using the JavaScript library ‘DataTables’ (typically via R Markdown or Shiny).\n\nDT::datatable(exam_data, class= \"compact\")\n\n\n\n\n\n\nThis provides interactive elements like pagination, search and sort with just 1 line of code!"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#rendering-plots-with-data-table",
+    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#rendering-plots-with-data-table",
+    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
+    "section": "5.2 Rendering plots with data table",
+    "text": "5.2 Rendering plots with data table\n\nd &lt;- highlight_key(exam_data) \np &lt;- ggplot(d, \n            aes(ENGLISH, \n                MATHS)) + \n  geom_point(size=1) +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100))\n\ngg &lt;- highlight(ggplotly(p),        \n                \"plotly_selected\")  \n\ncrosstalk::bscols(gg,               \n                  DT::datatable(d), \n                  widths = 5)        \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nThe scatterplot is rendered beside datatable."
   }
 ]
