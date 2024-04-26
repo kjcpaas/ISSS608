@@ -49,9 +49,9 @@ For the purposes of this exercise, we will refer to each data as the following:
 
 To start the data analysis, we first need to prepare the R environment for analysis. This includes loading the R packages and loading the datasets.
 
-After the setup, we need to do data wrangling where we clean and transform the data into a form that is fitting for our analysis. This will possible entail removing irrelevant data, deriving additional variables, renaming columns, etc.
+After the setup, we need to do **data wrangling** where we clean and transform the data into a form that is fitting for our analysis. This will possible entail removing irrelevant data, deriving additional variables, renaming columns, etc.
 
-Next, we need to decide on what data we would like to look at closely. For the purposes of this exercise, these are the data we can look at that can potentially give valuable insights:
+As part of wrangling, we need to decide on what data we would like to look at closely. For the purposes of this exercise, these are the data we can look at that can potentially give valuable insights:
 
 -   Total units sold by quarter
 
@@ -279,33 +279,38 @@ nrow(realis) == nrow(realis_2023q1) +
 After adding the `QUARTER` and `TXN_ID` columns, there are now 23 variables in the dataframe. However, not all of them are relevant to answer the questions we are asking. The table below summarizes the columns and whether we will keep them or not.
 
 ::: panel-tabset
-### Column Details
+### Columns Retained
 
-| Column Name                 | Description                                                                                                                                                                  | Action                      | Reason                                                            |
-|-----------------|-----------------------|-----------------|-----------------|
-| PROJECT_NAME                | Name of the project                                                                                                                                                          | [DROP]{style="color:red"}   | Too specific for aggregation                                      |
-| TRANSACTED_PRICE            | Transaction price (SGD)                                                                                                                                                      | [KEEP]{style="color:green"} | Core data for analysis                                            |
-| AREA_SQFT                   | Area of the property in sqft                                                                                                                                                 | [KEEP]{style="color:green"} | Can be useful partitioning data                                   |
-| UNIT_PRICE_PSF              | Price per sqft                                                                                                                                                               | [KEEP]{style="color:green"} | Can be useful for price analysis                                  |
-| SALE_DATE                   | Date when the sale was made                                                                                                                                                  | [DROP]{style="color:red"}   | We will aggregate by quarter, no need to know the specific dates. |
-| ADDRESS                     | Property Address                                                                                                                                                             | [DROP]{style="color:red"}   | Too specific for aggregation                                      |
-| TYPE_OF_SALE                | One of *New Sale*, *Resale*, *Subsale*                                                                                                                                       | [KEEP]{style="color:green"} | Important submarket information                                   |
-| TYPE_OF_AREA                | One of *Landed*, *Strata*                                                                                                                                                    | [KEEP]{style="color:green"} | Can be used to partition data                                     |
-| AREA_SQM                    | Price per sqm                                                                                                                                                                | [DROP]{style="color:red"}   | AREA_SFT is adequate                                              |
-| UNIT_PRICE_PSM              | Price per sqm                                                                                                                                                                | [DROP]{style="color:red"}   | UNIT_PRICE_PSF is adequate                                        |
-| NETT_PRICE                  |                                                                                                                                                                              | [DROP]{style="color:red"}   | Column is blank                                                   |
-| PROPERTY_TYPE               | Type of Property, e.g. *Apartment, Condominium, Executive Condominium, Terrace House, Semi-Detached House, Detached House*                                                   | [KEEP]{style="color:green"} | Can be used to partition data                                     |
-| NUMBER_OF_UNITS             | Number of units involved in the transaction                                                                                                                                  | [KEEP]{style="color:green"} | Core data for analysis                                            |
-| TENURE                      | Can be Freehold or Leasehold                                                                                                                                                 | [KEEP]{style="color:green"} | Can be used to partition data                                     |
-| COMPLETION_DATE             | When the property was completed. Some properties are Uncompleted as they will be turned over for the future                                                                  | [KEEP]{style="color:green"} | Can be used to partition data                                     |
-| PURCHASER_ADDRESS_INDICATOR | [Type of residence of the purchaser](https://www.ura.gov.sg/reis/dataDictionary#:~:text=Purchaser%20Address%20Indicator%3A%20It%20refers,is%20owned%20by%20the%20purchaser.) | [KEEP]{style="color:green"} | Can be used to partition data                                     |
-| POSTAL_CODE                 | Postal code of the property                                                                                                                                                  | [DROP]{style="color:red"}   | Too specific for aggregation                                      |
-| POSTAL_DISTRICT             | District where the property is located                                                                                                                                       | [KEEP]{style="color:green"} | Can be used to partition data                                     |
-| POSTAL_SECTOR               | Sector where the property is located                                                                                                                                         | [DROP]{style="color:red"}   | Irrelevant                                                        |
-| PLANNING_REGION             | Region where the property is located                                                                                                                                         | [KEEP]{style="color:green"} | Can be used to partition data                                     |
-| PLANNING_AREA               | Area where the property is located                                                                                                                                           | [KEEP]{style="color:green"} | Can be used to partition data                                     |
-| QUARTER                     | Quarter where the property was sold                                                                                                                                          | [KEEP]{style="color:green"} | Core data for aggregation                                         |
-| TXN_ID                      | Identifier for the transaction                                                                                                                                               | [KEEP]{style="color:green"} | It is an identifier                                               |
+| Column Name      | Description                                                                                                                | Reason                                   |
+|------------------|------------------------|-------------------------------|
+| TXN_ID           | Identifier for the transaction                                                                                             | It is an identifier                      |
+| QUARTER          | Quarter when the property was sold                                                                                         | Core data for aggregation                |
+| PROJECT_NAME     | Name of the project                                                                                                        | Can be used to pinpoint popular projects |
+| TRANSACTED_PRICE | Transaction price (SGD)                                                                                                    | Useful for deriving insights             |
+| AREA_SQFT        | Area of the property in sqft                                                                                               | Useful for deriving insights             |
+| UNIT_PRICE_PSF   | Price per sqft                                                                                                             | Useful for price analysis                |
+| TYPE_OF_SALE     | One of *New Sale*, *Resale*, *Subsale*                                                                                     | Important submarket information          |
+| TYPE_OF_AREA     | One of *Landed*, *Strata*                                                                                                  | Can be used to partition data            |
+| PROPERTY_TYPE    | Type of Property, e.g. *Apartment, Condominium, Executive Condominium, Terrace House, Semi-Detached House, Detached House* | Can be used to partition data            |
+| NUMBER_OF_UNITS  | Number of units involved in the transaction                                                                                | Core data for analysis                   |
+| POSTAL_DISTRICT  | District where the property is located                                                                                     | Can be used to partition data            |
+| TENURE           | Can be Freehold or Leasehold                                                                                               | Can be used to partition data            |
+
+### Columns Dropped
+
+| Column Name                 | Description                                                                                                                                                                  | Reason                                                                                                   |
+|------------------|------------------------|-------------------------------|
+| SALE_DATE                   | Date when the sale was made                                                                                                                                                  | We will aggregate **by quarter**, no need to know the specific dates.                                    |
+| ADDRESS                     | Property Address                                                                                                                                                             | Will use `PROJECT_NAME` if needed to pinpoint projects                                                   |
+| AREA_SQM                    | Price per sqm                                                                                                                                                                | `AREA_SFT` is adequate                                                                                   |
+| UNIT_PRICE_PSM              | Price per sqm                                                                                                                                                                | `UNIT_PRICE_PSF` is adequate                                                                             |
+| NETT_PRICE                  |                                                                                                                                                                              | Column is blank                                                                                          |
+| COMPLETION_DATE             | When the property was completed. Some properties are Uncompleted as they will be turned over for the future                                                                  | Other attributes (e.g. `TYPE_OF_SALE`, `PROPERTY_TYPE`) are more important for checking submarket trends |
+| PURCHASER_ADDRESS_INDICATOR | [Type of residence of the purchaser](https://www.ura.gov.sg/reis/dataDictionary#:~:text=Purchaser%20Address%20Indicator%3A%20It%20refers,is%20owned%20by%20the%20purchaser.) | No interest in buyer's current address                                                                   |
+| POSTAL_CODE                 | Postal code of the property                                                                                                                                                  | Will use `POSTAL_DISTRICT` for location                                                                  |
+| POSTAL_SECTOR               | Sector where the property is located                                                                                                                                         | Will use `POSTAL_DISTRICT` for location                                                                  |
+| PLANNING_REGION             | Region where the property is located                                                                                                                                         | Will use `POSTAL_DISTRICT` for location                                                                  |
+| PLANNING_AREA               | Area where the property is located                                                                                                                                           | Will use `POSTAL_DISTRICT` for location                                                                  |
 
 ### Filter code
 
@@ -316,27 +321,24 @@ realis <-
   realis %>% select(
     c(
       TXN_ID,
-      PROJECT_NAME,
       QUARTER,
-      NUMBER_OF_UNITS,
+      PROJECT_NAME,
       TRANSACTED_PRICE,
       AREA_SQFT,
-      TYPE_OF_SALE,
-      PROPERTY_TYPE,
-      TYPE_OF_AREA,
-      POSTAL_DISTRICT,
-      PLANNING_REGION,
-      PLANNING_AREA,
-      TENURE,
       UNIT_PRICE_PSF,
-      COMPLETION_DATE,
-      PURCHASER_ADDRESS_INDICATOR
+      TYPE_OF_SALE,
+      TYPE_OF_AREA,
+      PROPERTY_TYPE,
+      NUMBER_OF_UNITS,
+      POSTAL_DISTRICT,
+      TENURE
     )
   )
+glimpse(realis)
 ```
 :::
 
-After this initial cleanup, we are left with 15 variables relevant to our exploration.
+After this initial cleanup, we are left with **12** variables relevant to our exploration.
 
 ::: {.callout-tip collapse="true"}
 ### Save point
@@ -344,7 +346,7 @@ After this initial cleanup, we are left with 15 variables relevant to our explor
 Let us save `realis` so we do not need to rerun the steps above.
 
 ```{r}
-write_rds(realis, "data/rds/realis_after_clean.rds")
+write_rds(realis, "data/rds/realis_cleaned.rds")
 ```
 :::
 
@@ -371,7 +373,7 @@ rm(realis_2024q1)
 We can continue running the document from this point by loading the following prepared data.
 
 ```{r}
-realis <- read_rds("data/rds/realis_after_clean.rds")
+realis <- read_rds("data/rds/realis_cleaned.rds")
 ```
 :::
 
@@ -398,8 +400,8 @@ Although Option 2 is more difficult, it is the better approach as all the transa
 For this solution, we need to do the following:
 
 1.  Repeat all rows by `NUMBER_OF_UNITS` times.
-2.  Set transacted price to the average price: $\frac{TRANSACTED\_PRICE}{NUMBER\_OF\_UNITS}$.
-3.  Set the area (sqft) to the average area: $\frac{AREA\_SQFT}{NUMBER\_OF\_UNITS}$.
+2.  Set transacted price to the average price: ${TRANSACTED\_PRICE}\div{NUMBER\_OF\_UNITS}$.
+3.  Set the area (sqft) to the average area: ${AREA\_SQFT}\div{NUMBER\_OF\_UNITS}$.
 4.  Set `NUMBER_OF_UNITS` to 1.
 
 ::: panel-tabset
@@ -416,13 +418,13 @@ Reference: [Stackoverflow](https://stackoverflow.com/questions/11121385/repeat-r
 :::
 
 ```{r}
-realis_per_unit <- realis[rep(seq_len(nrow(realis)), realis$NUMBER_OF_UNITS),]
+sales_txns <- realis[rep(seq_len(nrow(realis)), realis$NUMBER_OF_UNITS),]
 ```
 
 Lets' check if the number of rows correspond to the total number of units sold.
 
 ```{r}
-nrow(realis_per_unit) == sum(realis$NUMBER_OF_UNITS)
+nrow(sales_txns) == sum(realis$NUMBER_OF_UNITS)
 ```
 
 ### Setting column values
@@ -430,12 +432,12 @@ nrow(realis_per_unit) == sum(realis$NUMBER_OF_UNITS)
 We will perform the changes to `NUMBER_OF_UNITS`, `TRANSACTED_PRICE`, `AREA_SQFT` in 1 code chunk so that rerunning the code chunk is idempotent and won't mutate the variable further
 
 ```{r}
-realis_per_unit <- realis_per_unit %>%
+sales_txns <- sales_txns %>%
   filter(NUMBER_OF_UNITS > 1) %>%
   mutate(TRANSACTED_PRICE = round(TRANSACTED_PRICE / NUMBER_OF_UNITS, 0)) %>%
   mutate(AREA_SQFT = round(AREA_SQFT / NUMBER_OF_UNITS, 0)) %>%
   mutate(NUMBER_OF_UNITS = 1) %>%
-  rbind(realis_per_unit %>% # Reconnect to the rest of the dataframe
+  rbind(sales_txns %>% # Reconnect to the rest of the dataframe
               filter(NUMBER_OF_UNITS == 1))
 ```
 :::
@@ -456,7 +458,7 @@ realis %>%
 ### After
 
 ```{r}
-realis_per_unit %>%
+sales_txns %>%
   filter(TXN_ID %in% c(
     "TXN00001", "TXN00002", # Single-unit transactions
     "TXN10593", "TXN13376" # Bulk transactions
@@ -467,26 +469,102 @@ realis_per_unit %>%
 ::: {.callout-tip collapse="true"}
 ### Save point
 
-Let us save `realis_per_unit` so we do not need to rerun the steps above.
+Let us save `sales_txns` so we do not need to rerun the steps above.
 
 ```{r}
-write_rds(realis_per_unit, "data/rds/realis_per_unit.rds")
+write_rds(sales_txns, "data/rds/sales_txns.rds")
+```
+:::
+
+::: {.callout-warning collapse="true"}
+### Data clear point
+
+We will use `sales_txns` from now on so we can remove `realis` from the environment.
+
+```{r}
+#| eval: true
+rm(realis)
 ```
 :::
 
 # 4 Data Exploration
 
-For this exercise, we will focus on exploring and visualizing the **distribution among the different submarkets**.
+::: {.callout-note collapse="true"}
+## Load point
+
+We can continue running the document from this point by loading the following prepared data.
+
+```{r}
+sales_txns <- read_rds("data/rds/sales_txns.rds")
+```
+:::
+
+## 4.1 Defining the audience and purpose of the visualizations
+
+### 4.1.1 Considerations
+
+It is important to note that it is quite challenging to **present all data available with just 3 visualizations**. We cannot cover all ground and visualize the data from all perspectives, and some blind spots and biases are bound occur in the process.
+
+With this in mind, it is important that we define the **audience and purpose** of the visualizations.
+
+The audience is a **prospective private property buyer** that needs help answering these questions in making decisions on buying property:
+
+1.  Should I buy a new property or a resale property?
+2.  Should I buy a condo, apartment, or is it worth it to save more for a landed property?
+3.  Which districts should I consider when buying a property?
+4.  Do I get a bargain compared to buying a property last year?
+
+To answer the questions above, we will focus on exploring and visualizing the **distribution among the different markets** (New Sale, Resale, Sub Sale).
 
 The points of interest are:
 
--   2023 and 2024 Q1 prices
+-   Prices (unit and total)
 
--   Trends in sales volume per quarter
+-   Distribution across different markets
 
--   Distribution across different markets within 2024Q1
+-   Distribution by property type
 
-## 4.1 Comparing 2023Q1 and 2024Q1 prices
+::: {.callout-important appearance="simple"}
+#### Risks when selecting data to present
+
+As we have limited space to present data (within 2-3 visualizations), we cannot include all the data available to us.
+
+With this, some perspectives may be missed and we will not be able to dive deep enough all aspects of the data.
+:::
+
+### 4.1.2 Unit Price vs Transacted Price
+
+Given `AREA_SQFT` and `UNIT_PRICE_PSF`, it is intuitive to expect that: $$AREA\_SQFT \times UNIT\_PRICE\_PSF = TRANSACTED\_PRICE$$
+
+However, there are only **7 out of 26,936** transactions for which this is true.
+
+```{r}
+sales_txns %>% filter(TRANSACTED_PRICE == AREA_SQFT * UNIT_PRICE_PSF) %>% nrow()
+```
+
+This is because the final transacted price depends on other factors like size of property, floor height, where the property is facing, etc. Most of these **factors are not reflected** in the dataset we have.
+
+Hence, to have a fairer comparison with what we have, we will use **UNIT_PRICE_PSF** for price comparisons.
+
+### 4.1.3 Compare all quarters or two quarters
+
+In answering the questions we define (and based on the specifications of the exercise), the data partition for the visualization is by `TYPE_OF_SALE` as we want to look for trends from the different submarkets.
+
+We current have **5 quarters** in our dataset, **3** submarkets. This means **15 facets**, which may be too much for division for visualization. It is also difficult to see at a glance when information we are trying to communicate if there are many very small graphs.
+
+In addition, if we want to dive even deeper by `PROPERTY_TYPE`, which has 6 possible values, that is **90 data subsets** we need to present.
+
+Hence to simplify the visualization, we will choose only the `2023Q1` and `2024Q1`, which should suffice for our purpose of comparing the state of the market to last year's as we are comparing the same time of the year.
+
+Hence, we will produce the data frames to contain these data.
+
+```{r}
+sales_txns_q1_2324 <- sales_txns %>% filter(QUARTER %in% c("2023Q1", "2024Q1"))
+sales_txns_q1_23 <- sales_txns_q1_2324 %>% filter(QUARTER == "2023Q1")
+sales_txns_q1_24 <- sales_txns_q1_2324 %>% filter(QUARTER == "2024Q1")
+```
+
+## 4.2 Visualization 1: 2023Q1 and 2024Q1 prices
 
 First we will compare the prices between the **First Quarter** of 2023 and 2024. This is to compare the prices at the same time of the year.
 
@@ -494,7 +572,7 @@ For this visualization, we will use the **Unit Price per Sqft** (`UNIT_PRICE_PSF
 
 We will use the `TYPE_OF_SALE` column to partition the data so we can compare the trends across the **Resale, New Sale and Sub Sale markets**.
 
-### 4.1.2 Creating the base Visualization
+### 4.2.1 Creating the base Visualization
 
 For the visualization, we will use a **Raincloud Plot** so that we can see the patterns in the price trends, and whether there are clusters of interest within the data set.
 
@@ -512,7 +590,7 @@ To visualize the volumes, the 2 options are using `stat_dots()` or `geom_jitter(
 #| code-summary: "Show ggplot2 code"
 plot_q1_yoy_psf_price <- function() {
   ggplot(
-    realis_per_unit %>% filter(QUARTER %in% c("2023Q1", "2024Q1")),
+    sales_txns_q1_2324,
     aes(
       x = QUARTER,
       y = UNIT_PRICE_PSF,
@@ -562,6 +640,7 @@ plot_q1_yoy_psf_price <- function() {
       fun = "median",
       position = position_nudge(y = 2500),
       family = "Roboto Condensed",
+      size = 3,
       show.legend = FALSE
     ) +
     
@@ -584,7 +663,7 @@ plot_q1_yoy_psf_price()
 #| code-summary: "Show ggplot2 code"
 plot_q1_yoy_psf_price_alt <- function() {
   ggplot(
-    realis_per_unit %>% filter(QUARTER %in% c("2023Q1", "2024Q1")),
+    sales_txns_q1_2324,
     aes(
       x = QUARTER,
       y = UNIT_PRICE_PSF,
@@ -631,6 +710,7 @@ plot_q1_yoy_psf_price_alt <- function() {
       fun = "median",
       position = position_nudge(y = 2500),
       family = "Roboto Condensed",
+      size = 3,
       show.legend = FALSE
     )+
     
@@ -647,8 +727,8 @@ plot_q1_yoy_psf_price_alt()
 ```
 :::
 
-::: callout-important
-#### Winner: stat_dots()
+::: callout-note
+#### Decision: stat_dots()
 
 Using `stat_dots()` is better than `geom_jitter()` as the purpose of providing volume information here is to **accompany the half-density plot** and provide a tool to compare the volume of each submarket.
 
@@ -657,7 +737,39 @@ Comparing the length of each horizontal line is much easier to do than comparing
 
 Now that we have the base visualization, we will generate the final visualization.
 
-### 4.1.2 Generating the visualization
+### 4.2.2 Adding the % change
+
+When generating the facet name, we also can add the % change so that it is clear for the audience how much the prices change.
+
+We will use the following function to render the % change, which will show as <span style='color:darkgreen'>**+x.x%**</span> when there is an increase, and <span style='color:brown'>**-x.x%**</span> when there is a decrease.
+
+```{r}
+show_price_pc_change <- function(market = "1") {
+  data2023 = sales_txns_q1_23
+  data2024 = sales_txns_q1_24
+  
+  # 1 is the facet name for All markets
+  if (market != "1") {
+    data2023 = data2023 %>% filter(TYPE_OF_SALE == market)
+    data2024 = data2024 %>% filter(TYPE_OF_SALE == market)
+  } else {
+    market = "All Markets"
+  }
+  
+  median2023 = data2023$UNIT_PRICE_PSF %>% median()
+  median2024 = data2024$UNIT_PRICE_PSF %>% median()
+  
+  sprintf(
+    "%s (<span style='color:%s;'>**%s%0.1f%%**</span>)",
+    market,
+    ifelse(median2024 < median2023, "brown", "darkgreen"),
+    ifelse(median2024 < median2023, "-", "+"),
+    (median2024 - median2023) * 100 / median2023
+  )
+}
+```
+
+### 4.2.3 Generating the visualization
 
 We want to compare the 2023 and 2024 Q1 sales for different submarkets. To do this, we will use `facet_wrap()` on `TYPE_OF_SALE`.
 
@@ -665,7 +777,7 @@ In addition, we will add another facet for **All Markets** for the overall compa
 
 These 2 plots will be shown side by side using `patchwork`.
 
-::: {.callout-note appearance="simple"}
+::: {.callout-note collapse="true" appearance="simple"}
 #### facet_grid(margin = TRUE) as alternative
 
 We can also use `facet_grid(margin = TRUE)` to generate a facet with all the data, instead of generating 2 separate plots.
@@ -677,34 +789,36 @@ However, I would like to change the panel color for the overall plot to highligh
 #| code-fold: true
 #| code-summary: "Show ggplot2 code"
 q1_yoy_psf_price_submarkets_graph <- plot_q1_yoy_psf_price() +
-  facet_wrap(~ TYPE_OF_SALE,
-             strip.position = "bottom",
-             labeller = labeller(
-               TYPE_OF_SALE = c(
-                 "New Sale" = "New Sale (<span style='color:brown;'>**-7.6%**</span>)",
-                 "Sub Sale" = "Sub Sale (<span style='color:brown;'>**-0.5%**</span>)",
-                 "Resale" = "Resale (<span style='color:darkgreen;'>**+3.3%**</span>)"
-               )
-             )) +
+  facet_wrap( ~ TYPE_OF_SALE,
+              strip.position = "bottom",
+              labeller = labeller(
+                TYPE_OF_SALE = c(
+                  "New Sale" = show_price_pc_change("New Sale"),
+                  "Sub Sale" = show_price_pc_change("Sub Sale"),
+                  "Resale" = show_price_pc_change("Resale")
+                )
+              )) +
   theme_minimal() +
   theme(axis.title.y = element_blank(),
         axis.text.y = element_blank())
 
 q1_yoy_psf_price_all_markets_graph <- plot_q1_yoy_psf_price() +
-  facet_wrap(~ NUMBER_OF_UNITS,
-             strip.position = "bottom",
-             labeller = as_labeller(function(l) {
-               "All Markets (<span style='color:darkgreen;'>**+1.7%**</span>)"
-             })) +
+  facet_wrap(
+    ~ NUMBER_OF_UNITS,
+    strip.position = "bottom",
+    labeller = as_labeller(show_price_pc_change)
+  ) +
   labs(x = "Transaction Price (,000 SGD)") +
   theme(panel.background = element_rect(fill = "aliceblue", linewidth =
                                           0))
 
-(q1_yoy_psf_price_all_markets_graph |
-    q1_yoy_psf_price_submarkets_graph) +
+# As much as we want the plot annotations to be dynamic, the subtitle is depending on the actual data
+# Only this part is hardcoded
+viz1 <- (q1_yoy_psf_price_all_markets_graph |
+           q1_yoy_psf_price_submarkets_graph) +
   plot_layout(widths = c(1, 3)) +
   plot_annotation(title = "Singapore Private Property Prices by Sales Market",
-                  subtitle = "Overall prices slightly increased by <span style='color:darkgreen;'>**1.7%**</span> but the New Sales market experienced <span style='color:brown;'>**7.6%**</span> decrease.") &
+                  subtitle = "Overall prices slightly increased by <span style='color:darkgreen;'>**1.2%**</span> but the New Sales market experienced <span style='color:brown;'>**7.6%**</span> decrease.") &
   theme(
     text = element_text(family = "Roboto Condensed"),
     axis.line.x = element_line(),
@@ -715,6 +829,7 @@ q1_yoy_psf_price_all_markets_graph <- plot_q1_yoy_psf_price() +
     strip.placement = "outside",
     strip.text = element_markdown(size = rel(1))
   )
+viz1
 ```
 
 ::: callout-tip
@@ -731,9 +846,9 @@ However, it is important to note that visualization can be very **misleading** e
 
 Hence, we need to look more deeply into these groups and present it as a visualizations so it can be better understood why there are groups that formed.
 
-## 4.2 Comparing 2023Q1 and 2024Q1 Sales Volume
+## 4.3 Visualization 2: 2023Q1 and 2024Q1 Sales Volume
 
-### 4.2.1 Understanding the groups in New Sales Market
+### 4.3.1 Understanding the groups in New Sales Market
 
 We hypothesized that the groups that are present in the **New Sales** plot is due to the sales of **newly-launched projects**.
 
@@ -745,7 +860,7 @@ We will check the aggregated data by `PROJECT_NAME` and `POSTAL_DISTRICT` to ver
 We will aggregate the **number of sales** and **median unit price** by projects. We will also add `POSTAL_DISTRICT` to the aggregation group as property prices depend on which district a property is in.
 
 ```{r}
-realis_per_unit %>% filter(TYPE_OF_SALE == "New Sale", QUARTER == "2024Q1") %>% 
+sales_txns_q1_24 %>% filter(TYPE_OF_SALE == "New Sale") %>% 
   group_by(POSTAL_DISTRICT, PROJECT_NAME) %>%
   summarize(
     MEDIAN_PRICE_PSF = median(UNIT_PRICE_PSF),
@@ -764,7 +879,7 @@ Hence, the density graph could reflected the groups that formed from the sales o
 #### By District
 
 ```{r}
-realis_per_unit %>% filter(TYPE_OF_SALE == "New Sale", QUARTER == "2024Q1") %>% 
+sales_txns_q1_24 %>% filter(TYPE_OF_SALE == "New Sale") %>% 
   group_by(POSTAL_DISTRICT) %>%
   summarize(
     MEDIAN_PRICE_PSF = median(UNIT_PRICE_PSF),
@@ -781,11 +896,11 @@ This is hinted by the fact that after aggregating all property sales by district
 
 Based on the findings from this deep dive, we will visualize the sales volume by district.
 
-### 4.2.2. Creating the base visualization
+### 4.3.2. Creating the base visualization
 
 Some of the options we have to visualize the sales by district are:
 
--   Bar graph of number of sales for **all** district, or
+-   Bar graph of number of sales for **all** districts, or
 
 -   Bar graph of number of sales for **most popular** districts
 
@@ -795,7 +910,7 @@ Some of the options we have to visualize the sales by district are:
 ```{r}
 plot_q1_yoy_sale_vol <- function() {
 ggplot(
-  realis_per_unit %>% filter(QUARTER %in% c("2023Q1", "2024Q1")),
+  sales_txns_q1_2324,
   aes(x = POSTAL_DISTRICT, fill = QUARTER)
 ) +
   geom_bar(position="dodge", show.legend = FALSE) +
@@ -812,7 +927,7 @@ plot_q1_yoy_sale_vol()
 This visualization needs some pre-processing so we can determine the Top 5 most popular districts in each submarket.
 
 ```{r}
-popular_districts <- realis_per_unit %>% filter(QUARTER %in% c("2023Q1", "2024Q1")) %>% 
+popular_districts <- sales_txns_q1_2324 %>% 
   group_by(QUARTER, POSTAL_DISTRICT, TYPE_OF_SALE) %>%
   summarize(
     MEDIAN_PRICE_PSF = median(UNIT_PRICE_PSF),
@@ -847,7 +962,7 @@ From the 2 options, plotting the **Most Popular Districts** is more appropriate 
 
 When we plot all the districts, it is more difficult to identify by sight which districts are popular in a quarter and the other. This is because this plot has a lot of noise, which may not be that relevant to connect to the previous visualization.
 
-### 4.2.3 Generating the visualization
+### 4.3.3 Generating the visualization
 
 We will generate the visualization such that `QUARTER` is in column and `TYPE_OF_SALE` is in rows.
 
@@ -856,13 +971,13 @@ We will using `facet_grid()` to generate the visualization and adjust the theme 
 ```{r}
 #| code-fold: true
 #| code-summary: "Show ggplot2 code"
-ggplot(popular_districts,
-               aes(
-                 # Order the axis elements by rank
-                 x = reorder(RANK, -RANK),
-                 y = NUMBER_OF_SALES,
-                 fill = QUARTER
-               )) +
+viz2 <- ggplot(popular_districts,
+       aes(
+         # Order the axis elements by rank
+         x = reorder(RANK,-RANK),
+         y = NUMBER_OF_SALES,
+         fill = QUARTER
+       )) +
   
   # Generate bar graph based on number of sales
   geom_bar(
@@ -876,14 +991,11 @@ ggplot(popular_districts,
   geom_text(aes(
     y = 10,
     hjust = 0,
-    label = paste0(
-      "D",
+    label = sprintf(
+      "D%s: %d units sold at S$%0.2f psf",
       POSTAL_DISTRICT,
-      ": ",
       NUMBER_OF_SALES,
-      " units sold at S$",
-      MEDIAN_PRICE_PSF,
-      " psf"
+      MEDIAN_PRICE_PSF
     )
   ), family = "Roboto Condensed") +
   
@@ -895,9 +1007,9 @@ ggplot(popular_districts,
   
   # Generate facets, with labels to the left and at the bottom
   facet_grid(TYPE_OF_SALE ~ QUARTER, switch = "both") +
-
+  
   # Set plot texts
-  plot_annotation(title = "Districts With Highest Units Sold for each Submarket",
+  plot_annotation(title = "Districts With Highest Units Sold for Each Submarket",
                   subtitle = "New Sale Market is heavily influenced by the newly-launched projects in **D23** (Lumina Grand) and **D26** (Lentor Mansion).",
                   caption = "Prices shown are **median unit price** per sqft") &
   # Set theme
@@ -909,12 +1021,13 @@ ggplot(popular_districts,
     axis.title.y = element_blank(),
     axis.text.y = element_blank(),
     plot.title = element_text(face = "bold"),
-    # Use element_markdown so we can style the text 
+    # Use element_markdown so we can style the text
     plot.subtitle = element_markdown(color = "grey50", size = rel(0.9)),
     plot.caption = element_markdown(color = "grey50"),
     strip.placement = "outside",
     strip.text = element_text(size = rel(1))
   )
+viz2
 ```
 
 ::: {.callout-note collapse="true" appearance="simple"}
@@ -939,7 +1052,7 @@ This is why the overall prices in the New Sale market appear to be much cheaper 
 On the contrary, the top districts in the Resale and Sub Sale markets have much less difference. This smaller change also resulted in a smaller impact on the overall median price in these markets.
 :::
 
-## 4.3 Diving deep into the 2024 Q1 Market
+## 4.4 Visualization 3: 2024 Q1 Market by Property Type
 
 ### 4.3.1 Checking price trends by property type
 
@@ -950,7 +1063,7 @@ For the next visualization, we will first explore the data with **2024Q1**, base
 Let us group the data by **TYPE_OF_SALE** and **PROPERTY_TYPE** if we can gain new insights based on the size of property. We will get the aggregated median values for price and area columns.
 
 ```{r}
-realis_per_unit %>% filter(QUARTER == "2024Q1") %>%
+sales_txns_q1_24 %>%
   group_by(TYPE_OF_SALE, PROPERTY_TYPE) %>%
   summarize(
     UNIT_PRICE_PSF = median(UNIT_PRICE_PSF),
@@ -980,11 +1093,10 @@ Lastly, we will generate some reference lines for statistics (mean and median).
 #| code-fold: true
 #| code-summary: "Show ggplot2 code"
 # Calculate stats for reference lines
-q12024 <- realis_per_unit %>% filter(QUARTER == "2024Q1")
-median_q1 <- median(q12024$UNIT_PRICE_PSF)
-mean_q1 <- mean(q12024$UNIT_PRICE_PSF)
+median_q1 <- median(sales_txns_q1_24$UNIT_PRICE_PSF)
+mean_q1 <- mean(sales_txns_q1_24$UNIT_PRICE_PSF)
 
-unit_price_by_prop_type <- ggplot(q12024,
+unit_price_by_prop_type <- ggplot(sales_txns_q1_24,
                                   aes(x = PROPERTY_TYPE, y = UNIT_PRICE_PSF, fill = TYPE_OF_SALE)) +
   
   # Generate different boxplots for each market and property type
@@ -1055,7 +1167,7 @@ As companion to the unit price graph, we will also generate a simple bar graph f
 #| code-summary: "Show ggplot2 code"
 sales_volume_by_prop_type <-
   ggplot(
-    realis_per_unit %>% filter(QUARTER == "2024Q1"),
+    sales_txns_q1_24,
     aes(x = PROPERTY_TYPE, fill = TYPE_OF_SALE)
   ) +
   
@@ -1104,9 +1216,9 @@ Finally, we will generate the visualization by stacking the 2 graphs and doing f
 ```{r}
 #| code-fold: true
 #| code-summary: "Show ggplot2 code"
-(unit_price_by_prop_type / sales_volume_by_prop_type ) +
+viz3 <- (unit_price_by_prop_type / sales_volume_by_prop_type ) +
   plot_layout(heights = c(5,1)) +
-  plot_annotation(title = "Private Property Sales by Property Type for 2024 Q1",
+  plot_annotation(title = "Singapore Private Property Sales by Property Type for 2024 Q1",
                   subtitle = "**Executive Condiminiums** sold at the lowest unit prices, while **Apartments** and **Condominiums** sold at the highest unit prices.") &
   theme(
     text = element_text(family = "Roboto Condensed"),
@@ -1117,6 +1229,7 @@ Finally, we will generate the visualization by stacking the 2 graphs and doing f
     plot.title = element_text(face = "bold"),
     plot.subtitle = element_markdown(color = "grey50", size = rel(0.9)),
   )
+viz3
 ```
 
 ::: callout-tip
@@ -1133,22 +1246,63 @@ It can also be observed that there are much fewer sales in the **New Sales** mar
 
 # 5 Summary
 
+## 5.1 Visualizations
+
+For this exercise, we generated 3 visualizations, show below.
+
+### 5.1.1 Singapore Private Property Prices by Sales Market
+
+```{r}
+#| echo: false
+viz1
+```
+
+### 5.1.2 Districts with Highest Units Sold for Each Submarket
+
+```{r}
+#| echo: false
+viz2
+```
+
+### 5.1.3 Singapore Private Property Sales by Property Type for 2024 Q1
+
+```{r}
+#| echo: false
+viz3
+```
+
+## 5.2 Overall Insights
+
+We found that the 2024 New Sales market experienced an sizable decrease is overall prices (7.6%) compared to the same period last year. However, it should be noted that this is due to **New Launches located in cheaper districts**, compared to the same period last year where that launches where in central districts like **9 and 10**.
+
+Another very interesting insight is that different property prices experience big variations in prices, while **Executive Condominiums** have smaller variations. This is because of the more controlled and regulated environment as these properties are under the jurisdiction of HDB. This is why although median prices are at S\$1736 in 2024Q1, it is possible to find a more affordable property when looking at Executive Condominiums.
+
+Hence, a prospective buyer must take generalizations in the housing market with the grain of salt as overall market trends may not reflect the situation in the market they are interested in. This is why when thinking of buying a property, it is important to be more **specific on the kind of property you are looking for** (e.g. which district, property type, new or resale, etc) and narrow down on the trends for each of those. They must do their own due diligence in researching the market they are interested in to make a sound decision on their purchase.
+
+## 5.2 Reflections
+
+When choosing how to visualize the data, I had to make hard decisions on what data subsets to select. At first I was wary that I will be presenting misleading data. My own bias and limitations also reflect the output as I had to limit myself to looking at 2 quarters as I cannot imagine how to present data from all 5 quarters effectively with the level of detail in the different submarkets and property type.
+
+However, I realized that with the details available to us, it is impossible to cover everything. It is more important to tailor the visualization to our target audience, and even then we may not be able to provide everything they need.
+
+I am now more aware that as a data visualization consumer, I must do my on due diligence to dive deep into the details as the visualizations may be too general or too detailed for our own needs. Some data may be omitted or data due to various limitations.
+
+As a student, there were also some frustrating moments as I wanted to present data in a certain way but my current abilities limit me from presenting data in such a way (especially on Visualization 2). As I progress in this course, I will challenge myself to implement those ideas as I expand my own learning.
+
 # 6 References
+
+99.co. (2024). New Launch Condos & Projects in Singapore. *99.co*. <https://www.99.co/singapore/new-launches>
+
+Holtz, Yan. (2024). Dealing with colors in ggplot2. *The R Graph Gallery*. <https://r-graph-gallery.com/ggplot2-color.html>
+
+Housing & Development Board. (2024). Executive Condominium. *Housing & Development Board.* <https://www.hdb.gov.sg/residential/buying-a-flat/executive-condominium>
+
+Kam, Tin Seong. (2023). Visualising Distribution. *R for Visual Analytics.* <https://r4va.netlify.app/chap09>
 
 Lim, Abram. (2024). 13+ Housing & Household Statistics in Singapore (2024).*SmartWealth Singapore*. <https://smartwealth.sg/housing-household-statistics-singapore/>
 
+PropertyGuru Editorial Team. (2024). Singapore Property Market Outlook 2024 Overview. *PropertyGuru.* [https://www.propertyguru.com.sg/property-guides/singapore-property-market-outlook-2024-90041](https://www.propertyguru.com.sg/property-guides/singapore-property-market-outlook-2024-90041#1){.uri}
+
+Tan, Kylie. (2023). Take-home Exercise 1: Investigating Student Performance with Data Visualisations. *Kale's Visual Analytics Tales.* <https://akalestale.netlify.app/>
+
 Trading Economics. (2024). *Home Ownership Rate \| G20*. <https://tradingeconomics.com/country-list/home-ownership-rate?continent=g20>
-
-<https://www.dbs.com.sg/personal/articles/nav/my-home/cooling-measures-in-singapore>
-
-[https://www.cedricscherer.com/2019/08/05/a-ggplot2-tutorial-for-beautiful-plotting-in-r](https://www.cedricscherer.com/2019/08/05/a-ggplot2-tutorial-for-beautiful-plotting-in-r/https://www.cedricscherer.com/2019/08/05/a-ggplot2-tutorial-for-beautiful-plotting-in-r/){.uri}
-
-<https://www.propertyguru.com.sg/property-guides/singapore-property-market-outlook-2024-90041#1>
-
-<https://akalestale.netlify.app/take-home_ex/take-home_ex01/take-home_ex01> (stat_halfeye usage)
-
-<https://sape.inf.usi.ch/quick-reference/ggplot2/colour>
-
-<https://www.redbrick.sg/blog/landed-property-singapore/>
-
-<https://www.hdb.gov.sg/residential/buying-a-flat/executive-condominium>
