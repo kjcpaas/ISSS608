@@ -1,7 +1,7 @@
 ---
 title: "Take-home Exercise 2: DataVis Makeover"
 author: "Kristine Joy Paas"
-date: "16 April 2024"
+date: "29 April 2024"
 date-modified: "last-modified"
 format: html
 execute: 
@@ -10,3 +10,190 @@ execute:
   warning: false
   freeze: true
 ---
+
+# 1 Overview
+
+For this exercise, we will revisit [Take-home Exercise 1](Take-home_Exs/Ex1/Take-home_Ex1), where we visualized the trends in the Private Real Estate Market of Q1 2024.
+
+We will critique a visualization from our [classmates](https://isss608-ay2023-24apr.netlify.app/take-home_ex/th_ex01#peer-learning) in terms of clarity and aesthetics and improve the visualizations using the best practices for visualizing data.
+
+# 2 The Original Visualization
+
+We will use [Alicia Loh's](https://lnealicia-isss608.netlify.app/take-home_ex/take-home_ex01/take-home_ex01#composite-plot-1) visualization as the purpose is very clear from a glance. However, there are some points that we can improve to improve its clarity and aesthetics.
+
+![](images/visualization_for_critique.png){fig-align="center"}
+
+This visualization has higher clarity than aesthetic. The image below shows where this visualization in in the Clarity vs Aesthetic quadrant.
+
+![](images/quadrant.png){fig-align="center" width="218"}
+
+## 2.1 Critique
+
+::: panel-tabset
+### Clarify
+
+#### Good Points
+
+-   Purpose of the visualization is very easy at a glance. The purpose is to **compare Q1 Transacted Prices between 2023 and 2024**.
+
+-   Plots are shown side by side, with same range in the y-axis, which makes it **easy to compare** the values between the 2 plots.
+
+-   Use of **median reference line** for each year to see how the prices for each property time compare with the overall median.
+
+#### Points of Improvement
+
+-   Details are **lost in the scale**. Most of the values are less than \$10M but it is hard to see the price distribution lower than this value.
+
+    -   Due to this, even if there is a median reference line, it is hard to see compare Apartment, Condominium, or Executive condo prices with this trend.
+
+-   No enlightening title to tell the story of the visualization.
+
+### Aesthetics
+
+#### Good Points
+
+-   Y-axis labels are easy to read, instead of the raw numbers, e.g. **40M** vs **40000000***.*
+
+-   No ticks on categorical axis (Property Type)
+
+-   Effort in using a theme for more professional look
+
+#### Points of Improvement
+
+-   Median labels cover the box plot.
+
+-   X-axis labels are rotated 90°, which make them hard to read
+
+-   Y-axis title (*Transacted Price*) is very close to the axis labels
+
+-   Difficult to compare the price difference for each property type
+
+    -   The reader needs to some context switching from the left to the right to compare
+:::
+
+## 2.2 Designing the Makeover
+
+The sketch below shows illustrates the idea on how we can improve the visualization.
+
+![](images/sketch.jpg)
+
+**Note:** The y-axis will label the axis in millions, like the original plot.
+
+::: {.callout-tip appearance="minimal"}
+This is an initial design an we will iterative along the way using ggplot.
+:::
+
+This design improves the visualization by:
+
+::: panel-tabset
+### Clarity
+
+-   Adding enlightening title and subtitle to the plot makes is easier for the reader to understand what is presented to them.
+
+-   Using **log10 scale** on the y-axis to show a wider range of values.
+
+### Aesthetics
+
+-   Plotting the 2023 and 2024 boxplots side by side to more easily compare prices for each property type. Muted and bright colors will be used for 2023 and 2024, respectively, to emphasize the 2024 plots.
+
+-   The previous point also provides more space to accommodate the x-axis labels. For longer titles, we will wrap them to the next time so they do not overlap with other labels.
+
+-   Place more focus on formatting the plots so the texts are using readable fonts and important details do not overlap each other.
+:::
+
+```{r}
+pacman::p_load(tidyverse, knitr, scales, patchwork, ggtext)
+```
+
+Proposals
+
+-   Consider plotting the boxplots for 2023 and 2024 **side by side in the same plot**. This way, it is easier to compare the trend within the same property type across different quarters.
+
+-   Use log scale in y axis. However, compare to linear scale, it may be harder for humans to judge the values, so use more frequent tick marks.
+
+```{r}
+rename_realis_column <- function(orig_name) {
+  # Add underscores to spaces
+  gsub(" +", "_",
+       # Remove special characters
+       gsub("[^A-Z ]", "",
+            # Convert to upper case and remove trailing spaces
+            toupper(orig_name)) %>% trimws())
+}
+```
+
+::: panel-tabset
+## 2023Q1
+
+```{r}
+realis_2023q1 <- read_csv('data/ResidentialTransaction20240308160536.csv') %>%
+                  rename_with(rename_realis_column) %>% 
+  mutate(QUARTER="2023Q1")
+kable(head(realis_2023q1, n=7))
+```
+
+## 2024Q1
+
+```{r}
+realis_2024q1 <- read_csv('data/ResidentialTransaction20240414220633.csv') %>%
+                  rename_with(rename_realis_column) %>% 
+  mutate(QUARTER="2024Q1")
+kable(head(realis_2024q1, n=7))
+```
+
+## Combining
+
+```{r}
+realis <- realis_2023q1 %>%
+  rbind(realis_2024q1) %>%
+  select(c(
+    QUARTER,
+    PROPERTY_TYPE,
+    TRANSACTED_PRICE
+  ))
+kable(head(realis, 10))
+```
+:::
+
+```{r}
+realis <- realis %>% mutate(PRICE_IN_MILLIONS = TRANSACTED_PRICE/1000000)
+```
+
+```{r}
+median2023 = median(realis_2023q1$TRANSACTED_PRICE) / 1000000
+median2024 = median(realis_2024q1$TRANSACTED_PRICE) / 1000000
+ggplot(realis, aes(y = PRICE_IN_MILLIONS, x = PROPERTY_TYPE, fill = QUARTER, color = QUARTER)) +
+  
+  geom_hline(yintercept = median2023, color = "2023", linetype = "dashed") +
+  annotate("text", label = paste0("Median =\n$", round(median2023, 2), "M"), y = median2023 * 0.7, x = 6.75, color = "2023", size = 3, family = "Roboto Condensed") +
+  
+  geom_hline(yintercept = median2024, color = "blue", linetype = "dashed") +
+  annotate("text", label = paste0("Median =\n$", round(median2024, 2), "M"), y = median2024 * 1.4, x = 6.75, color = "blue", size = 3, family = "Roboto Condensed") +
+  
+  geom_boxplot(alpha = 0.6, staplewidth=0.3, outlier.alpha = 0.8, outlier.size = 0.25) +
+  
+  scale_color_manual(values = c("grey60", "blue")) +
+  scale_fill_manual(values = c("grey60", "blue")) +
+  scale_y_log10(limits = c(0.5, 60)) +
+  scale_x_discrete(labels = wrap_format(10), expand = expansion(add = c(0.6, 1))) +
+  labs(y = "Transacted Price (in million $)", x="Property Type", fill = "Quarter", color = "Quarter") +
+  theme_minimal() +
+  plot_annotation(
+    title = "Transaction Prices by Property Type",
+    subtitle = "Overall prices have increased by **3.7%** from $1.63M to $1.69M. However, the price variability for all property types<br/>have decreased, with fewer outliers present."
+  ) &
+  theme(
+    text = element_text(family = "Roboto Condensed"),
+    plot.title = element_text(face = "bold"),
+    plot.subtitle = element_markdown(color = "grey50", size = rel(0.9)),
+    axis.line.x = element_line(),
+    legend.position = "inside",
+    legend.position.inside = c(1, 0.9),
+    legend.justification = "right",
+    legend.location = "plot",
+    legend.direction = "horizontal",
+    legend.box.background = element_rect(fill="aliceblue")
+  )
+```
+
+<https://isss608-ay2023-24apr.netlify.app/lesson/lesson02/lesson02-designing%20graphs%20to%20enlighten#/title-slide>
