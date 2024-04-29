@@ -79,10 +79,6 @@ The sketch below shows illustrates the idea on how we can improve the visualizat
 
 **Note:** The y-axis will label the axis in millions, like the original plot.
 
-::: {.callout-tip appearance="minimal"}
-This is an initial design an we will iterative along the way using ggplot.
-:::
-
 This design improves the visualization by:
 
 ::: panel-tabset
@@ -99,17 +95,35 @@ This design improves the visualization by:
 -   The previous point also provides more space to accommodate the x-axis labels. For longer titles, we will wrap them to the next time so they do not overlap with other labels.
 
 -   Place more focus on formatting the plots so the texts are using readable fonts and important details do not overlap each other.
+
+-   Remove the *Property Type* in the x-axis title as the plot title and subtitle is already clear on what we are comparing. Removing the title gives more focus on the property types themselves.
 :::
 
+# 3 Makeover Preparations
+
+Before we proceed with the makeover, we need to prepare the R environment and the data.
+
+## 3.1 Loading the R packages
+
+We will mainly use the following packages for the makeover:
+
+-   [tidyverse](https://www.tidyverse.org/): A collection of R packages used in data science, which includes [ggplot2](https://ggplot2.tidyverse.org/), [tibble](https://tibble.tidyverse.org/), [readr](https://readr.tidyverse.org/), among others
+-   [ggtext](https://wilkelab.org/ggtext/): Enhances text rendering for `ggplot2`. `element_markdown()` is most notable function used for markdown rendering so we can highlight important information in text.
+-   [patchwork](https://patchwork.data-imaginist.com/): Allows composition of multiple graphs into a single plot
+-   [scales](https://scales.r-lib.org/): Extends functions to operate on `ggplot2` scales. Useful for wrapping text and formatting numbers in axes.
+-   [DT](https://rstudio.github.io/DT/): To display tabular data
+
 ```{r}
-pacman::p_load(tidyverse, knitr, scales, patchwork, ggtext)
+pacman::p_load(tidyverse, scales, patchwork, ggtext, DT)
 ```
 
-Proposals
+## 3.2 Importing the datases
 
--   Consider plotting the boxplots for 2023 and 2024 **side by side in the same plot**. This way, it is easier to compare the trend within the same property type across different quarters.
+We will import only the **2023Q1** and **2024Q1** datasets as the visualization only involves those quarters.
 
--   Use log scale in y axis. However, compare to linear scale, it may be harder for humans to judge the values, so use more frequent tick marks.
+When loading the dataset, we will also rename the columns to R-friendly format. For this purpose, we will reuse the `rename_realis_column` function from [Take-home Exercise 1](httpsTake-home_Exs/Ex1/Take-home_Ex1#importing-the-datasets).
+
+For each dataset, we will also align the corresponding quarter in the `QUARTER` column.
 
 ```{r}
 rename_realis_column <- function(orig_name) {
@@ -123,77 +137,415 @@ rename_realis_column <- function(orig_name) {
 ```
 
 ::: panel-tabset
-## 2023Q1
+### 2023Q1
 
 ```{r}
-realis_2023q1 <- read_csv('data/ResidentialTransaction20240308160536.csv') %>%
-                  rename_with(rename_realis_column) %>% 
-  mutate(QUARTER="2023Q1")
-kable(head(realis_2023q1, n=7))
+realis_2023q1 <-
+  read_csv('data/ResidentialTransaction20240308160536.csv') %>%
+  rename_with(rename_realis_column)
+datatable(head(realis_2023q1, n = 20))
 ```
 
-## 2024Q1
+### 2024Q1
 
 ```{r}
-realis_2024q1 <- read_csv('data/ResidentialTransaction20240414220633.csv') %>%
-                  rename_with(rename_realis_column) %>% 
-  mutate(QUARTER="2024Q1")
-kable(head(realis_2024q1, n=7))
-```
-
-## Combining
-
-```{r}
-realis <- realis_2023q1 %>%
-  rbind(realis_2024q1) %>%
-  select(c(
-    QUARTER,
-    PROPERTY_TYPE,
-    TRANSACTED_PRICE
-  ))
-kable(head(realis, 10))
+realis_2024q1 <-
+  read_csv('data/ResidentialTransaction20240414220633.csv') %>%
+  rename_with(rename_realis_column)
+datatable(head(realis_2024q1, n = 20))
 ```
 :::
 
+## 3.3 Data Wrangling
+
+Now that we have `realis_2023q1` and `realis_2024q1`, we will combine them into a form that is usable for the make over.
+
+### 3.3.1 Adding QUARTER columns
+
+We will use `mutate()` to assign the corresponding quater to each dataset.
+
 ```{r}
-realis <- realis %>% mutate(PRICE_IN_MILLIONS = TRANSACTED_PRICE/1000000)
+realis_2023q1$QUARTER <- "2023Q1"
+realis_2024q1$QUARTER <- "2024Q1"
+```
+
+### 3.3.2 Combining the dataframes
+
+We will combine the dataframes to a single one using `rbind()`, so that we only need to work with a single dataframe for the makeover.
+
+```{r}
+realis <- rbind(realis_2023q1, realis_2024q1)
+```
+
+### 3.3.3 Selecting relevant columns
+
+Lastly, we will select only the columns relevant to the visualization (`QUARTER`, `PROPERTY_TYPE`, `TRANSACTED_PRICE`) to make our dataframe more lightweight.
+
+```{r}
+realis <- realis %>% select(c(QUARTER,
+                              PROPERTY_TYPE,
+                              TRANSACTED_PRICE))
+datatable(head(realis, 20))
+```
+
+We now have all the data we need in `realis`.
+
+# 4 The Makeover
+
+## 4.1 Implementing the design
+
+In [2.2 Designing the Makeover], we came up with a design to improve the original visualization. We will use this as a starting point for the makeover.
+
+We are getting the plot title and subtitle by extracting from the write-up in the original visualization.
+
+We also need to calculate the medians for the reference lines:
+
+```{r}
+median2023 = median(realis_2023q1$TRANSACTED_PRICE)
+median2024 = median(realis_2024q1$TRANSACTED_PRICE)
 ```
 
 ```{r}
-median2023 = median(realis_2023q1$TRANSACTED_PRICE) / 1000000
-median2024 = median(realis_2024q1$TRANSACTED_PRICE) / 1000000
-ggplot(realis, aes(y = PRICE_IN_MILLIONS, x = PROPERTY_TYPE, fill = QUARTER, color = QUARTER)) +
+#| code-fold: true
+ggplot(realis,
+       aes(
+         y = TRANSACTED_PRICE,
+         x = PROPERTY_TYPE,
+         fill = QUARTER,
+         color = QUARTER
+       )) +
   
-  geom_hline(yintercept = median2023, color = "2023", linetype = "dashed") +
-  annotate("text", label = paste0("Median =\n$", round(median2023, 2), "M"), y = median2023 * 0.7, x = 6.75, color = "2023", size = 3, family = "Roboto Condensed") +
+  # Renders colored outliers and box border
+  geom_boxplot(
+    aes(fill = NULL),
+    outlier.alpha = 0.8,
+    outlier.size = 0.2,
+    show.legend = FALSE
+  ) +
+  # Renders without outliers to override the colored borders from previous box plot
+  # Staples are rendered so it is clearer where the outliers start
+  geom_boxplot(
+    alpha = 0.8,
+    staplewidth = 0.2,
+    outliers = FALSE,
+    color = "black"
+  ) +
   
-  geom_hline(yintercept = median2024, color = "blue", linetype = "dashed") +
-  annotate("text", label = paste0("Median =\n$", round(median2024, 2), "M"), y = median2024 * 1.4, x = 6.75, color = "blue", size = 3, family = "Roboto Condensed") +
+  # 2023 Median reference line
+  geom_hline(yintercept = median2023,
+             color = "grey60",
+             linetype = "dashed") +
+  annotate(
+    "text",
+    label = paste0("Median =\n$", round(median2023 / 1e6, 2), "M"),
+    y = median2023 * 0.7,
+    x = 6.75,
+    color = "grey50",
+    size = 3,
+    family = "Roboto Condensed"
+  ) +
   
-  geom_boxplot(alpha = 0.6, staplewidth=0.3, outlier.alpha = 0.8, outlier.size = 0.25) +
+  # 2024 Median reference line
+  geom_hline(yintercept = median2024,
+             color = "blue",
+             linetype = "dashed") +
+  annotate(
+    "text",
+    label = paste0("Median =\n$", round(median2024 / 1e6, 2), "M"),
+    y = median2024 * 1.4,
+    x = 6.75,
+    color = "blue",
+    size = 3,
+    family = "Roboto Condensed"
+  ) +
   
-  scale_color_manual(values = c("grey60", "blue")) +
+  # Set colors
   scale_fill_manual(values = c("grey60", "blue")) +
-  scale_y_log10(limits = c(0.5, 60)) +
+  scale_color_manual(values = c("grey60", "blue")) +
+  
+  # Format axes
+  scale_y_log10(limits = c(0.5e6, 70e6),
+                labels = number_format(scale = 1e-6, suffix = "M")) +
   scale_x_discrete(labels = wrap_format(10), expand = expansion(add = c(0.6, 1))) +
-  labs(y = "Transacted Price (in million $)", x="Property Type", fill = "Quarter", color = "Quarter") +
+  labs(x = "Property Type",
+       y = "Transacted Price ($)",
+       fill = "Quarter") +
+  
+  # Plot styles
   theme_minimal() +
-  plot_annotation(
-    title = "Transaction Prices by Property Type",
-    subtitle = "Overall prices have increased by **3.7%** from $1.63M to $1.69M. However, the price variability for all property types<br/>have decreased, with fewer outliers present."
-  ) &
+  plot_annotation(title = "Transaction Prices by Property Type for 2023Q1 & 2024Q1",
+                  subtitle = "Overall prices have increased by **3.7%** from $1.63M to $1.69M. However, the price variability for all property types<br/>have decreased, with fewer outliers present.") &
   theme(
     text = element_text(family = "Roboto Condensed"),
     plot.title = element_text(face = "bold"),
     plot.subtitle = element_markdown(color = "grey50", size = rel(0.9)),
     axis.line.x = element_line(),
-    legend.position = "inside",
-    legend.position.inside = c(1, 0.9),
-    legend.justification = "right",
-    legend.location = "plot",
-    legend.direction = "horizontal",
-    legend.box.background = element_rect(fill="aliceblue")
+    axis.title.x = element_blank()
   )
 ```
 
+::: panel-tabset
+### Gains
+
+Plotting the boxplots in pairs improved the clarity of the visualization as it makes it easier to compare prices within each property type. Using a bright color like blue for the 2024 plot and a muted color like gray for the 2023 plot places the focus towards the 2024 data during the comparison.
+
+The theme and the styles applied greatly improved the readability, especially as the x-axis labels are now rendered horizontally. This also provided a bigger space for the plot itself.
+
+Lastly, the title and subtitle provides a story for the visualization to help the reader understand what is presented to them.
+
+### Points for improvement
+
+While the makeover made the visualization more aesthetic further improvements can be made:
+
+-   Free up more space on the right by moving the legend to inside the plot. This will help expand the plot horizontally.
+
+-   Make the x-axis labels a bit bigger. As we removed the title, *Property Type*, the balance of the text sizes between the x and y axes seem off. A larger text will also make it easier to read.
+
+-   Reference lines are hard to see when overlapping with boxplots. It is hard to compare with the reference lines especially for `Apartment` and `Condominium` as the color of the reference lines are the same as the fill.
+
+-   Add axis line and ticks to y-axis as it is a continuous value
+
+-   If possible, add more values in y-axis labels as log scale is more difficult to judge than a linear scale. For example, we **cannot see the values above \$30M**.
+:::
+
+## 4.2 2nd Iteration
+
+From the points of improvement of the initial makeover, we will do the following:
+
+-   Move the legend to inside the plot
+
+-   Increase size of x-axis labels
+
+-   Adjust y-axis style and labels
+
+-   Tweak the presentation of the reference lines
+
+```{r}
+#| code-fold: true
+ggplot(realis,
+       aes(
+         y = TRANSACTED_PRICE,
+         x = PROPERTY_TYPE,
+         fill = QUARTER,
+         color = QUARTER
+       )) +
+  
+  # Renders colored outliers and box border
+  geom_boxplot(
+    aes(fill = NULL),
+    outlier.alpha = 0.8,
+    outlier.size = 0.3,
+    show.legend = FALSE
+  ) +
+  # Renders without outliers to override the colored borders from previous box plot
+  # Staples are rendered so it is clearer where the outliers start
+  geom_boxplot(
+    alpha = 0.8,
+    staplewidth = 0.2,
+    outliers = FALSE,
+    color = "black"
+  ) +
+  
+  # 2023 Median reference line
+  geom_hline(yintercept = median2023,
+             color = "darkgoldenrod4",
+             linetype = "dashed") +
+  annotate(
+    "richtext",
+    label = paste0("2023Q1 Median<br/>**$", round(median2023 / 1e6, 2), "M**"),
+    y = median2023 * 0.65,
+    x = 6.9,
+    color = "darkgoldenrod4",
+    size = 3,
+    family = "Roboto Condensed"
+  ) +
+  
+  # 2024 Median reference line
+  geom_hline(yintercept = median2024,
+             color = "brown",
+             linetype = "dashed") +
+  annotate(
+    "richtext",
+    label = paste0("2024Q1 Median<br/>**$", round(median2024 / 1e6, 2), "M**"),
+    y = median2024 * 1.55,
+    x = 6.9,
+    color = "brown",
+    size = 3,
+    family = "Roboto Condensed"
+  ) +
+  
+  # Set colors
+  scale_fill_manual(values = c("grey60", "blue")) +
+  scale_color_manual(values = c("grey60", "blue")) +
+  
+  # Format axes
+  scale_y_log10(limits = c(0.5e6, 100e6),
+                labels = number_format(scale = 1e-6, suffix = "M"),
+                n.breaks = 9) +
+  # Add more space to the right side for the reference line annotations and legend
+  scale_x_discrete(labels = wrap_format(10), expand = expansion(add = c(0.6, 1.4))) +
+  labs(x = "Property Type",
+       y = "Transacted Price ($)",
+       fill = "Quarter") +
+  
+  # Plot styles
+  theme_minimal() +
+  plot_annotation(title = "Transaction Prices by Property Type for 2023Q1 & 2024Q1",
+                  subtitle = "Overall prices have increased by **3.7%** from $1.63M to $1.69M. However, the price variability for all property types<br/>have decreased, with fewer outliers present.") &
+  theme(
+    text = element_text(family = "Roboto Condensed"),
+    plot.title = element_text(face = "bold"),
+    plot.subtitle = element_markdown(color = "grey50", size = rel(0.9)),
+    axis.line.x = element_line(),
+    axis.title.x = element_blank(),
+    axis.text.x = element_text(size = rel(1.2)),
+    axis.line.y = element_line(),
+    axis.ticks.y = element_line(),
+    # Render legend inside the plot
+    legend.position = "inside",
+    legend.position.inside = c(1, 0.85),
+    legend.justification = "right",
+    legend.location = "plot",
+    legend.box.background = element_rect()
+  )
+```
+
+::: panel-tabset
+### Gains
+
+In this iteration, we maximized the available space by expanding the right side of the x-axis further, which now holds the legend and annotations for the reference lines. Doing this also ensures that no important information get covered by the annotations.
+
+Next, the colors of the reference lines are changed to a different color than the fills with the labels added to the end of the line so readers won't be confused with the colors in our legend.
+
+Lastly, we did tweaks on the y-axis to have smaller breaks to help readers gauge the log scale better. Aesthetically, this is worse as the axis labels do not look equidistant. However, this helps a lot in clarity.
+
+### Points for improvement
+
+In our subtitle, we have this excerpt from the original write-up:
+
+> Overall prices have increased by **3.7%** from \$1.63M to \$1.69M. However, the price variability for all property types have decreased, with fewer outliers present.
+
+Now that we expanded the y-axis, we can see that this is not necessarily true. Hence, we must update this to prevent confusion.
+
+Instead, we can emphasize the point that Landed properties all sold above the market median.
+:::
+
+## 4.3 Final Iteration
+
+To emphasize that Landed properties sell above the the median price, we will do the following:
+
+-   Rearrange x-axis to put landed property types on 1 side of the plot
+
+-   Add annotation that they sell above market median.
+
+```{r}
+#| code-fold: true
+ggplot(realis,
+       aes(
+         y = TRANSACTED_PRICE,
+         x = factor(PROPERTY_TYPE, levels = c("Detached House", "Semi-Detached House", "Terrace House", "Condominium", "Apartment", "Executive Condominium")),
+         fill = QUARTER,
+         color = QUARTER
+       )) +
+  
+  # Annotate that all landed properties sold above market median
+  annotate("rect", xmin = 0.5, xmax = 3.5, ymin = 0.5e6, ymax = 100e6,
+           alpha = 0.1,fill = "blue") +
+  annotate(
+    "richtext",
+    label = "Landed properties sold for<br/>above market median<br/>prices in 2024Q1.",
+    y = 55e6,
+    x = 2.6,
+    size = 3,
+    family = "Roboto Condensed"
+  ) +
+  
+  # Renders colored outliers and box border
+  geom_boxplot(
+    aes(fill = NULL),
+    outlier.alpha = 0.8,
+    outlier.size = 0.3,
+    show.legend = FALSE
+  ) +
+  # Renders without outliers to override the colored borders from previous box plot
+  # Staples are rendered so it is clearer where the outliers start
+  geom_boxplot(
+    alpha = 0.8,
+    staplewidth = 0.2,
+    outliers = FALSE,
+    color = "black"
+  ) +
+  
+  # 2023 Median reference line
+  geom_hline(yintercept = median2023,
+             color = "darkgoldenrod4",
+             linetype = "dashed") +
+  annotate(
+    "richtext",
+    label = paste0("2023Q1 Median<br/>**$", round(median2023 / 1e6, 2), "M**"),
+    y = median2023 * 0.65,
+    x = 6.9,
+    color = "darkgoldenrod4",
+    size = 3,
+    family = "Roboto Condensed"
+  ) +
+  
+  # 2024 Median reference line
+  geom_hline(yintercept = median2024,
+             color = "brown",
+             linetype = "dashed") +
+  annotate(
+    "richtext",
+    label = paste0("2024Q1 Median<br/>**$", round(median2024 / 1e6, 2), "M**"),
+    y = median2024 * 1.55,
+    x = 6.9,
+    color = "brown",
+    size = 3,
+    family = "Roboto Condensed"
+  ) +
+  
+  # Set colors
+  scale_fill_manual(values = c("grey60", "blue")) +
+  scale_color_manual(values = c("grey60", "blue")) +
+  
+  # Format axes
+  scale_y_log10(limits = c(0.5e6, 100e6),
+                labels = number_format(scale = 1e-6, suffix = "M"),
+                n.breaks = 9) +
+  # Add more space to the right side for the reference line annotations and legend
+  scale_x_discrete(labels = wrap_format(10), expand = expansion(add = c(0.6, 1.4))) +
+  labs(x = "Property Type",
+       y = "Transacted Price ($)",
+       fill = "Quarter") +
+  
+  # Plot styles
+  theme_minimal() +
+  plot_annotation(title = "Transaction Prices by Property Type for 2023Q1 & 2024Q1",
+                  subtitle = "Overall prices have increased by <span style='color:darkgreen;'>**3.7%**</span> from **$1.63M** to **1.69M**. **Detached Houses** remain the most expensive property type,<br/>while **Executive Condominiums** are still the cheapest.") &
+  theme(
+    text = element_text(family = "Roboto Condensed"),
+    plot.title = element_text(face = "bold"),
+    plot.subtitle = element_markdown(color = "grey50", size = rel(0.9)),
+    axis.line.x = element_line(),
+    axis.title.x = element_blank(),
+    axis.text.x = element_text(size = rel(1.2)),
+    axis.line.y = element_line(),
+    axis.ticks.y = element_line(),
+    # Render legend inside the plot
+    legend.position = "inside",
+    legend.position.inside = c(1, 0.85),
+    legend.justification = "right",
+    legend.location = "plot",
+    legend.box.background = element_rect()
+  )
+```
+
+# 5 Summary
+
+# 6 References
+
 <https://isss608-ay2023-24apr.netlify.app/lesson/lesson02/lesson02-designing%20graphs%20to%20enlighten#/title-slide>
+
+[Exercise](Take-home_Exs/Ex1/Take-home_Ex1)
+
+<https://www.propertygiant.com/blog/everything-you-need-to-know-about-strata-landed-houses-and-the-available-strata-landed-projects-in-singapore>

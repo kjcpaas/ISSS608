@@ -96,6 +96,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
+<script src="../../site_libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
+<link href="../../site_libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet">
+<script src="../../site_libs/datatables-binding-0.30/datatables.js"></script>
+<script src="../../site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<link href="../../site_libs/dt-core-1.13.4/css/jquery.dataTables.min.css" rel="stylesheet">
+<link href="../../site_libs/dt-core-1.13.4/css/jquery.dataTables.extra.css" rel="stylesheet">
+<script src="../../site_libs/dt-core-1.13.4/js/jquery.dataTables.min.js"></script>
+<link href="../../site_libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet">
+<script src="../../site_libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+
 
 <link rel="stylesheet" href="../../styles.css">
 </head>
@@ -202,6 +212,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#critique" id="toc-critique" class="nav-link" data-scroll-target="#critique">2.1 Critique</a></li>
   <li><a href="#designing-the-makeover" id="toc-designing-the-makeover" class="nav-link" data-scroll-target="#designing-the-makeover">2.2 Designing the Makeover</a></li>
   </ul></li>
+  <li><a href="#makeover-preparations" id="toc-makeover-preparations" class="nav-link" data-scroll-target="#makeover-preparations">3 Makeover Preparations</a>
+  <ul class="collapse">
+  <li><a href="#loading-the-r-packages" id="toc-loading-the-r-packages" class="nav-link" data-scroll-target="#loading-the-r-packages">3.1 Loading the R packages</a></li>
+  <li><a href="#importing-the-datases" id="toc-importing-the-datases" class="nav-link" data-scroll-target="#importing-the-datases">3.2 Importing the datases</a></li>
+  <li><a href="#data-wrangling" id="toc-data-wrangling" class="nav-link" data-scroll-target="#data-wrangling">3.3 Data Wrangling</a>
+  <ul class="collapse">
+  <li><a href="#adding-quarter-columns" id="toc-adding-quarter-columns" class="nav-link" data-scroll-target="#adding-quarter-columns">3.3.1 Adding QUARTER columns</a></li>
+  <li><a href="#combining-the-dataframes" id="toc-combining-the-dataframes" class="nav-link" data-scroll-target="#combining-the-dataframes">3.3.2 Combining the dataframes</a></li>
+  <li><a href="#selecting-relevant-columns" id="toc-selecting-relevant-columns" class="nav-link" data-scroll-target="#selecting-relevant-columns">3.3.3 Selecting relevant columns</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#the-makeover" id="toc-the-makeover" class="nav-link" data-scroll-target="#the-makeover">4 The Makeover</a>
+  <ul class="collapse">
+  <li><a href="#implementing-the-design" id="toc-implementing-the-design" class="nav-link" data-scroll-target="#implementing-the-design">4.1 Implementing the design</a></li>
+  <li><a href="#nd-iteration" id="toc-nd-iteration" class="nav-link" data-scroll-target="#nd-iteration">4.2 2nd Iteration</a></li>
+  <li><a href="#final-iteration" id="toc-final-iteration" class="nav-link" data-scroll-target="#final-iteration">4.3 Final Iteration</a></li>
+  </ul></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">5 Summary</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">6 References</a></li>
   </ul>
 </nav>
     </div>
@@ -317,16 +346,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>The sketch below shows illustrates the idea on how we can improve the visualization.</p>
 <p><img src="images/sketch.jpg" class="img-fluid"></p>
 <p><strong>Note:</strong> The y-axis will label the axis in millions, like the original plot.</p>
-<div class="callout callout-style-simple callout-tip no-icon">
-<div class="callout-body d-flex">
-<div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
-</div>
-<div class="callout-body-container">
-<p>This is an initial design an we will iterative along the way using ggplot.</p>
-</div>
-</div>
-</div>
 <p>This design improves the visualization by:</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Clarity</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Aesthetics</a></li></ul>
@@ -342,18 +361,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p>Plotting the 2023 and 2024 boxplots side by side to more easily compare prices for each property type. Muted and bright colors will be used for 2023 and 2024, respectively, to emphasize the 2024 plots.</p></li>
 <li><p>The previous point also provides more space to accommodate the x-axis labels. For longer titles, we will wrap them to the next time so they do not overlap with other labels.</p></li>
 <li><p>Place more focus on formatting the plots so the texts are using readable fonts and important details do not overlap each other.</p></li>
+<li><p>Remove the <em>Property Type</em> in the x-axis title as the plot title and subtitle is already clear on what we are comparing. Removing the title gives more focus on the property types themselves.</p></li>
 </ul>
 </div>
 </div>
 </div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(tidyverse, knitr, scales, patchwork, ggtext)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Proposals</p>
+</section>
+</section>
+<section id="makeover-preparations" class="level1">
+<h1>3 Makeover Preparations</h1>
+<p>Before we proceed with the makeover, we need to prepare the R environment and the data.</p>
+<section id="loading-the-r-packages" class="level2">
+<h2 class="anchored" data-anchor-id="loading-the-r-packages">3.1 Loading the R packages</h2>
+<p>We will mainly use the following packages for the makeover:</p>
 <ul>
-<li><p>Consider plotting the boxplots for 2023 and 2024 <strong>side by side in the same plot</strong>. This way, it is easier to compare the trend within the same property type across different quarters.</p></li>
-<li><p>Use log scale in y axis. However, compare to linear scale, it may be harder for humans to judge the values, so use more frequent tick marks.</p></li>
+<li><a href="https://www.tidyverse.org/">tidyverse</a>: A collection of R packages used in data science, which includes <a href="https://ggplot2.tidyverse.org/">ggplot2</a>, <a href="https://tibble.tidyverse.org/">tibble</a>, <a href="https://readr.tidyverse.org/">readr</a>, among others</li>
+<li><a href="https://wilkelab.org/ggtext/">ggtext</a>: Enhances text rendering for <code>ggplot2</code>. <code>element_markdown()</code> is most notable function used for markdown rendering so we can highlight important information in text.</li>
+<li><a href="https://patchwork.data-imaginist.com/">patchwork</a>: Allows composition of multiple graphs into a single plot</li>
+<li><a href="https://scales.r-lib.org/">scales</a>: Extends functions to operate on <code>ggplot2</code> scales. Useful for wrapping text and formatting numbers in axes.</li>
+<li><a href="https://rstudio.github.io/DT/">DT</a>: To display tabular data</li>
 </ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(tidyverse, scales, patchwork, ggtext, DT)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="importing-the-datases" class="level2">
+<h2 class="anchored" data-anchor-id="importing-the-datases">3.2 Importing the datases</h2>
+<p>We will import only the <strong>2023Q1</strong> and <strong>2024Q1</strong> datasets as the visualization only involves those quarters.</p>
+<p>When loading the dataset, we will also rename the columns to R-friendly format. For this purpose, we will reuse the <code>rename_realis_column</code> function from <a href="httpsTake-home_Exs/Ex1/Take-home_Ex1#importing-the-datasets">Take-home Exercise 1</a>.</p>
+<p>For each dataset, we will also align the corresponding quarter in the <code>QUARTER</code> column.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>rename_realis_column <span class="ot">&lt;-</span> <span class="cf">function</span>(orig_name) {</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add underscores to spaces</span></span>
@@ -365,595 +401,435 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">2023Q1</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">2024Q1</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false">Combining</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">2023Q1</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">2024Q1</a></li></ul>
 <div class="tab-content">
 <div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>realis_2023q1 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">'data/ResidentialTransaction20240308160536.csv'</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">rename_with</span>(rename_realis_column) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">QUARTER=</span><span class="st">"2023Q1"</span>)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">head</span>(realis_2023q1, <span class="at">n=</span><span class="dv">7</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>realis_2023q1 <span class="ot">&lt;-</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_csv</span>(<span class="st">'data/ResidentialTransaction20240308160536.csv'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_with</span>(rename_realis_column)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">datatable</span>(<span class="fu">head</span>(realis_2023q1, <span class="at">n =</span> <span class="dv">20</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-sm table-striped small">
-<colgroup>
-<col style="width: 6%">
-<col style="width: 4%">
-<col style="width: 2%">
-<col style="width: 4%">
-<col style="width: 3%">
-<col style="width: 8%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 2%">
-<col style="width: 4%">
-<col style="width: 3%">
-<col style="width: 6%">
-<col style="width: 4%">
-<col style="width: 6%">
-<col style="width: 4%">
-<col style="width: 7%">
-<col style="width: 3%">
-<col style="width: 4%">
-<col style="width: 3%">
-<col style="width: 5%">
-<col style="width: 3%">
-<col style="width: 2%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">PROJECT_NAME</th>
-<th style="text-align: right;">TRANSACTED_PRICE</th>
-<th style="text-align: right;">AREA_SQFT</th>
-<th style="text-align: right;">UNIT_PRICE_PSF</th>
-<th style="text-align: left;">SALE_DATE</th>
-<th style="text-align: left;">ADDRESS</th>
-<th style="text-align: left;">TYPE_OF_SALE</th>
-<th style="text-align: left;">TYPE_OF_AREA</th>
-<th style="text-align: right;">AREA_SQM</th>
-<th style="text-align: right;">UNIT_PRICE_PSM</th>
-<th style="text-align: left;">NETT_PRICE</th>
-<th style="text-align: left;">PROPERTY_TYPE</th>
-<th style="text-align: right;">NUMBER_OF_UNITS</th>
-<th style="text-align: left;">TENURE</th>
-<th style="text-align: left;">COMPLETION_DATE</th>
-<th style="text-align: left;">PURCHASER_ADDRESS_INDICATOR</th>
-<th style="text-align: left;">POSTAL_CODE</th>
-<th style="text-align: left;">POSTAL_DISTRICT</th>
-<th style="text-align: left;">POSTAL_SECTOR</th>
-<th style="text-align: left;">PLANNING_REGION</th>
-<th style="text-align: left;">PLANNING_AREA</th>
-<th style="text-align: left;">QUARTER</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">THE REEF AT KING’S DOCK</td>
-<td style="text-align: right;">2317000</td>
-<td style="text-align: right;">882.65</td>
-<td style="text-align: right;">2625</td>
-<td style="text-align: left;">01 Jan 2023</td>
-<td style="text-align: left;">12 HARBOURFRONT AVENUE #05-32</td>
-<td style="text-align: left;">New Sale</td>
-<td style="text-align: left;">Strata</td>
-<td style="text-align: right;">82.0</td>
-<td style="text-align: right;">28256</td>
-<td style="text-align: left;">-</td>
-<td style="text-align: left;">Condominium</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: left;">99 yrs from 12/01/2021</td>
-<td style="text-align: left;">Uncompleted</td>
-<td style="text-align: left;">HDB</td>
-<td style="text-align: left;">097996</td>
-<td style="text-align: left;">04</td>
-<td style="text-align: left;">09</td>
-<td style="text-align: left;">Central Region</td>
-<td style="text-align: left;">Bukit Merah</td>
-<td style="text-align: left;">2023Q1</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">URBAN TREASURES</td>
-<td style="text-align: right;">1823500</td>
-<td style="text-align: right;">882.65</td>
-<td style="text-align: right;">2066</td>
-<td style="text-align: left;">02 Jan 2023</td>
-<td style="text-align: left;">205 JALAN EUNOS #08-02</td>
-<td style="text-align: left;">New Sale</td>
-<td style="text-align: left;">Strata</td>
-<td style="text-align: right;">82.0</td>
-<td style="text-align: right;">22238</td>
-<td style="text-align: left;">-</td>
-<td style="text-align: left;">Condominium</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: left;">Freehold</td>
-<td style="text-align: left;">Uncompleted</td>
-<td style="text-align: left;">Private</td>
-<td style="text-align: left;">419535</td>
-<td style="text-align: left;">14</td>
-<td style="text-align: left;">41</td>
-<td style="text-align: left;">East Region</td>
-<td style="text-align: left;">Bedok</td>
-<td style="text-align: left;">2023Q1</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">NORTH GAIA</td>
-<td style="text-align: right;">1421112</td>
-<td style="text-align: right;">1076.40</td>
-<td style="text-align: right;">1320</td>
-<td style="text-align: left;">02 Jan 2023</td>
-<td style="text-align: left;">29 YISHUN CLOSE #08-10</td>
-<td style="text-align: left;">New Sale</td>
-<td style="text-align: left;">Strata</td>
-<td style="text-align: right;">100.0</td>
-<td style="text-align: right;">14211</td>
-<td style="text-align: left;">-</td>
-<td style="text-align: left;">Executive Condominium</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: left;">99 yrs from 15/02/2021</td>
-<td style="text-align: left;">Uncompleted</td>
-<td style="text-align: left;">HDB</td>
-<td style="text-align: left;">269343</td>
-<td style="text-align: left;">27</td>
-<td style="text-align: left;">26</td>
-<td style="text-align: left;">North Region</td>
-<td style="text-align: left;">Yishun</td>
-<td style="text-align: left;">2023Q1</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">NORTH GAIA</td>
-<td style="text-align: right;">1258112</td>
-<td style="text-align: right;">1033.34</td>
-<td style="text-align: right;">1218</td>
-<td style="text-align: left;">02 Jan 2023</td>
-<td style="text-align: left;">45 YISHUN CLOSE #07-42</td>
-<td style="text-align: left;">New Sale</td>
-<td style="text-align: left;">Strata</td>
-<td style="text-align: right;">96.0</td>
-<td style="text-align: right;">13105</td>
-<td style="text-align: left;">-</td>
-<td style="text-align: left;">Executive Condominium</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: left;">99 yrs from 15/02/2021</td>
-<td style="text-align: left;">Uncompleted</td>
-<td style="text-align: left;">HDB</td>
-<td style="text-align: left;">269294</td>
-<td style="text-align: left;">27</td>
-<td style="text-align: left;">26</td>
-<td style="text-align: left;">North Region</td>
-<td style="text-align: left;">Yishun</td>
-<td style="text-align: left;">2023Q1</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">PARC BOTANNIA</td>
-<td style="text-align: right;">1280000</td>
-<td style="text-align: right;">871.88</td>
-<td style="text-align: right;">1468</td>
-<td style="text-align: left;">03 Jan 2023</td>
-<td style="text-align: left;">12 FERNVALE STREET #06-16</td>
-<td style="text-align: left;">Resale</td>
-<td style="text-align: left;">Strata</td>
-<td style="text-align: right;">81.0</td>
-<td style="text-align: right;">15802</td>
-<td style="text-align: left;">-</td>
-<td style="text-align: left;">Condominium</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: left;">99 yrs from 28/12/2016</td>
-<td style="text-align: left;">2022</td>
-<td style="text-align: left;">HDB</td>
-<td style="text-align: left;">797391</td>
-<td style="text-align: left;">28</td>
-<td style="text-align: left;">79</td>
-<td style="text-align: left;">North East Region</td>
-<td style="text-align: left;">Sengkang</td>
-<td style="text-align: left;">2023Q1</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">NANYANG PARK</td>
-<td style="text-align: right;">5870000</td>
-<td style="text-align: right;">3322.85</td>
-<td style="text-align: right;">1767</td>
-<td style="text-align: left;">03 Jan 2023</td>
-<td style="text-align: left;">72 JALAN LIMBOK</td>
-<td style="text-align: left;">Resale</td>
-<td style="text-align: left;">Land</td>
-<td style="text-align: right;">308.7</td>
-<td style="text-align: right;">19015</td>
-<td style="text-align: left;">-</td>
-<td style="text-align: left;">Terrace House</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: left;">999 yrs from 14/02/1881</td>
-<td style="text-align: left;">-</td>
-<td style="text-align: left;">Private</td>
-<td style="text-align: left;">548742</td>
-<td style="text-align: left;">19</td>
-<td style="text-align: left;">54</td>
-<td style="text-align: left;">North East Region</td>
-<td style="text-align: left;">Hougang</td>
-<td style="text-align: left;">2023Q1</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">PALMS @ SIXTH AVENUE</td>
-<td style="text-align: right;">4950000</td>
-<td style="text-align: right;">4520.88</td>
-<td style="text-align: right;">1095</td>
-<td style="text-align: left;">03 Jan 2023</td>
-<td style="text-align: left;">231 SIXTH AVENUE</td>
-<td style="text-align: left;">Resale</td>
-<td style="text-align: left;">Strata</td>
-<td style="text-align: right;">420.0</td>
-<td style="text-align: right;">11786</td>
-<td style="text-align: left;">-</td>
-<td style="text-align: left;">Semi-Detached House</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: left;">Freehold</td>
-<td style="text-align: left;">2015</td>
-<td style="text-align: left;">Private</td>
-<td style="text-align: left;">275780</td>
-<td style="text-align: left;">10</td>
-<td style="text-align: left;">27</td>
-<td style="text-align: left;">Central Region</td>
-<td style="text-align: left;">Bukit Timah</td>
-<td style="text-align: left;">2023Q1</td>
-</tr>
-</tbody>
-</table>
+
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-604ba40d3cc8819255b4" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-604ba40d3cc8819255b4">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"],["THE REEF AT KING'S DOCK","URBAN TREASURES","NORTH GAIA","NORTH GAIA","PARC BOTANNIA","NANYANG PARK","PALMS @ SIXTH AVENUE","N.A.","WHISTLER GRAND","NORTHOAKS","AMBER PARK","THE GAZANIA","WILSHIRE RESIDENCES","WILSHIRE RESIDENCES","PARC CLEMATIS","MOOI RESIDENCES","TENET","TENET","FRANKEL ESTATE","THE URBANITE"],[2317000,1823500,1421112,1258112,1280000,5870000,4950000,3260000,850000,1268000,1888000,1477000,1990000,1975000,2735000,3288888,1224000,1534000,6765000,1470000],[882.65,882.65,1076.4,1033.34,871.88,3322.85,4520.88,1555.4,441.32,1603.84,678.13,635.08,753.48,742.72,1463.9,1280.92,925.7,1108.69,3962.23,1173.28],[2625,2066,1320,1218,1468,1767,1095,2096,1926,791,2784,2326,2641,2659,1868,2568,1322,1384,1707,1253],["01 Jan 2023","02 Jan 2023","02 Jan 2023","02 Jan 2023","03 Jan 2023","03 Jan 2023","03 Jan 2023","03 Jan 2023","03 Jan 2023","03 Jan 2023","03 Jan 2023","03 Jan 2023","03 Jan 2023","03 Jan 2023","03 Jan 2023","03 Jan 2023","03 Jan 2023","03 Jan 2023","03 Jan 2023","03 Jan 2023"],["12 HARBOURFRONT AVENUE #05-32","205 JALAN EUNOS #08-02","29 YISHUN CLOSE #08-10","45 YISHUN CLOSE #07-42","12 FERNVALE STREET #06-16","72 JALAN LIMBOK","231 SIXTH AVENUE","19 TENG TONG ROAD","107 WEST COAST VALE #30-04","30 WOODLANDS CRESCENT #01-11","16 AMBER GARDENS #04-08","5 HOW SUN DRIVE #04-08","30 FARRER ROAD #05-03","30 FARRER ROAD #06-05","6A JALAN LEMPENG #13-05","139 HOLLAND ROAD #05-01","73 TAMPINES STREET 62 #07-06","73 TAMPINES STREET 62 #02-08","72A FRANKEL AVENUE","29 HERTFORD ROAD #05-02"],["New Sale","New Sale","New Sale","New Sale","Resale","Resale","Resale","Resale","Sub Sale","Resale","New Sale","New Sale","New Sale","New Sale","New Sale","New Sale","New Sale","New Sale","Resale","Resale"],["Strata","Strata","Strata","Strata","Strata","Land","Strata","Land","Strata","Strata","Strata","Strata","Strata","Strata","Strata","Strata","Strata","Strata","Land","Strata"],[82,82,100,96,81,308.7,420,144.5,41,149,63,59,70,69,136,119,86,103,368.1,109],[28256,22238,14211,13105,15802,19015,11786,22561,20732,8510,29968,25034,28429,28623,20110,27638,14233,14893,18378,13486],["-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-"],["Condominium","Condominium","Executive Condominium","Executive Condominium","Condominium","Terrace House","Semi-Detached House","Terrace House","Apartment","Executive Condominium","Condominium","Condominium","Apartment","Apartment","Apartment","Apartment","Executive Condominium","Executive Condominium","Semi-Detached House","Apartment"],[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],["99 yrs from 12/01/2021","Freehold","99 yrs from 15/02/2021","99 yrs from 15/02/2021","99 yrs from 28/12/2016","999 yrs from 14/02/1881","Freehold","Freehold","99 yrs from 07/05/2018","99 yrs from 16/12/1997","Freehold","Freehold","Freehold","Freehold","99 yrs from 08/08/2019","Freehold","99 yrs from 01/11/2021","99 yrs from 01/11/2021","Freehold","Freehold"],["Uncompleted","Uncompleted","Uncompleted","Uncompleted","2022","-","2015","1941","2022","2000","Uncompleted","2022","Uncompleted","Uncompleted","Uncompleted","Uncompleted","Uncompleted","Uncompleted","1958","2014"],["HDB","Private","HDB","HDB","HDB","Private","Private","Private","HDB","HDB","HDB","Private","Private","HDB","N.A","N.A","HDB","Private","Private","HDB"],["097996","419535","269343","269294","797391","548742","275780","423510","126751","738086","439961","538527","268832","268832","128822","278573","529700","529700","458202","219384"],["04","14","27","27","28","19","10","15","05","25","15","19","10","10","05","10","18","18","15","08"],["09","41","26","26","79","54","27","42","12","73","43","53","26","26","12","27","52","52","45","21"],["Central Region","East Region","North Region","North Region","North East Region","North East Region","Central Region","Central Region","West Region","North Region","Central Region","North East Region","Central Region","Central Region","West Region","Central Region","East Region","East Region","East Region","Central Region"],["Bukit Merah","Bedok","Yishun","Yishun","Sengkang","Hougang","Bukit Timah","Marine Parade","Clementi","Woodlands","Marine Parade","Serangoon","Tanglin","Tanglin","Clementi","Bukit Timah","Tampines","Tampines","Bedok","Kallang"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>PROJECT_NAME<\/th>\n      <th>TRANSACTED_PRICE<\/th>\n      <th>AREA_SQFT<\/th>\n      <th>UNIT_PRICE_PSF<\/th>\n      <th>SALE_DATE<\/th>\n      <th>ADDRESS<\/th>\n      <th>TYPE_OF_SALE<\/th>\n      <th>TYPE_OF_AREA<\/th>\n      <th>AREA_SQM<\/th>\n      <th>UNIT_PRICE_PSM<\/th>\n      <th>NETT_PRICE<\/th>\n      <th>PROPERTY_TYPE<\/th>\n      <th>NUMBER_OF_UNITS<\/th>\n      <th>TENURE<\/th>\n      <th>COMPLETION_DATE<\/th>\n      <th>PURCHASER_ADDRESS_INDICATOR<\/th>\n      <th>POSTAL_CODE<\/th>\n      <th>POSTAL_DISTRICT<\/th>\n      <th>POSTAL_SECTOR<\/th>\n      <th>PLANNING_REGION<\/th>\n      <th>PLANNING_AREA<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[2,3,4,9,10,13]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 </div>
 <div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>realis_2024q1 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">'data/ResidentialTransaction20240414220633.csv'</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">rename_with</span>(rename_realis_column) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">QUARTER=</span><span class="st">"2024Q1"</span>)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">head</span>(realis_2024q1, <span class="at">n=</span><span class="dv">7</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>realis_2024q1 <span class="ot">&lt;-</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_csv</span>(<span class="st">'data/ResidentialTransaction20240414220633.csv'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_with</span>(rename_realis_column)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">datatable</span>(<span class="fu">head</span>(realis_2024q1, <span class="at">n =</span> <span class="dv">20</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="table table-sm table-striped small">
-<colgroup>
-<col style="width: 6%">
-<col style="width: 4%">
-<col style="width: 2%">
-<col style="width: 4%">
-<col style="width: 3%">
-<col style="width: 8%">
-<col style="width: 3%">
-<col style="width: 3%">
-<col style="width: 2%">
-<col style="width: 4%">
-<col style="width: 3%">
-<col style="width: 4%">
-<col style="width: 4%">
-<col style="width: 6%">
-<col style="width: 4%">
-<col style="width: 8%">
-<col style="width: 3%">
-<col style="width: 4%">
-<col style="width: 4%">
-<col style="width: 5%">
-<col style="width: 4%">
-<col style="width: 2%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">PROJECT_NAME</th>
-<th style="text-align: right;">TRANSACTED_PRICE</th>
-<th style="text-align: right;">AREA_SQFT</th>
-<th style="text-align: right;">UNIT_PRICE_PSF</th>
-<th style="text-align: left;">SALE_DATE</th>
-<th style="text-align: left;">ADDRESS</th>
-<th style="text-align: left;">TYPE_OF_SALE</th>
-<th style="text-align: left;">TYPE_OF_AREA</th>
-<th style="text-align: right;">AREA_SQM</th>
-<th style="text-align: right;">UNIT_PRICE_PSM</th>
-<th style="text-align: left;">NETT_PRICE</th>
-<th style="text-align: left;">PROPERTY_TYPE</th>
-<th style="text-align: right;">NUMBER_OF_UNITS</th>
-<th style="text-align: left;">TENURE</th>
-<th style="text-align: left;">COMPLETION_DATE</th>
-<th style="text-align: left;">PURCHASER_ADDRESS_INDICATOR</th>
-<th style="text-align: left;">POSTAL_CODE</th>
-<th style="text-align: left;">POSTAL_DISTRICT</th>
-<th style="text-align: left;">POSTAL_SECTOR</th>
-<th style="text-align: left;">PLANNING_REGION</th>
-<th style="text-align: left;">PLANNING_AREA</th>
-<th style="text-align: left;">QUARTER</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">THE LANDMARK</td>
-<td style="text-align: right;">2726888</td>
-<td style="text-align: right;">1076.40</td>
-<td style="text-align: right;">2533</td>
-<td style="text-align: left;">01 Jan 2024</td>
-<td style="text-align: left;">173 CHIN SWEE ROAD #22-11</td>
-<td style="text-align: left;">New Sale</td>
-<td style="text-align: left;">Strata</td>
-<td style="text-align: right;">100</td>
-<td style="text-align: right;">27269</td>
-<td style="text-align: left;">-</td>
-<td style="text-align: left;">Condominium</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: left;">99 yrs from 28/08/2020</td>
-<td style="text-align: left;">Uncompleted</td>
-<td style="text-align: left;">Private</td>
-<td style="text-align: left;">169878</td>
-<td style="text-align: left;">03</td>
-<td style="text-align: left;">16</td>
-<td style="text-align: left;">Central Region</td>
-<td style="text-align: left;">Outram</td>
-<td style="text-align: left;">2024Q1</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">POLLEN COLLECTION</td>
-<td style="text-align: right;">3850000</td>
-<td style="text-align: right;">1808.35</td>
-<td style="text-align: right;">2129</td>
-<td style="text-align: left;">01 Jan 2024</td>
-<td style="text-align: left;">34 POLLEN PLACE</td>
-<td style="text-align: left;">New Sale</td>
-<td style="text-align: left;">Land</td>
-<td style="text-align: right;">168</td>
-<td style="text-align: right;">22917</td>
-<td style="text-align: left;">-</td>
-<td style="text-align: left;">Terrace House</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: left;">99 yrs from 09/12/2019</td>
-<td style="text-align: left;">Uncompleted</td>
-<td style="text-align: left;">N.A</td>
-<td style="text-align: left;">807233</td>
-<td style="text-align: left;">28</td>
-<td style="text-align: left;">80</td>
-<td style="text-align: left;">North East Region</td>
-<td style="text-align: left;">Serangoon</td>
-<td style="text-align: left;">2024Q1</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">SKY EDEN@BEDOK</td>
-<td style="text-align: right;">2346000</td>
-<td style="text-align: right;">1087.16</td>
-<td style="text-align: right;">2158</td>
-<td style="text-align: left;">01 Jan 2024</td>
-<td style="text-align: left;">1 BEDOK CENTRAL #09-10</td>
-<td style="text-align: left;">New Sale</td>
-<td style="text-align: left;">Strata</td>
-<td style="text-align: right;">101</td>
-<td style="text-align: right;">23228</td>
-<td style="text-align: left;">-</td>
-<td style="text-align: left;">Apartment</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: left;">99 yrs from 05/01/2022</td>
-<td style="text-align: left;">Uncompleted</td>
-<td style="text-align: left;">HDB</td>
-<td style="text-align: left;">469657</td>
-<td style="text-align: left;">16</td>
-<td style="text-align: left;">46</td>
-<td style="text-align: left;">East Region</td>
-<td style="text-align: left;">Bedok</td>
-<td style="text-align: left;">2024Q1</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">TERRA HILL</td>
-<td style="text-align: right;">2190000</td>
-<td style="text-align: right;">807.30</td>
-<td style="text-align: right;">2713</td>
-<td style="text-align: left;">01 Jan 2024</td>
-<td style="text-align: left;">18A YEW SIANG ROAD #03-12</td>
-<td style="text-align: left;">New Sale</td>
-<td style="text-align: left;">Strata</td>
-<td style="text-align: right;">75</td>
-<td style="text-align: right;">29200</td>
-<td style="text-align: left;">-</td>
-<td style="text-align: left;">Apartment</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: left;">Freehold</td>
-<td style="text-align: left;">Uncompleted</td>
-<td style="text-align: left;">N.A</td>
-<td style="text-align: left;">118992</td>
-<td style="text-align: left;">05</td>
-<td style="text-align: left;">11</td>
-<td style="text-align: left;">Central Region</td>
-<td style="text-align: left;">Queenstown</td>
-<td style="text-align: left;">2024Q1</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">PINETREE HILL</td>
-<td style="text-align: right;">1954000</td>
-<td style="text-align: right;">796.54</td>
-<td style="text-align: right;">2453</td>
-<td style="text-align: left;">01 Jan 2024</td>
-<td style="text-align: left;">36 PINE GROVE #05-18</td>
-<td style="text-align: left;">New Sale</td>
-<td style="text-align: left;">Strata</td>
-<td style="text-align: right;">74</td>
-<td style="text-align: right;">26405</td>
-<td style="text-align: left;">-</td>
-<td style="text-align: left;">Condominium</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: left;">99 yrs from 12/09/2022</td>
-<td style="text-align: left;">Uncompleted</td>
-<td style="text-align: left;">Private</td>
-<td style="text-align: left;">598444</td>
-<td style="text-align: left;">21</td>
-<td style="text-align: left;">59</td>
-<td style="text-align: left;">Central Region</td>
-<td style="text-align: left;">Bukit Timah</td>
-<td style="text-align: left;">2024Q1</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">THE RESERVE RESIDENCES</td>
-<td style="text-align: right;">3412201</td>
-<td style="text-align: right;">1323.97</td>
-<td style="text-align: right;">2577</td>
-<td style="text-align: left;">01 Jan 2024</td>
-<td style="text-align: left;">13 JALAN ANAK BUKIT #28-106</td>
-<td style="text-align: left;">New Sale</td>
-<td style="text-align: left;">Strata</td>
-<td style="text-align: right;">123</td>
-<td style="text-align: right;">27741</td>
-<td style="text-align: left;">-</td>
-<td style="text-align: left;">Apartment</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: left;">99 yrs from 29/11/2021</td>
-<td style="text-align: left;">Uncompleted</td>
-<td style="text-align: left;">Private</td>
-<td style="text-align: left;">589605</td>
-<td style="text-align: left;">21</td>
-<td style="text-align: left;">58</td>
-<td style="text-align: left;">Central Region</td>
-<td style="text-align: left;">Bukit Timah</td>
-<td style="text-align: left;">2024Q1</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">SUMMER VILLAS</td>
-<td style="text-align: right;">2960000</td>
-<td style="text-align: right;">3530.59</td>
-<td style="text-align: right;">838</td>
-<td style="text-align: left;">02 Jan 2024</td>
-<td style="text-align: left;">73 GERALD DRIVE #01-06</td>
-<td style="text-align: left;">Resale</td>
-<td style="text-align: left;">Strata</td>
-<td style="text-align: right;">328</td>
-<td style="text-align: right;">9024</td>
-<td style="text-align: left;">-</td>
-<td style="text-align: left;">Terrace House</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: left;">Freehold</td>
-<td style="text-align: left;">2004</td>
-<td style="text-align: left;">Private</td>
-<td style="text-align: left;">797703</td>
-<td style="text-align: left;">28</td>
-<td style="text-align: left;">79</td>
-<td style="text-align: left;">North East Region</td>
-<td style="text-align: left;">Hougang</td>
-<td style="text-align: left;">2024Q1</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-<div id="tabset-3-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-3-tab">
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>realis <span class="ot">&lt;-</span> realis_2023q1 <span class="sc">%&gt;%</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rbind</span>(realis_2024q1) <span class="sc">%&gt;%</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    QUARTER,</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    PROPERTY_TYPE,</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    TRANSACTED_PRICE</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  ))</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">head</span>(realis, <span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<table class="table table-sm table-striped small">
-<thead>
-<tr class="header">
-<th style="text-align: left;">QUARTER</th>
-<th style="text-align: left;">PROPERTY_TYPE</th>
-<th style="text-align: right;">TRANSACTED_PRICE</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">2023Q1</td>
-<td style="text-align: left;">Condominium</td>
-<td style="text-align: right;">2317000</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2023Q1</td>
-<td style="text-align: left;">Condominium</td>
-<td style="text-align: right;">1823500</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2023Q1</td>
-<td style="text-align: left;">Executive Condominium</td>
-<td style="text-align: right;">1421112</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2023Q1</td>
-<td style="text-align: left;">Executive Condominium</td>
-<td style="text-align: right;">1258112</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2023Q1</td>
-<td style="text-align: left;">Condominium</td>
-<td style="text-align: right;">1280000</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2023Q1</td>
-<td style="text-align: left;">Terrace House</td>
-<td style="text-align: right;">5870000</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2023Q1</td>
-<td style="text-align: left;">Semi-Detached House</td>
-<td style="text-align: right;">4950000</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2023Q1</td>
-<td style="text-align: left;">Terrace House</td>
-<td style="text-align: right;">3260000</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2023Q1</td>
-<td style="text-align: left;">Apartment</td>
-<td style="text-align: right;">850000</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2023Q1</td>
-<td style="text-align: left;">Executive Condominium</td>
-<td style="text-align: right;">1268000</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>realis <span class="ot">&lt;-</span> realis <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">PRICE_IN_MILLIONS =</span> TRANSACTED_PRICE<span class="sc">/</span><span class="dv">1000000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>median2023 <span class="ot">=</span> <span class="fu">median</span>(realis_2023q1<span class="sc">$</span>TRANSACTED_PRICE) <span class="sc">/</span> <span class="dv">1000000</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>median2024 <span class="ot">=</span> <span class="fu">median</span>(realis_2024q1<span class="sc">$</span>TRANSACTED_PRICE) <span class="sc">/</span> <span class="dv">1000000</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(realis, <span class="fu">aes</span>(<span class="at">y =</span> PRICE_IN_MILLIONS, <span class="at">x =</span> PROPERTY_TYPE, <span class="at">fill =</span> QUARTER, <span class="at">color =</span> QUARTER)) <span class="sc">+</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> median2023, <span class="at">color =</span> <span class="st">"2023"</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">label =</span> <span class="fu">paste0</span>(<span class="st">"Median =</span><span class="sc">\n</span><span class="st">$"</span>, <span class="fu">round</span>(median2023, <span class="dv">2</span>), <span class="st">"M"</span>), <span class="at">y =</span> median2023 <span class="sc">*</span> <span class="fl">0.7</span>, <span class="at">x =</span> <span class="fl">6.75</span>, <span class="at">color =</span> <span class="st">"2023"</span>, <span class="at">size =</span> <span class="dv">3</span>, <span class="at">family =</span> <span class="st">"Roboto Condensed"</span>) <span class="sc">+</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> median2024, <span class="at">color =</span> <span class="st">"blue"</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">label =</span> <span class="fu">paste0</span>(<span class="st">"Median =</span><span class="sc">\n</span><span class="st">$"</span>, <span class="fu">round</span>(median2024, <span class="dv">2</span>), <span class="st">"M"</span>), <span class="at">y =</span> median2024 <span class="sc">*</span> <span class="fl">1.4</span>, <span class="at">x =</span> <span class="fl">6.75</span>, <span class="at">color =</span> <span class="st">"blue"</span>, <span class="at">size =</span> <span class="dv">3</span>, <span class="at">family =</span> <span class="st">"Roboto Condensed"</span>) <span class="sc">+</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">staplewidth=</span><span class="fl">0.3</span>, <span class="at">outlier.alpha =</span> <span class="fl">0.8</span>, <span class="at">outlier.size =</span> <span class="fl">0.25</span>) <span class="sc">+</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"grey60"</span>, <span class="st">"blue"</span>)) <span class="sc">+</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"grey60"</span>, <span class="st">"blue"</span>)) <span class="sc">+</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="dv">60</span>)) <span class="sc">+</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">labels =</span> <span class="fu">wrap_format</span>(<span class="dv">10</span>), <span class="at">expand =</span> <span class="fu">expansion</span>(<span class="at">add =</span> <span class="fu">c</span>(<span class="fl">0.6</span>, <span class="dv">1</span>))) <span class="sc">+</span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Transacted Price (in million $)"</span>, <span class="at">x=</span><span class="st">"Property Type"</span>, <span class="at">fill =</span> <span class="st">"Quarter"</span>, <span class="at">color =</span> <span class="st">"Quarter"</span>) <span class="sc">+</span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_annotation</span>(</span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Transaction Prices by Property Type"</span>,</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Overall prices have increased by **3.7%** from $1.63M to $1.69M. However, the price variability for all property types&lt;br/&gt;have decreased, with fewer outliers present."</span></span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">&amp;</span></span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">"Roboto Condensed"</span>),</span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_markdown</span>(<span class="at">color =</span> <span class="st">"grey50"</span>, <span class="at">size =</span> <span class="fu">rel</span>(<span class="fl">0.9</span>)),</span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.line.x =</span> <span class="fu">element_line</span>(),</span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"inside"</span>,</span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position.inside =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">0.9</span>),</span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.justification =</span> <span class="st">"right"</span>,</span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.location =</span> <span class="st">"plot"</span>,</span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.direction =</span> <span class="st">"horizontal"</span>,</span>
-<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.box.background =</span> <span class="fu">element_rect</span>(<span class="at">fill=</span><span class="st">"aliceblue"</span>)</span>
-<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="Take-home_Ex2_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<p><a href="https://isss608-ay2023-24apr.netlify.app/lesson/lesson02/lesson02-designing%20graphs%20to%20enlighten#/title-slide" class="uri">https://isss608-ay2023-24apr.netlify.app/lesson/lesson02/lesson02-designing%20graphs%20to%20enlighten#/title-slide</a></p>
 
-
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-32d2e6726ac17b72d18f" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-32d2e6726ac17b72d18f">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"],["THE LANDMARK","POLLEN COLLECTION","SKY EDEN@BEDOK","TERRA HILL","PINETREE HILL","THE RESERVE RESIDENCES","SUMMER VILLAS","THE MINTON","SEMBAWANG HILLS ESTATE","NV RESIDENCES","SANT RITZ","ECOPOLITAN","AFFINITY AT SERANGOON","PARC KOMO","TREASURE CREST","ECO","SIXTH AVENUE CENTRE","NOMA","PARC CLEMATIS","MARINA BAY RESIDENCES"],[2726888,3850000,2346000,2190000,1954000,3412201,2960000,1840000,4200000,1350000,890000,1390000,1938000,1758000,1790000,1620000,1935000,1500000,1990000,1420000],[1076.4,1808.35,1087.16,807.3,796.54,1323.97,3530.59,1216.33,2092.52,1108.69,527.4399999999999,1097.93,1173.28,1001.05,1248.62,990.2900000000001,1173.28,850.3599999999999,904.1800000000001,710.42],[2533,2129,2158,2713,2453,2577,838,1513,2007,1218,1687,1266,1652,1756,1434,1636,1649,1764,2201,1999],["01 Jan 2024","01 Jan 2024","01 Jan 2024","01 Jan 2024","01 Jan 2024","01 Jan 2024","02 Jan 2024","02 Jan 2024","02 Jan 2024","02 Jan 2024","02 Jan 2024","02 Jan 2024","02 Jan 2024","02 Jan 2024","02 Jan 2024","02 Jan 2024","02 Jan 2024","02 Jan 2024","02 Jan 2024","02 Jan 2024"],["173 CHIN SWEE ROAD #22-11","34 POLLEN PLACE","1 BEDOK CENTRAL #09-10","18A YEW SIANG ROAD #03-12","36 PINE GROVE #05-18","13 JALAN ANAK BUKIT #28-106","73 GERALD DRIVE #01-06","6 HOUGANG STREET 11 #11-09","67 JALAN CHENGAM","99 PASIR RIS GROVE #08-47","1 PHENG GECK AVENUE #06-24","134 PUNGGOL WALK #07-21","20 SERANGOON NORTH AVENUE 1 #01-20","959 UPPER CHANGI ROAD NORTH #05-65","54 ANCHORVALE CRESCENT #05-15","275 BEDOK SOUTH AVENUE 3 #01-22","805 BUKIT TIMAH ROAD #04-03","333 GUILLEMARD ROAD #02-04","8 JALAN LEMPENG #09-16","18 MARINA BOULEVARD #26-04"],["New Sale","New Sale","New Sale","New Sale","New Sale","New Sale","Resale","Resale","Resale","Resale","Resale","Resale","Sub Sale","Sub Sale","Resale","Resale","Resale","Sub Sale","Sub Sale","Resale"],["Strata","Land","Strata","Strata","Strata","Strata","Strata","Strata","Land","Strata","Strata","Strata","Strata","Strata","Strata","Strata","Strata","Strata","Strata","Strata"],[100,168,101,75,74,123,328,113,194.4,103,49,102,109,93,116,92,109,79,84,66],[27269,22917,23228,29200,26405,27741,9024,16283,21605,13107,18163,13627,17780,18903,15431,17609,17752,18987,23690,21515],["-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-"],["Condominium","Terrace House","Apartment","Apartment","Condominium","Apartment","Terrace House","Condominium","Terrace House","Condominium","Condominium","Executive Condominium","Apartment","Apartment","Executive Condominium","Condominium","Apartment","Apartment","Apartment","Condominium"],[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],["99 yrs from 28/08/2020","99 yrs from 09/12/2019","99 yrs from 05/01/2022","Freehold","99 yrs from 12/09/2022","99 yrs from 29/11/2021","Freehold","99 yrs from 27/07/2007","Freehold","99 yrs from 07/01/2008","99 yrs from 01/10/2012","99 yrs from 04/12/2012","99 yrs from 18/05/2018","Freehold","99 yrs from 05/05/2015","99 yrs from 14/05/2012","Freehold","Freehold","99 yrs from 08/08/2019","99 yrs from 11/10/2005"],["Uncompleted","Uncompleted","Uncompleted","Uncompleted","Uncompleted","Uncompleted","2004","2013","2015","2013","2016","2016","2023","2023","2018","2017","1986","2023","2023","2010"],["Private","N.A","HDB","N.A","Private","Private","Private","HDB","Private","HDB","HDB","HDB","HDB","Private","Private","Private","Private","Private","HDB","HDB"],["169878","807233","469657","118992","598444","589605","797703","538755","578350","518194","348196","828778","554337","506787","544631","465491","279883","399758","128796","018980"],["03","28","16","05","21","21","28","19","20","18","13","19","19","17","19","16","10","14","05","01"],["16","80","46","11","59","58","79","53","57","51","34","82","55","50","54","46","27","39","12","01"],["Central Region","North East Region","East Region","Central Region","Central Region","Central Region","North East Region","North East Region","North East Region","East Region","Central Region","North East Region","North East Region","East Region","North East Region","East Region","Central Region","Central Region","West Region","Central Region"],["Outram","Serangoon","Bedok","Queenstown","Bukit Timah","Bukit Timah","Hougang","Hougang","Ang Mo Kio","Pasir Ris","Toa Payoh","Punggol","Serangoon","Pasir Ris","Sengkang","Bedok","Bukit Timah","Geylang","Clementi","Downtown Core"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>PROJECT_NAME<\/th>\n      <th>TRANSACTED_PRICE<\/th>\n      <th>AREA_SQFT<\/th>\n      <th>UNIT_PRICE_PSF<\/th>\n      <th>SALE_DATE<\/th>\n      <th>ADDRESS<\/th>\n      <th>TYPE_OF_SALE<\/th>\n      <th>TYPE_OF_AREA<\/th>\n      <th>AREA_SQM<\/th>\n      <th>UNIT_PRICE_PSM<\/th>\n      <th>NETT_PRICE<\/th>\n      <th>PROPERTY_TYPE<\/th>\n      <th>NUMBER_OF_UNITS<\/th>\n      <th>TENURE<\/th>\n      <th>COMPLETION_DATE<\/th>\n      <th>PURCHASER_ADDRESS_INDICATOR<\/th>\n      <th>POSTAL_CODE<\/th>\n      <th>POSTAL_DISTRICT<\/th>\n      <th>POSTAL_SECTOR<\/th>\n      <th>PLANNING_REGION<\/th>\n      <th>PLANNING_AREA<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[2,3,4,9,10,13]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</div>
+</div>
+</div>
 </section>
+<section id="data-wrangling" class="level2">
+<h2 class="anchored" data-anchor-id="data-wrangling">3.3 Data Wrangling</h2>
+<p>Now that we have <code>realis_2023q1</code> and <code>realis_2024q1</code>, we will combine them into a form that is usable for the make over.</p>
+<section id="adding-quarter-columns" class="level3">
+<h3 class="anchored" data-anchor-id="adding-quarter-columns">3.3.1 Adding QUARTER columns</h3>
+<p>We will use <code>mutate()</code> to assign the corresponding quater to each dataset.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>realis_2023q1<span class="sc">$</span>QUARTER <span class="ot">&lt;-</span> <span class="st">"2023Q1"</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>realis_2024q1<span class="sc">$</span>QUARTER <span class="ot">&lt;-</span> <span class="st">"2024Q1"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="combining-the-dataframes" class="level3">
+<h3 class="anchored" data-anchor-id="combining-the-dataframes">3.3.2 Combining the dataframes</h3>
+<p>We will combine the dataframes to a single one using <code>rbind()</code>, so that we only need to work with a single dataframe for the makeover.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>realis <span class="ot">&lt;-</span> <span class="fu">rbind</span>(realis_2023q1, realis_2024q1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="selecting-relevant-columns" class="level3">
+<h3 class="anchored" data-anchor-id="selecting-relevant-columns">3.3.3 Selecting relevant columns</h3>
+<p>Lastly, we will select only the columns relevant to the visualization (<code>QUARTER</code>, <code>PROPERTY_TYPE</code>, <code>TRANSACTED_PRICE</code>) to make our dataframe more lightweight.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>realis <span class="ot">&lt;-</span> realis <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">c</span>(QUARTER,</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                              PROPERTY_TYPE,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                              TRANSACTED_PRICE))</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">datatable</span>(<span class="fu">head</span>(realis, <span class="dv">20</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-69e6ce5b87080d7c3bb7" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-69e6ce5b87080d7c3bb7">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"],["2023Q1","2023Q1","2023Q1","2023Q1","2023Q1","2023Q1","2023Q1","2023Q1","2023Q1","2023Q1","2023Q1","2023Q1","2023Q1","2023Q1","2023Q1","2023Q1","2023Q1","2023Q1","2023Q1","2023Q1"],["Condominium","Condominium","Executive Condominium","Executive Condominium","Condominium","Terrace House","Semi-Detached House","Terrace House","Apartment","Executive Condominium","Condominium","Condominium","Apartment","Apartment","Apartment","Apartment","Executive Condominium","Executive Condominium","Semi-Detached House","Apartment"],[2317000,1823500,1421112,1258112,1280000,5870000,4950000,3260000,850000,1268000,1888000,1477000,1990000,1975000,2735000,3288888,1224000,1534000,6765000,1470000]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>QUARTER<\/th>\n      <th>PROPERTY_TYPE<\/th>\n      <th>TRANSACTED_PRICE<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":3},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<p>We now have all the data we need in <code>realis</code>.</p>
+</section>
+</section>
+</section>
+<section id="the-makeover" class="level1">
+<h1>4 The Makeover</h1>
+<section id="implementing-the-design" class="level2">
+<h2 class="anchored" data-anchor-id="implementing-the-design">4.1 Implementing the design</h2>
+<p>In <a href="#designing-the-makeover">2.2 Designing the Makeover</a>, we came up with a design to improve the original visualization. We will use this as a starting point for the makeover.</p>
+<p>We are getting the plot title and subtitle by extracting from the write-up in the original visualization.</p>
+<p>We also need to calculate the medians for the reference lines:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>median2023 <span class="ot">=</span> <span class="fu">median</span>(realis_2023q1<span class="sc">$</span>TRANSACTED_PRICE)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>median2024 <span class="ot">=</span> <span class="fu">median</span>(realis_2024q1<span class="sc">$</span>TRANSACTED_PRICE)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(realis,</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> TRANSACTED_PRICE,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">x =</span> PROPERTY_TYPE,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">fill =</span> QUARTER,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">color =</span> QUARTER</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>       )) <span class="sc">+</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Renders colored outliers and box border</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">fill =</span> <span class="cn">NULL</span>),</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">outlier.alpha =</span> <span class="fl">0.8</span>,</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">outlier.size =</span> <span class="fl">0.2</span>,</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">show.legend =</span> <span class="cn">FALSE</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Renders without outliers to override the colored borders from previous box plot</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Staples are rendered so it is clearer where the outliers start</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.8</span>,</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">staplewidth =</span> <span class="fl">0.2</span>,</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">outliers =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"black"</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2023 Median reference line</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> median2023,</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">"grey60"</span>,</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>    <span class="st">"text"</span>,</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="fu">paste0</span>(<span class="st">"Median =</span><span class="sc">\n</span><span class="st">$"</span>, <span class="fu">round</span>(median2023 <span class="sc">/</span> <span class="fl">1e6</span>, <span class="dv">2</span>), <span class="st">"M"</span>),</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> median2023 <span class="sc">*</span> <span class="fl">0.7</span>,</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fl">6.75</span>,</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"grey50"</span>,</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">3</span>,</span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">family =</span> <span class="st">"Roboto Condensed"</span></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2024 Median reference line</span></span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> median2024,</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">"blue"</span>,</span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(</span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>    <span class="st">"text"</span>,</span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="fu">paste0</span>(<span class="st">"Median =</span><span class="sc">\n</span><span class="st">$"</span>, <span class="fu">round</span>(median2024 <span class="sc">/</span> <span class="fl">1e6</span>, <span class="dv">2</span>), <span class="st">"M"</span>),</span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> median2024 <span class="sc">*</span> <span class="fl">1.4</span>,</span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fl">6.75</span>,</span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"blue"</span>,</span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">3</span>,</span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>    <span class="at">family =</span> <span class="st">"Roboto Condensed"</span></span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Set colors</span></span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"grey60"</span>, <span class="st">"blue"</span>)) <span class="sc">+</span></span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"grey60"</span>, <span class="st">"blue"</span>)) <span class="sc">+</span></span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Format axes</span></span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="fl">0.5e6</span>, <span class="fl">70e6</span>),</span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>                <span class="at">labels =</span> <span class="fu">number_format</span>(<span class="at">scale =</span> <span class="fl">1e-6</span>, <span class="at">suffix =</span> <span class="st">"M"</span>)) <span class="sc">+</span></span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">labels =</span> <span class="fu">wrap_format</span>(<span class="dv">10</span>), <span class="at">expand =</span> <span class="fu">expansion</span>(<span class="at">add =</span> <span class="fu">c</span>(<span class="fl">0.6</span>, <span class="dv">1</span>))) <span class="sc">+</span></span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Property Type"</span>,</span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Transacted Price ($)"</span>,</span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Quarter"</span>) <span class="sc">+</span></span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Plot styles</span></span>
+<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_annotation</span>(<span class="at">title =</span> <span class="st">"Transaction Prices by Property Type for 2023Q1 &amp; 2024Q1"</span>,</span>
+<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a>                  <span class="at">subtitle =</span> <span class="st">"Overall prices have increased by **3.7%** from $1.63M to $1.69M. However, the price variability for all property types&lt;br/&gt;have decreased, with fewer outliers present."</span>) <span class="sc">&amp;</span></span>
+<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">"Roboto Condensed"</span>),</span>
+<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_markdown</span>(<span class="at">color =</span> <span class="st">"grey50"</span>, <span class="at">size =</span> <span class="fu">rel</span>(<span class="fl">0.9</span>)),</span>
+<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.line.x =</span> <span class="fu">element_line</span>(),</span>
+<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="Take-home_Ex2_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true">Gains</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false">Points for improvement</a></li></ul>
+<div class="tab-content">
+<div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
+<p>Plotting the boxplots in pairs improved the clarity of the visualization as it makes it easier to compare prices within each property type. Using a bright color like blue for the 2024 plot and a muted color like gray for the 2023 plot places the focus towards the 2024 data during the comparison.</p>
+<p>The theme and the styles applied greatly improved the readability, especially as the x-axis labels are now rendered horizontally. This also provided a bigger space for the plot itself.</p>
+<p>Lastly, the title and subtitle provides a story for the visualization to help the reader understand what is presented to them.</p>
+</div>
+<div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
+<p>While the makeover made the visualization more aesthetic further improvements can be made:</p>
+<ul>
+<li><p>Free up more space on the right by moving the legend to inside the plot. This will help expand the plot horizontally.</p></li>
+<li><p>Make the x-axis labels a bit bigger. As we removed the title, <em>Property Type</em>, the balance of the text sizes between the x and y axes seem off. A larger text will also make it easier to read.</p></li>
+<li><p>Reference lines are hard to see when overlapping with boxplots. It is hard to compare with the reference lines especially for <code>Apartment</code> and <code>Condominium</code> as the color of the reference lines are the same as the fill.</p></li>
+<li><p>Add axis line and ticks to y-axis as it is a continuous value</p></li>
+<li><p>If possible, add more values in y-axis labels as log scale is more difficult to judge than a linear scale. For example, we <strong>cannot see the values above $30M</strong>.</p></li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="nd-iteration" class="level2">
+<h2 class="anchored" data-anchor-id="nd-iteration">4.2 2nd Iteration</h2>
+<p>From the points of improvement of the initial makeover, we will do the following:</p>
+<ul>
+<li><p>Move the legend to inside the plot</p></li>
+<li><p>Increase size of x-axis labels</p></li>
+<li><p>Adjust y-axis style and labels</p></li>
+<li><p>Tweak the presentation of the reference lines</p></li>
+</ul>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(realis,</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> TRANSACTED_PRICE,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">x =</span> PROPERTY_TYPE,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">fill =</span> QUARTER,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">color =</span> QUARTER</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>       )) <span class="sc">+</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Renders colored outliers and box border</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">fill =</span> <span class="cn">NULL</span>),</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">outlier.alpha =</span> <span class="fl">0.8</span>,</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">outlier.size =</span> <span class="fl">0.3</span>,</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">show.legend =</span> <span class="cn">FALSE</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Renders without outliers to override the colored borders from previous box plot</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Staples are rendered so it is clearer where the outliers start</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.8</span>,</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">staplewidth =</span> <span class="fl">0.2</span>,</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">outliers =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"black"</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2023 Median reference line</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> median2023,</span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">"darkgoldenrod4"</span>,</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>    <span class="st">"richtext"</span>,</span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="fu">paste0</span>(<span class="st">"2023Q1 Median&lt;br/&gt;**$"</span>, <span class="fu">round</span>(median2023 <span class="sc">/</span> <span class="fl">1e6</span>, <span class="dv">2</span>), <span class="st">"M**"</span>),</span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> median2023 <span class="sc">*</span> <span class="fl">0.65</span>,</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fl">6.9</span>,</span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"darkgoldenrod4"</span>,</span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">3</span>,</span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">family =</span> <span class="st">"Roboto Condensed"</span></span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2024 Median reference line</span></span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> median2024,</span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">"brown"</span>,</span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(</span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a>    <span class="st">"richtext"</span>,</span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="fu">paste0</span>(<span class="st">"2024Q1 Median&lt;br/&gt;**$"</span>, <span class="fu">round</span>(median2024 <span class="sc">/</span> <span class="fl">1e6</span>, <span class="dv">2</span>), <span class="st">"M**"</span>),</span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> median2024 <span class="sc">*</span> <span class="fl">1.55</span>,</span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fl">6.9</span>,</span>
+<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"brown"</span>,</span>
+<span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">3</span>,</span>
+<span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a>    <span class="at">family =</span> <span class="st">"Roboto Condensed"</span></span>
+<span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Set colors</span></span>
+<span id="cb10-54"><a href="#cb10-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"grey60"</span>, <span class="st">"blue"</span>)) <span class="sc">+</span></span>
+<span id="cb10-55"><a href="#cb10-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"grey60"</span>, <span class="st">"blue"</span>)) <span class="sc">+</span></span>
+<span id="cb10-56"><a href="#cb10-56" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-57"><a href="#cb10-57" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Format axes</span></span>
+<span id="cb10-58"><a href="#cb10-58" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="fl">0.5e6</span>, <span class="fl">100e6</span>),</span>
+<span id="cb10-59"><a href="#cb10-59" aria-hidden="true" tabindex="-1"></a>                <span class="at">labels =</span> <span class="fu">number_format</span>(<span class="at">scale =</span> <span class="fl">1e-6</span>, <span class="at">suffix =</span> <span class="st">"M"</span>),</span>
+<span id="cb10-60"><a href="#cb10-60" aria-hidden="true" tabindex="-1"></a>                <span class="at">n.breaks =</span> <span class="dv">9</span>) <span class="sc">+</span></span>
+<span id="cb10-61"><a href="#cb10-61" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add more space to the right side for the reference line annotations and legend</span></span>
+<span id="cb10-62"><a href="#cb10-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">labels =</span> <span class="fu">wrap_format</span>(<span class="dv">10</span>), <span class="at">expand =</span> <span class="fu">expansion</span>(<span class="at">add =</span> <span class="fu">c</span>(<span class="fl">0.6</span>, <span class="fl">1.4</span>))) <span class="sc">+</span></span>
+<span id="cb10-63"><a href="#cb10-63" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Property Type"</span>,</span>
+<span id="cb10-64"><a href="#cb10-64" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Transacted Price ($)"</span>,</span>
+<span id="cb10-65"><a href="#cb10-65" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Quarter"</span>) <span class="sc">+</span></span>
+<span id="cb10-66"><a href="#cb10-66" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-67"><a href="#cb10-67" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Plot styles</span></span>
+<span id="cb10-68"><a href="#cb10-68" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb10-69"><a href="#cb10-69" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_annotation</span>(<span class="at">title =</span> <span class="st">"Transaction Prices by Property Type for 2023Q1 &amp; 2024Q1"</span>,</span>
+<span id="cb10-70"><a href="#cb10-70" aria-hidden="true" tabindex="-1"></a>                  <span class="at">subtitle =</span> <span class="st">"Overall prices have increased by **3.7%** from $1.63M to $1.69M. However, the price variability for all property types&lt;br/&gt;have decreased, with fewer outliers present."</span>) <span class="sc">&amp;</span></span>
+<span id="cb10-71"><a href="#cb10-71" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb10-72"><a href="#cb10-72" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">"Roboto Condensed"</span>),</span>
+<span id="cb10-73"><a href="#cb10-73" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb10-74"><a href="#cb10-74" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_markdown</span>(<span class="at">color =</span> <span class="st">"grey50"</span>, <span class="at">size =</span> <span class="fu">rel</span>(<span class="fl">0.9</span>)),</span>
+<span id="cb10-75"><a href="#cb10-75" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.line.x =</span> <span class="fu">element_line</span>(),</span>
+<span id="cb10-76"><a href="#cb10-76" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb10-77"><a href="#cb10-77" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="fu">rel</span>(<span class="fl">1.2</span>)),</span>
+<span id="cb10-78"><a href="#cb10-78" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.line.y =</span> <span class="fu">element_line</span>(),</span>
+<span id="cb10-79"><a href="#cb10-79" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.ticks.y =</span> <span class="fu">element_line</span>(),</span>
+<span id="cb10-80"><a href="#cb10-80" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Render legend inside the plot</span></span>
+<span id="cb10-81"><a href="#cb10-81" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"inside"</span>,</span>
+<span id="cb10-82"><a href="#cb10-82" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position.inside =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">0.85</span>),</span>
+<span id="cb10-83"><a href="#cb10-83" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.justification =</span> <span class="st">"right"</span>,</span>
+<span id="cb10-84"><a href="#cb10-84" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.location =</span> <span class="st">"plot"</span>,</span>
+<span id="cb10-85"><a href="#cb10-85" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.box.background =</span> <span class="fu">element_rect</span>()</span>
+<span id="cb10-86"><a href="#cb10-86" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="Take-home_Ex2_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-5-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-1" role="tab" aria-controls="tabset-5-1" aria-selected="true">Gains</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-2" role="tab" aria-controls="tabset-5-2" aria-selected="false">Points for improvement</a></li></ul>
+<div class="tab-content">
+<div id="tabset-5-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-5-1-tab">
+<p>In this iteration, we maximized the available space by expanding the right side of the x-axis further, which now holds the legend and annotations for the reference lines. Doing this also ensures that no important information get covered by the annotations.</p>
+<p>Next, the colors of the reference lines are changed to a different color than the fills with the labels added to the end of the line so readers won’t be confused with the colors in our legend.</p>
+<p>Lastly, we did tweaks on the y-axis to have smaller breaks to help readers gauge the log scale better. Aesthetically, this is worse as the axis labels do not look equidistant. However, this helps a lot in clarity.</p>
+</div>
+<div id="tabset-5-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-2-tab">
+<p>In our subtitle, we have this excerpt from the original write-up:</p>
+<blockquote class="blockquote">
+<p>Overall prices have increased by <strong>3.7%</strong> from $1.63M to $1.69M. However, the price variability for all property types have decreased, with fewer outliers present.</p>
+</blockquote>
+<p>Now that we expanded the y-axis, we can see that this is not necessarily true. Hence, we must update this to prevent confusion.</p>
+<p>Instead, we can emphasize the point that Landed properties all sold above the market median.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="final-iteration" class="level2">
+<h2 class="anchored" data-anchor-id="final-iteration">4.3 Final Iteration</h2>
+<p>To emphasize that Landed properties sell above the the median price, we will do the following:</p>
+<ul>
+<li><p>Rearrange x-axis to put landed property types on 1 side of the plot</p></li>
+<li><p>Add annotation that they sell above market median.</p></li>
+</ul>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(realis,</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> TRANSACTED_PRICE,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">x =</span> <span class="fu">factor</span>(PROPERTY_TYPE, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Detached House"</span>, <span class="st">"Semi-Detached House"</span>, <span class="st">"Terrace House"</span>, <span class="st">"Condominium"</span>, <span class="st">"Apartment"</span>, <span class="st">"Executive Condominium"</span>)),</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">fill =</span> QUARTER,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">color =</span> QUARTER</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>       )) <span class="sc">+</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Annotate that all landed properties sold above market median</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"rect"</span>, <span class="at">xmin =</span> <span class="fl">0.5</span>, <span class="at">xmax =</span> <span class="fl">3.5</span>, <span class="at">ymin =</span> <span class="fl">0.5e6</span>, <span class="at">ymax =</span> <span class="fl">100e6</span>,</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>           <span class="at">alpha =</span> <span class="fl">0.1</span>,<span class="at">fill =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"richtext"</span>,</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="st">"Landed properties sold for&lt;br/&gt;above market median&lt;br/&gt;prices in 2024Q1."</span>,</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fl">55e6</span>,</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fl">2.6</span>,</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">3</span>,</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">family =</span> <span class="st">"Roboto Condensed"</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Renders colored outliers and box border</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">fill =</span> <span class="cn">NULL</span>),</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">outlier.alpha =</span> <span class="fl">0.8</span>,</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">outlier.size =</span> <span class="fl">0.3</span>,</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">show.legend =</span> <span class="cn">FALSE</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Renders without outliers to override the colored borders from previous box plot</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Staples are rendered so it is clearer where the outliers start</span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(</span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.8</span>,</span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">staplewidth =</span> <span class="fl">0.2</span>,</span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">outliers =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"black"</span></span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2023 Median reference line</span></span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> median2023,</span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">"darkgoldenrod4"</span>,</span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(</span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a>    <span class="st">"richtext"</span>,</span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="fu">paste0</span>(<span class="st">"2023Q1 Median&lt;br/&gt;**$"</span>, <span class="fu">round</span>(median2023 <span class="sc">/</span> <span class="fl">1e6</span>, <span class="dv">2</span>), <span class="st">"M**"</span>),</span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> median2023 <span class="sc">*</span> <span class="fl">0.65</span>,</span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fl">6.9</span>,</span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"darkgoldenrod4"</span>,</span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">3</span>,</span>
+<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a>    <span class="at">family =</span> <span class="st">"Roboto Condensed"</span></span>
+<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2024 Median reference line</span></span>
+<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> median2024,</span>
+<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">"brown"</span>,</span>
+<span id="cb11-54"><a href="#cb11-54" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb11-55"><a href="#cb11-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(</span>
+<span id="cb11-56"><a href="#cb11-56" aria-hidden="true" tabindex="-1"></a>    <span class="st">"richtext"</span>,</span>
+<span id="cb11-57"><a href="#cb11-57" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="fu">paste0</span>(<span class="st">"2024Q1 Median&lt;br/&gt;**$"</span>, <span class="fu">round</span>(median2024 <span class="sc">/</span> <span class="fl">1e6</span>, <span class="dv">2</span>), <span class="st">"M**"</span>),</span>
+<span id="cb11-58"><a href="#cb11-58" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> median2024 <span class="sc">*</span> <span class="fl">1.55</span>,</span>
+<span id="cb11-59"><a href="#cb11-59" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fl">6.9</span>,</span>
+<span id="cb11-60"><a href="#cb11-60" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"brown"</span>,</span>
+<span id="cb11-61"><a href="#cb11-61" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">3</span>,</span>
+<span id="cb11-62"><a href="#cb11-62" aria-hidden="true" tabindex="-1"></a>    <span class="at">family =</span> <span class="st">"Roboto Condensed"</span></span>
+<span id="cb11-63"><a href="#cb11-63" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb11-64"><a href="#cb11-64" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-65"><a href="#cb11-65" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Set colors</span></span>
+<span id="cb11-66"><a href="#cb11-66" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"grey60"</span>, <span class="st">"blue"</span>)) <span class="sc">+</span></span>
+<span id="cb11-67"><a href="#cb11-67" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"grey60"</span>, <span class="st">"blue"</span>)) <span class="sc">+</span></span>
+<span id="cb11-68"><a href="#cb11-68" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-69"><a href="#cb11-69" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Format axes</span></span>
+<span id="cb11-70"><a href="#cb11-70" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="fl">0.5e6</span>, <span class="fl">100e6</span>),</span>
+<span id="cb11-71"><a href="#cb11-71" aria-hidden="true" tabindex="-1"></a>                <span class="at">labels =</span> <span class="fu">number_format</span>(<span class="at">scale =</span> <span class="fl">1e-6</span>, <span class="at">suffix =</span> <span class="st">"M"</span>),</span>
+<span id="cb11-72"><a href="#cb11-72" aria-hidden="true" tabindex="-1"></a>                <span class="at">n.breaks =</span> <span class="dv">9</span>) <span class="sc">+</span></span>
+<span id="cb11-73"><a href="#cb11-73" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add more space to the right side for the reference line annotations and legend</span></span>
+<span id="cb11-74"><a href="#cb11-74" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">labels =</span> <span class="fu">wrap_format</span>(<span class="dv">10</span>), <span class="at">expand =</span> <span class="fu">expansion</span>(<span class="at">add =</span> <span class="fu">c</span>(<span class="fl">0.6</span>, <span class="fl">1.4</span>))) <span class="sc">+</span></span>
+<span id="cb11-75"><a href="#cb11-75" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Property Type"</span>,</span>
+<span id="cb11-76"><a href="#cb11-76" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Transacted Price ($)"</span>,</span>
+<span id="cb11-77"><a href="#cb11-77" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Quarter"</span>) <span class="sc">+</span></span>
+<span id="cb11-78"><a href="#cb11-78" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-79"><a href="#cb11-79" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Plot styles</span></span>
+<span id="cb11-80"><a href="#cb11-80" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb11-81"><a href="#cb11-81" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_annotation</span>(<span class="at">title =</span> <span class="st">"Transaction Prices by Property Type for 2023Q1 &amp; 2024Q1"</span>,</span>
+<span id="cb11-82"><a href="#cb11-82" aria-hidden="true" tabindex="-1"></a>                  <span class="at">subtitle =</span> <span class="st">"Overall prices have increased by &lt;span style='color:darkgreen;'&gt;**3.7%**&lt;/span&gt; from **$1.63M** to **1.69M**. **Detached Houses** remain the most expensive property type,&lt;br/&gt;while **Executive Condominiums** are still the cheapest."</span>) <span class="sc">&amp;</span></span>
+<span id="cb11-83"><a href="#cb11-83" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb11-84"><a href="#cb11-84" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">family =</span> <span class="st">"Roboto Condensed"</span>),</span>
+<span id="cb11-85"><a href="#cb11-85" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb11-86"><a href="#cb11-86" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_markdown</span>(<span class="at">color =</span> <span class="st">"grey50"</span>, <span class="at">size =</span> <span class="fu">rel</span>(<span class="fl">0.9</span>)),</span>
+<span id="cb11-87"><a href="#cb11-87" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.line.x =</span> <span class="fu">element_line</span>(),</span>
+<span id="cb11-88"><a href="#cb11-88" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb11-89"><a href="#cb11-89" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="fu">rel</span>(<span class="fl">1.2</span>)),</span>
+<span id="cb11-90"><a href="#cb11-90" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.line.y =</span> <span class="fu">element_line</span>(),</span>
+<span id="cb11-91"><a href="#cb11-91" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.ticks.y =</span> <span class="fu">element_line</span>(),</span>
+<span id="cb11-92"><a href="#cb11-92" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Render legend inside the plot</span></span>
+<span id="cb11-93"><a href="#cb11-93" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"inside"</span>,</span>
+<span id="cb11-94"><a href="#cb11-94" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position.inside =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">0.85</span>),</span>
+<span id="cb11-95"><a href="#cb11-95" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.justification =</span> <span class="st">"right"</span>,</span>
+<span id="cb11-96"><a href="#cb11-96" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.location =</span> <span class="st">"plot"</span>,</span>
+<span id="cb11-97"><a href="#cb11-97" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.box.background =</span> <span class="fu">element_rect</span>()</span>
+<span id="cb11-98"><a href="#cb11-98" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="Take-home_Ex2_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="summary" class="level1">
+<h1>5 Summary</h1>
+</section>
+<section id="references" class="level1">
+<h1>6 References</h1>
+<p><a href="https://isss608-ay2023-24apr.netlify.app/lesson/lesson02/lesson02-designing%20graphs%20to%20enlighten#/title-slide" class="uri">https://isss608-ay2023-24apr.netlify.app/lesson/lesson02/lesson02-designing%20graphs%20to%20enlighten#/title-slide</a></p>
+<p><a href="Take-home_Exs/Ex1/Take-home_Ex1">Exercise</a></p>
+<p><a href="https://www.propertygiant.com/blog/everything-you-need-to-know-about-strata-landed-houses-and-the-available-strata-landed-projects-in-singapore" class="uri">https://www.propertygiant.com/blog/everything-you-need-to-know-about-strata-landed-houses-and-the-available-strata-landed-projects-in-singapore</a></p>
+
+
 </section>
 
 </main> <!-- /main -->
