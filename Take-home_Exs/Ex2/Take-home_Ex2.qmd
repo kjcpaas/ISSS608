@@ -15,7 +15,7 @@ execute:
 
 For this exercise, we will revisit [Take-home Exercise 1](Take-home_Exs/Ex1/Take-home_Ex1), where we visualized the trends in the Private Real Estate Market of Q1 2024.
 
-We will critique a visualization from our [classmates](https://isss608-ay2023-24apr.netlify.app/take-home_ex/th_ex01#peer-learning) in terms of clarity and aesthetics and improve the visualizations using the best practices for visualizing data.
+We will critique a visualization from our [classmates](https://isss608-ay2023-24apr.netlify.app/take-home_ex/th_ex01#peer-learning) in terms of clarity and aesthetics and improve the visualization using the best practices for visualizing data.
 
 # 2 The Original Visualization
 
@@ -25,12 +25,12 @@ We will use [Alicia Loh's](https://lnealicia-isss608.netlify.app/take-home_ex/ta
 
 This visualization has higher clarity than aesthetic. The image below shows where this visualization in in the Clarity vs Aesthetic quadrant.
 
-![](images/quadrant.png){fig-align="center" width="218"}
+![](images/quadrant_before.png){fig-align="center" width="300"}
 
 ## 2.1 Critique
 
 ::: panel-tabset
-### Clarify
+### Clarity
 
 #### Good Points
 
@@ -62,13 +62,13 @@ This visualization has higher clarity than aesthetic. The image below shows wher
 
 -   Median labels cover the box plot.
 
--   X-axis labels are rotated 90°, which make them hard to read
+-   X-axis labels are vertical, which make them hard to read
 
--   Y-axis title (*Transacted Price*) is very close to the axis labels
+-   Axis texts are very close to the axis labels, making the plot look messy
 
 -   Difficult to compare the price difference for each property type
 
-    -   The reader needs to some context switching from the left to the right to compare
+    -   The reader needs context switching from the left to right graph to compare
 :::
 
 ## 2.2 Designing the Makeover
@@ -90,13 +90,11 @@ This design improves the visualization by:
 
 ### Aesthetics
 
--   Plotting the 2023 and 2024 boxplots side by side to more easily compare prices for each property type. Muted and bright colors will be used for 2023 and 2024, respectively, to emphasize the 2024 plots.
+-   Plotting the 2023 and 2024 **boxplots side by side** to more easily compare prices for each property type. Muted and bright colors will be used for 2023 and 2024, respectively, to emphasize the 2024 plots.
 
--   The previous point also provides more space to accommodate the x-axis labels. For longer titles, we will wrap them to the next time so they do not overlap with other labels.
+-   The previous point also provides more space to **accommodate the x-axis labels**. For longer titles, we will **wrap them to the next line** so they do not overlap with other labels.
 
--   Place more focus on formatting the plots so the texts are using readable fonts and important details do not overlap each other.
-
--   Remove the *Property Type* in the x-axis title as the plot title and subtitle is already clear on what we are comparing. Removing the title gives more focus on the property types themselves.
+-   Place more **focus on styling** the plots so the texts are using readable fonts and important details do not overlap each other.
 :::
 
 # 3 Makeover Preparations
@@ -105,13 +103,15 @@ Before we proceed with the makeover, we need to prepare the R environment and th
 
 ## 3.1 Loading the R packages
 
-We will mainly use the following packages for the makeover:
+We will use the following packages for the makeover:
 
--   [tidyverse](https://www.tidyverse.org/): A collection of R packages used in data science, which includes [ggplot2](https://ggplot2.tidyverse.org/), [tibble](https://tibble.tidyverse.org/), [readr](https://readr.tidyverse.org/), among others
--   [ggtext](https://wilkelab.org/ggtext/): Enhances text rendering for `ggplot2`. `element_markdown()` is most notable function used for markdown rendering so we can highlight important information in text.
--   [patchwork](https://patchwork.data-imaginist.com/): Allows composition of multiple graphs into a single plot
--   [scales](https://scales.r-lib.org/): Extends functions to operate on `ggplot2` scales. Useful for wrapping text and formatting numbers in axes.
--   [DT](https://rstudio.github.io/DT/): To display tabular data
+|                                                    |                                                                                                                                                                                                          |
+|---------------|---------------------------------------------------------|
+| [tidyverse](https://www.tidyverse.org/)            | A collection of R packages used in data science, which includes [ggplot2](https://ggplot2.tidyverse.org/), [tibble](https://tibble.tidyverse.org/), [readr](https://readr.tidyverse.org/), among others. |
+| [ggtext](https://wilkelab.org/ggtext/)             | Enhances text rendering for `ggplot2`. `element_markdown()` is most notable function used for markdown rendering so we can highlight important information in text.                                      |
+| [patchwork](https://patchwork.data-imaginist.com/) | Allows composition of multiple graphs into a single plot.                                                                                                                                                |
+| [scales](https://scales.r-lib.org/)                | Extends functions to operate on `ggplot2` scales. Useful for wrapping text and formatting numbers in axes.                                                                                               |
+| [DT](https://rstudio.github.io/DT/)                | Wrapper for [datatable.js](https://datatables.net/), used for presenting tabular data                                                                                                                    |
 
 ```{r}
 pacman::p_load(tidyverse, scales, patchwork, ggtext, DT)
@@ -121,7 +121,7 @@ pacman::p_load(tidyverse, scales, patchwork, ggtext, DT)
 
 We will import only the **2023Q1** and **2024Q1** datasets as the visualization only involves those quarters.
 
-When loading the dataset, we will also rename the columns to R-friendly format. For this purpose, we will reuse the `rename_realis_column` function from [Take-home Exercise 1](httpsTake-home_Exs/Ex1/Take-home_Ex1#importing-the-datasets).
+When loading the datasets, we will also rename the columns to R-friendly format. For this purpose, we will reuse the `rename_realis_column` function from [Take-home Exercise 1](/Take-home_Exs/Ex1/Take-home_Ex1#importing-the-datasets).
 
 For each dataset, we will also align the corresponding quarter in the `QUARTER` column.
 
@@ -207,6 +207,7 @@ median2024 = median(realis_2024q1$TRANSACTED_PRICE)
 
 ```{r}
 #| code-fold: true
+#| code-summary: "Show the code"
 ggplot(realis,
        aes(
          y = TRANSACTED_PRICE,
@@ -279,8 +280,7 @@ ggplot(realis,
     text = element_text(family = "Roboto Condensed"),
     plot.title = element_text(face = "bold"),
     plot.subtitle = element_markdown(color = "grey50", size = rel(0.9)),
-    axis.line.x = element_line(),
-    axis.title.x = element_blank()
+    axis.line.x = element_line()
   )
 ```
 
@@ -295,13 +295,13 @@ Lastly, the title and subtitle provides a story for the visualization to help th
 
 ### Points for improvement
 
-While the makeover made the visualization more aesthetic further improvements can be made:
+While the makeover made the visualization more aesthetic, further improvements can be made:
 
 -   Free up more space on the right by moving the legend to inside the plot. This will help expand the plot horizontally.
 
--   Make the x-axis labels a bit bigger. As we removed the title, *Property Type*, the balance of the text sizes between the x and y axes seem off. A larger text will also make it easier to read.
+-   Adjust the x-axis texts. The labels are small and may be challenging for readers to read. As *Property Type* is a core part of the visualization, the legibility must be improved.
 
--   Reference lines are hard to see when overlapping with boxplots. It is hard to compare with the reference lines especially for `Apartment` and `Condominium` as the color of the reference lines are the same as the fill.
+-   Reference lines are hard to see when overlapping with boxplots. It is hard to compare with the reference lines especially for `Apartment` and `Condominium` as the color of the reference lines are the same as the fill. Consider changing the color of the reference lines.
 
 -   Add axis line and ticks to y-axis as it is a continuous value
 
@@ -314,14 +314,13 @@ From the points of improvement of the initial makeover, we will do the following
 
 -   Move the legend to inside the plot
 
--   Increase size of x-axis labels
-
--   Adjust y-axis style and labels
+-   Adjust axis styles and labels
 
 -   Tweak the presentation of the reference lines
 
 ```{r}
 #| code-fold: true
+#| code-summary: "Show the code"
 ggplot(realis,
        aes(
          y = TRANSACTED_PRICE,
@@ -396,10 +395,9 @@ ggplot(realis,
     text = element_text(family = "Roboto Condensed"),
     plot.title = element_text(face = "bold"),
     plot.subtitle = element_markdown(color = "grey50", size = rel(0.9)),
-    axis.line.x = element_line(),
-    axis.title.x = element_blank(),
-    axis.text.x = element_text(size = rel(1.2)),
-    axis.line.y = element_line(),
+    axis.line = element_line(),
+    axis.title = element_text(face = "bold", size=rel(1.1)),
+    axis.text = element_text(size = rel(0.9)),
     axis.ticks.y = element_line(),
     # Render legend inside the plot
     legend.position = "inside",
@@ -415,9 +413,9 @@ ggplot(realis,
 
 In this iteration, we maximized the available space by expanding the right side of the x-axis further, which now holds the legend and annotations for the reference lines. Doing this also ensures that no important information get covered by the annotations.
 
-Next, the colors of the reference lines are changed to a different color than the fills with the labels added to the end of the line so readers won't be confused with the colors in our legend.
+Next, the colors of the reference lines were changed to a different color than the fills, with labels added to the end of the line so readers won't need to refer to the legend to identify what the line is for.
 
-Lastly, we did tweaks on the y-axis to have smaller breaks to help readers gauge the log scale better. Aesthetically, this is worse as the axis labels do not look equidistant. However, this helps a lot in clarity.
+Lastly, we did tweaks on the axis to improve legibility by increasing the font size. The y-axis now has smaller breaks to help readers gauge the log scale better. Aesthetically, this is worse as the axis labels do not look equidistant. However, this helps a lot in clarity.
 
 ### Points for improvement
 
@@ -425,32 +423,54 @@ In our subtitle, we have this excerpt from the original write-up:
 
 > Overall prices have increased by **3.7%** from \$1.63M to \$1.69M. However, the price variability for all property types have decreased, with fewer outliers present.
 
-Now that we expanded the y-axis, we can see that this is not necessarily true. Hence, we must update this to prevent confusion.
+Now that we expanded the y-axis, we can see that this is not necessarily true. The box and whiskers are longer in 2024 than 2023 for *Condominium* and *Semi-Detached House*. Hence, we must update this to prevent confusion.
 
-Instead, we can emphasize the point that Landed properties all sold above the market median.
+Instead, we can emphasize the observation that Landed properties all sold above the market median.
+
+Lastly, the text size of our plot title and subtitles must be increased as well for legibility and make adjustments accordingly after we increased the font sizes in other parts of the plot.
 :::
 
 ## 4.3 Final Iteration
 
 To emphasize that Landed properties sell above the the median price, we will do the following:
 
--   Rearrange x-axis to put landed property types on 1 side of the plot
+-   Rearrange x-axis to put landed property types to 1 side of the plot
 
--   Add annotation that they sell above market median.
+-   Add annotation that landed property types sold above market median.
+
+-   Adjust text for legibility
 
 ```{r}
 #| code-fold: true
-ggplot(realis,
-       aes(
-         y = TRANSACTED_PRICE,
-         x = factor(PROPERTY_TYPE, levels = c("Detached House", "Semi-Detached House", "Terrace House", "Condominium", "Apartment", "Executive Condominium")),
-         fill = QUARTER,
-         color = QUARTER
-       )) +
+#| code-summary: "Show the code"
+final_viz <- ggplot(realis,
+                    aes(
+                      y = TRANSACTED_PRICE,
+                      x = factor(
+                        PROPERTY_TYPE,
+                        levels = c(
+                          "Detached House",
+                          "Semi-Detached House",
+                          "Terrace House",
+                          "Condominium",
+                          "Apartment",
+                          "Executive Condominium"
+                        )
+                      ),
+                      fill = QUARTER,
+                      color = QUARTER
+                    )) +
   
   # Annotate that all landed properties sold above market median
-  annotate("rect", xmin = 0.5, xmax = 3.5, ymin = 0.5e6, ymax = 100e6,
-           alpha = 0.1,fill = "blue") +
+  annotate(
+    "rect",
+    xmin = 0.5,
+    xmax = 3.5,
+    ymin = 0.5e6,
+    ymax = 100e6,
+    alpha = 0.1,
+    fill = "blue"
+  ) +
   annotate(
     "richtext",
     label = "Landed properties sold for<br/>above market median<br/>prices in 2024Q1.",
@@ -477,9 +497,11 @@ ggplot(realis,
   ) +
   
   # 2023 Median reference line
-  geom_hline(yintercept = median2023,
-             color = "darkgoldenrod4",
-             linetype = "dashed") +
+  geom_hline(
+    yintercept = median2023,
+    color = "darkgoldenrod4",
+    linetype = "dashed"
+  ) +
   annotate(
     "richtext",
     label = paste0("2023Q1 Median<br/>**$", round(median2023 / 1e6, 2), "M**"),
@@ -509,9 +531,11 @@ ggplot(realis,
   scale_color_manual(values = c("grey60", "blue")) +
   
   # Format axes
-  scale_y_log10(limits = c(0.5e6, 100e6),
-                labels = number_format(scale = 1e-6, suffix = "M"),
-                n.breaks = 9) +
+  scale_y_log10(
+    limits = c(0.5e6, 100e6),
+    labels = number_format(scale = 1e-6, suffix = "M"),
+    n.breaks = 9
+  ) +
   # Add more space to the right side for the reference line annotations and legend
   scale_x_discrete(labels = wrap_format(10), expand = expansion(add = c(0.6, 1.4))) +
   labs(x = "Property Type",
@@ -521,31 +545,69 @@ ggplot(realis,
   # Plot styles
   theme_minimal() +
   plot_annotation(title = "Transaction Prices by Property Type for 2023Q1 & 2024Q1",
-                  subtitle = "Overall prices have increased by <span style='color:darkgreen;'>**3.7%**</span> from **$1.63M** to **1.69M**. **Detached Houses** remain the most expensive property type,<br/>while **Executive Condominiums** are still the cheapest.") &
+                  subtitle = "Overall prices have increased by <span style='color:darkgreen;'>**3.7%**</span> from **$1.63M** to **1.69M**. **Detached Houses** remain the most<br />expensive property type, while **Executive Condominiums** are still the cheapest.") &
   theme(
     text = element_text(family = "Roboto Condensed"),
-    plot.title = element_text(face = "bold"),
-    plot.subtitle = element_markdown(color = "grey50", size = rel(0.9)),
-    axis.line.x = element_line(),
-    axis.title.x = element_blank(),
-    axis.text.x = element_text(size = rel(1.2)),
-    axis.line.y = element_line(),
+    plot.title = element_text(face = "bold", size = rel(1.4)),
+    plot.subtitle = element_markdown(color = "grey50"),
+    axis.line = element_line(),
+    axis.title = element_text(face = "bold", size = rel(1.1)),
+    axis.text = element_text(size = rel(0.9)),
     axis.ticks.y = element_line(),
     # Render legend inside the plot
     legend.position = "inside",
     legend.position.inside = c(1, 0.85),
     legend.justification = "right",
     legend.location = "plot",
-    legend.box.background = element_rect()
+    legend.box.background = element_rect(),
+    legend.title = element_text(face = "bold", size = rel(1.1)),
+    legend.text = element_text(size = rel(0.9))
   )
+
+final_viz
 ```
+
+We adjusted the texts for the core visualization elements so that they are more legible.
+
+The landed property types were clustered in one side of the map, with annotation added so the observation that they sold above market median is can easily be seen and interpreted. Another added benefit of this is that property types whose prices are closer to the median are closer to the reference line labels, which makes it easier to do a closer comparison and referencing.
+
+We also changed the focus of the subtitle from price variability, which was found to be misleading once we could see the price ranges more clearly.
+
+This ends the makeover as we have already greatly improved the clarity and aesthetics.
 
 # 5 Summary
 
-# 6 References
+## 5.1 Makeover results
 
-<https://isss608-ay2023-24apr.netlify.app/lesson/lesson02/lesson02-designing%20graphs%20to%20enlighten#/title-slide>
+::: panel-tabset
+### Before
 
-[Exercise](Take-home_Exs/Ex1/Take-home_Ex1)
+![](images/visualization_for_critique.png){fig-align="center"}
 
-<https://www.propertygiant.com/blog/everything-you-need-to-know-about-strata-landed-houses-and-the-available-strata-landed-projects-in-singapore>
+### After
+
+```{r}
+#| echo: false
+final_viz
+```
+:::
+
+::: callout-tip
+### Insights
+
+The makeover significantly enhanced the visualization's effectiveness in comparing prices by property type between 2023Q1 and 2024Q1. With adjacent box plots, price comparisons from one year to the other became much easier.
+
+Additionally, scaling the y-axis from linear to log improved clarity, especially as properties sold for a wide range of prices. We can observe that *Semi-Detached Houses* and *Condominiums* show increased variability in 2024Q1, as indicated by longer box and whiskers. This is contrary to the insights from the original visualization, which indicated that prices are less variable for all property types.
+
+Furthermore, annotations highlighted notable observations, such as all landed properties sold in 2024Q1 for higher than the market median. Additionally, the switch to a white background enhanced the overall aesthetic of the visualization. This allowed for more flexible styling compared to the original's light blue *economist* theme, providing a more visually appealing and informative representation of the data.
+:::
+
+# References
+
+Kam, Tin Seong. (2024). Lesson 2: Designing Graphs to Enlighten. *ISSS608 AY2023-24 April Term*. <https://isss608-ay2023-24apr.netlify.app/lesson/lesson02/lesson02-designing%20graphs%20to%20enlighten>
+
+Loh, Alicia. (2024, April 24). Take-home Exercise 1 - Creating Data Visualisation Beyond Default. *ISSS608*. <https://lnealicia-isss608.netlify.app/take-home_ex/take-home_ex01/take-home_ex01>
+
+Paas, Kristine Joy. (2024, April 26). Take-home Exercise 1: Singapore Private Residential Property Market for 2024 Q1. *ISSS608*. <https://isss608-kjcpaas.netlify.app/take-home_exs/ex1/take-home_ex1>
+
+PropertyGiant Singapore. (2021, August 9). Everything you need to know about strata landed houses and the available strata landed projects in Singapore. *PropertyGiant*.<https://www.propertygiant.com/blog/everything-you-need-to-know-about-strata-landed-houses-and-the-available-strata-landed-projects-in-singapore>
