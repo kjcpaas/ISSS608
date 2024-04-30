@@ -602,6 +602,14 @@ Additionally, scaling the y-axis from linear to log improved clarity, especially
 Furthermore, annotations highlighted notable observations, such as all landed properties sold in 2024Q1 for higher than the market median. Additionally, the switch to a white background enhanced the overall aesthetic of the visualization. This allowed for more flexible styling compared to the original's light blue *economist* theme, providing a more visually appealing and informative representation of the data.
 :::
 
+## 5.2 Reflections
+
+Doing this exercise helped me become more critical when viewing data visualizations. With the learning from this course, I was able to know what to look out for when looking at data presented (e.g. what's missing, what it really means, etc.)
+
+I also realized that although I was very detailed in my work for [Take-home Exercise 1](https://isss608-kjcpaas.netlify.app/take-home_exs/ex1/take-home_ex1), I focused more on the **aesthetics** of the visualization more than the clarity as I enjoyed playing around with ggplot themes.
+
+This exercise reminded me to balance the clarity with aesthetics and that data visualizations are for enlightenment, not entertaining.
+
 # References
 
 Kam, Tin Seong. (2024). Lesson 2: Designing Graphs to Enlighten. *ISSS608 AY2023-24 April Term*. <https://isss608-ay2023-24apr.netlify.app/lesson/lesson02/lesson02-designing%20graphs%20to%20enlighten>

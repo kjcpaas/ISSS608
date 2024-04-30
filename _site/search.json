@@ -712,5 +712,12 @@
     "title": "Take-home Exercise 2: DataVis Makeover",
     "section": "5.1 Makeover results",
     "text": "5.1 Makeover results\n\nBeforeAfter\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nInsights\n\n\n\nThe makeover significantly enhanced the visualization’s effectiveness in comparing prices by property type between 2023Q1 and 2024Q1. With adjacent box plots, price comparisons from one year to the other became much easier.\nAdditionally, scaling the y-axis from linear to log improved clarity, especially as properties sold for a wide range of prices. We can observe that Semi-Detached Houses and Condominiums show increased variability in 2024Q1, as indicated by longer box and whiskers. This is contrary to the insights from the original visualization, which indicated that prices are less variable for all property types.\nFurthermore, annotations highlighted notable observations, such as all landed properties sold in 2024Q1 for higher than the market median. Additionally, the switch to a white background enhanced the overall aesthetic of the visualization. This allowed for more flexible styling compared to the original’s light blue economist theme, providing a more visually appealing and informative representation of the data."
+  },
+  {
+    "objectID": "Take-home_Exs/Ex2/Take-home_Ex2.html#reflections",
+    "href": "Take-home_Exs/Ex2/Take-home_Ex2.html#reflections",
+    "title": "Take-home Exercise 2: DataVis Makeover",
+    "section": "5.2 Reflections",
+    "text": "5.2 Reflections\nDoing this exercise helped me become more critical when viewing data visualizations. With the learning from this course, I was able to know what to look out for when looking at data presented (e.g. what’s missing, what it really means, etc.)\nI also realized that although I was very detailed in my work for Take-home Exercise 1, I focused more on the aesthetics of the visualization more than the clarity as I enjoyed playing around with ggplot themes.\nThis exercise reminded me to balance the clarity with aesthetics and that data visualizations are for enlightenment, not entertaining."
   }
 ]
