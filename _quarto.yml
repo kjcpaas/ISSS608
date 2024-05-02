@@ -15,7 +15,7 @@ website:
             href: Hands-on_Exs/Ex3A/Hands-on_Ex3A.qmd
           - text: "3B: Programming Animated Statistical Graphics with R"
             href: Hands-on_Exs/Ex3B/Hands-on_Ex3B.qmd
-          - text: "4A: Visualizing Distribution"
+          - text: "4A: Visualizing Statistical Analysis"
             href: Hands-on_Exs/Ex4A/Hands-on_Ex4A.qmd
       - text: In-class Exercises
         menu:

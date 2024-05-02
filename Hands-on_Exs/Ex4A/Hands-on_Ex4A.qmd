@@ -1,7 +1,7 @@
 ---
-title: "Hands-on Exercise 4A: Visualizing Distribution"
+title: "Hands-on Exercise 4A: Visualizing Statistical Analysis"
 author: "Kristine Joy Paas"
-date: "28 April 2024"
+date: "3 May 2024"
 date-modified: "last-modified"
 format: html
 execute: 
@@ -13,11 +13,11 @@ execute:
 
 # 1 Overview
 
-This hands-on exercise covers .
+This hands-on exercise covers [Chapter 10: Visual Statistical Analysis](https://r4va.netlify.app/chap10).
 
 I learned about the following:
 
--   Creating interactive data visualizations
+-   creating visual graphics with rich statistical information
 
 # 2 Getting Started
 
@@ -25,21 +25,17 @@ I learned about the following:
 
 For this exercise we will use the following R packages:
 
--   [**ggiraph**](https://davidgohel.github.io/ggiraph/) for making ‘ggplot’ graphics interactive.
-
--   [**plotly**](https://plotly.com/r/), R library for plotting interactive statistical graphs.
-
--   [**DT**](https://rstudio.github.io/DT/) provides an R interface to the JavaScript library [DataTables](https://datatables.net/) that create interactive table on html page.
-
 -   [**tidyverse**](https://www.tidyverse.org/), a family of modern R packages specially designed to support data science, analysis and communication task including creating static statistical graphs.
 
--   [**patchwork**](https://patchwork.data-imaginist.com/) for combining multiple ggplot2 graphs into one figure.
+-   [**ggstatsplot**](https://indrajeetpatil.github.io/ggstatsplot/), extension of [**ggplot2**](https://ggplot2.tidyverse.org/) package for creating graphics with details from statistical tests included in the information-rich plots themselves.
+
+-   [**rstantools**](https://cran.r-project.org/package=rstantools), interfaces with [Stan](https://mc-stan.org/) for statistical modeling and high-performance statistical computation
 
 ```{r}
 #| label: setup
-pacman::p_load(ggiraph, plotly, 
-               DT, patchwork,
-               tidyverse)
+pacman::p_load(tidyverse, ggstatsplot, rstantools)
+# Set seed
+set.seed(1234)
 ```
 
 ## 2.2 Loading the data
@@ -57,382 +53,248 @@ There are a total of seven attributes in the exam_data tibble data frame. Four o
 
 -   The continuous attributes are: `MATHS`, `ENGLISH` and `SCIENCE`.
 
-# 3 Interactive Visualizations using ggiraph
+# 3 Statistical Functions with ggplot2
 
-[ggiraph](https://davidgohel.github.io/ggiraph/) is an htmlwidget and a ggplot2 extension. It allows ggplot graphics to be interactive.
+## 3.1 One-sample test: gghistostats() method
 
-Interactive is made with [**ggplot geometries**](https://davidgohel.github.io/ggiraph/reference/#section-interactive-geometries) that can understand three arguments:
-
--   **Tooltip**: a column of data-sets that contain tooltips to be displayed when the mouse is over elements.
-
--   **Onclick**: a column of data-sets that contain a JavaScript function to be executed when elements are clicked.
-
--   **Data_id**: a column of data-sets that contain an id to be associated with elements.
-
-If it used within a shiny application, elements associated with an id (data_id) can be selected and manipulated on client and server sides.
-
-## 3.1 Tooltips
-
-### 3.1.2 Adding tooltips
-
-Instead of `geom_dotplot()` provided by `ggplot2`, we will use `ggiraph`'s `geom_dotplot_interactive()` with the `tooltip` aesthetic to add the label in the content.
-
-After defining the plot, we will pass this to [`girafe()`](https://davidgohel.github.io/ggiraph/reference/girafe.html) to generate the interactive element in our webpage.
+In the code chunk below, [*gghistostats()*](https://indrajeetpatil.github.io/ggstatsplot/reference/gghistostats.html) is used to to build an visual of one-sample test on English scores.
 
 ```{r}
-p <- ggplot(data=exam_data, 
-       aes(x = MATHS)) +
-  geom_dotplot_interactive(
-    aes(tooltip = ID),
-    stackgroups = TRUE, 
-    binwidth = 1, 
-    method = "histodot") +
-  scale_y_continuous(NULL, 
-                     breaks = NULL)
-girafe(
-  ggobj = p,
-  width_svg = 6,
-  height_svg = 6*0.618
+gghistostats(
+  data = exam_data,
+  x = ENGLISH,
+  type = "bayes",
+  test.value = 60,
+  xlab = "English scores"
 )
 ```
 
-Hovering on a dot in a plot shows the `ID`, which we set as the tooltip content.
+The default information included are: - statistical details - Bayes Factor - sample sizes - distribution summary.
 
-### 3.1.2 Adding multiple information in tooltip
+## 3.2 Unpacking the Bayes Factor
 
-One way we can add multiple information in tooltip is by setting `tooltip` value in dataframe with the data to be presented.
+-   A Bayes factor is the ratio of the likelihood of one particular hypothesis to the likelihood of another. It can be interpreted as a measure of the strength of evidence in favor of one theory among two competing theories.
+
+-   That’s because the Bayes factor gives us a way to evaluate the data in favor of a null hypothesis, and to use external information to do so. It tells us what the weight of the evidence is in favor of a given hypothesis.
+
+-   When we are comparing two hypotheses, H1 (the alternate hypothesis) and H0 (the null hypothesis), the Bayes Factor is often written as B10. It can be defined mathematically as
+
+$$
+\frac{likelihood\ of\ data\ given H_1}{likelihood\ of\ data\ given H_0} = \frac{P(D|H_1)}{P(D|H_0)}
+$$
+
+-   The [**Schwarz criterion**](https://www.statisticshowto.com/bayesian-information-criterion/) is one of the easiest ways to calculate rough approximation of the Bayes Factor.
+
+## 3.3 How to interpret Bayes Factor
+
+A **Bayes Factor** can be any positive number. One of the most common interpretations is this one—first proposed by Harold Jeffereys (1961) and slightly modified by [Lee and Wagenmakers](https://www-tandfonline-com.libproxy.smu.edu.sg/doi/pdf/10.1080/00031305.1999.10474443?needAccess=true) in 2013:
+
+![](images/clipboard-2856455611.png){fig-align="center" width="483"}
+
+## 3.4 Two-sample mean test: ggbetweenstats()
+
+In the code chunk below, [*ggbetweenstats()*](https://indrajeetpatil.github.io/ggstatsplot/reference/ggbetweenstats.html) is used to build a visual for two-sample mean test of Maths scores by gender.
 
 ```{r}
-exam_data$tooltip <- c(paste0(     
-  "Name = ", exam_data$ID,         
-  "\n Class = ", exam_data$CLASS)) 
-
-p <- ggplot(data=exam_data, 
-       aes(x = MATHS)) +
-  geom_dotplot_interactive(
-    aes(tooltip = exam_data$tooltip), 
-    stackgroups = TRUE,
-    binwidth = 1,
-    method = "histodot") +
-  scale_y_continuous(NULL,               
-                     breaks = NULL)
-girafe(
-  ggobj = p,
-  width_svg = 8,
-  height_svg = 8*0.618
+ggbetweenstats(
+  data = exam_data,
+  x = GENDER, 
+  y = MATHS,
+  type = "np",
+  messages = FALSE
 )
 ```
 
-The tooltip now has the student Name and Class when hovering on the dots.
+The default information included are: - statistical details - Bayes Factor - sample sizes - distribution summary
 
-### 3.1.3 Styling the tooltip
+## 3.5 Oneway ANOVA Test: ggbetweenstats() method
 
-The tooltip can be styled using CSS as the rendering is done on the webpage, and no processing of style by `ggplot2`. This style is passed to the `girafe()` function.
-
-For example, we can change the background to white, instead of the default black. We will also change the font to `Arial`.
+In the code chunk below, [*ggbetweenstats()*](https://indrajeetpatil.github.io/ggstatsplot/reference/ggbetweenstats.html) is used to build a visual for One-way ANOVA test on English score by race.
 
 ```{r}
-tooltip_css <- "background-color:white; #<<
-font-style:bold; color:black; font-family: Arial" #<<
-
-p <- ggplot(data=exam_data, 
-       aes(x = MATHS)) +
-  geom_dotplot_interactive(              
-    aes(tooltip = ID),                   
-    stackgroups = TRUE,                  
-    binwidth = 1,                        
-    method = "histodot") +               
-  scale_y_continuous(NULL,               
-                     breaks = NULL)
-girafe(                                  
-  ggobj = p,                             
-  width_svg = 6,                         
-  height_svg = 6*0.618,
-  options = list(    #<<
-    opts_tooltip(    #<<
-      css = tooltip_css)) #<<
+ggbetweenstats(
+  data = exam_data,
+  x = RACE, 
+  y = ENGLISH,
+  type = "p",
+  mean.ci = TRUE, 
+  pairwise.comparisons = TRUE, 
+  pairwise.display = "s",
+  p.adjust.method = "fdr",
+  messages = FALSE
 )
 ```
 
-## 3.2 Hover
+-   “ns” → only non-significant
 
-### 3.2.1 Adding hover effect
+-   “s” → only significant
 
-We can add hover effect by adding `data_id` aesthetic to `geom_dotplot_interactive()`.
+-   “all” → everything
+
+### 3.5.1 Summary of tests
+
+![](images/clipboard-3507947308.png){fig-align="center" width="494"}
+
+![](images/clipboard-2536960366.png){fig-align="center" width="490"}
+
+![](images/clipboard-3952632935.png){fig-align="center" width="488"}
+
+## 3.6 Significant Test of Correlation: ggscatterstats()
+
+In the code chunk below, [*ggscatterstats()*](https://indrajeetpatil.github.io/ggstatsplot/reference/ggscatterstats.html) is used to build a visual for Significant Test of Correlation between Maths scores and English scores.
 
 ```{r}
-p <- ggplot(data=exam_data, 
-       aes(x = MATHS)) +
-  geom_dotplot_interactive(           
-    aes(data_id = CLASS),             
-    stackgroups = TRUE,               
-    binwidth = 1,                        
-    method = "histodot") +               
-  scale_y_continuous(NULL,               
-                     breaks = NULL)
-girafe(                                  
-  ggobj = p,                             
-  width_svg = 6,                         
-  height_svg = 6*0.618                      
+ggscatterstats(
+  data = exam_data,
+  x = MATHS,
+  y = ENGLISH,
+  marginal = FALSE,
+  )
+```
+
+## 3.7 Significant Test of Association (Depedence) : ggbarstats() methods
+
+In the code chunk below, the Maths scores is binned into a 4-class variable by using [*cut()*](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/cut).
+
+```{r}
+exam_binned <- exam_data %>% 
+  mutate(MATHS_bins = 
+           cut(MATHS, 
+               breaks = c(0,60,75,85,100))
 )
 ```
 
-Hovering on a dot show the other dots with the same value in `CLASS`. This is useful for highlight plot elements related to the data.
-
-### 3.2.2 Styling hover effect
-
-We can also use CSS to style the hover effect. The styles are passed to the `girafe()` function.
-
-`opts_hover` - style of the hovered and related data
-
-`opts_hover_inv` - style of unrelated data
+In this code chunk below [*ggbarstats()*](https://indrajeetpatil.github.io/ggstatsplot/reference/ggbarstats.html) is used to build a visual for Significant Test of Association.
 
 ```{r}
-p <- ggplot(data=exam_data, 
-       aes(x = MATHS)) +
-  geom_dotplot_interactive(              
-    aes(data_id = CLASS),              
-    stackgroups = TRUE,                  
-    binwidth = 1,                        
-    method = "histodot") +               
-  scale_y_continuous(NULL,               
-                     breaks = NULL)
-girafe(                                  
-  ggobj = p,                             
-  width_svg = 6,                         
-  height_svg = 6*0.618,
-  options = list(                        
-    opts_hover(css = "fill: blue;"),  
-    opts_hover_inv(css = "opacity:0.4;") 
-  )                                        
-)
+ggbarstats(exam_binned, 
+           x = MATHS_bins, 
+           y = GENDER)
 ```
 
-### 3.2.3 Combining tooltip and hover
+# 4 Setting up for Visualizations
 
-We can also combine both tooltips and hover effect to highlight related data and provide guiding text on the tootltip.
+From this section, we will learn how to visualise model diagnostic and model parameters by using parameters package.
 
-This can be done by setting both `tooltip` and `data_id` aesthetics on `geom_dotplot_interactive()`.
+-   Toyota Corolla case study will be used. The purpose of study is to build a model to discover factors affecting prices of used-cars by taking into consideration a set of explanatory variables.
+
+## 4.1 Loading the required packages
+
+We will load additional packages:
 
 ```{r}
-p <- ggplot(data=exam_data, 
-       aes(x = MATHS)) +
-  geom_dotplot_interactive(              
-    aes(tooltip = paste("Class:", CLASS), 
-        data_id = CLASS),              
-    stackgroups = TRUE,                  
-    binwidth = 1,                        
-    method = "histodot") +               
-  scale_y_continuous(NULL,               
-                     breaks = NULL)
-girafe(                                  
-  ggobj = p,                             
-  width_svg = 6,                         
-  height_svg = 6*0.618,
-  options = list(                        
-    opts_tooltip(css = "background-color:white; font-style:bold; color:black; font-family: Arial"),
-    opts_hover(css = "fill: blue;"),  
-    opts_hover_inv(css = "opacity:0.4;") 
-  )                                        
-)
+pacman::p_load(readxl, performance, parameters, see)
 ```
 
-With this, the tooltip shows the class and highlights the other dots associated with the class.
+## 4.2 Importing Excel file: readxl methods
 
-## 3.3 onclick() effect
-
-This provides functionality to run Javascript code when clicking on a plot element.
+In the code chunk below, [*read_xls()*](https://readxl.tidyverse.org/reference/read_excel.html) of [**readxl**](https://readxl.tidyverse.org/) package is used to import the data worksheet of `ToyotaCorolla.xls` workbook into R.
 
 ```{r}
-exam_data$onclick <- sprintf("window.open(\"%s%s\")",
-"https://www.moe.gov.sg/schoolfinder?journey=Primary%20school",
-as.character(exam_data$ID))
-
-p <- ggplot(data=exam_data, 
-       aes(x = MATHS)) +
-  geom_dotplot_interactive(              
-    aes(onclick = onclick),              
-    stackgroups = TRUE,                  
-    binwidth = 1,                        
-    method = "histodot") +               
-  scale_y_continuous(NULL,               
-                     breaks = NULL)
-girafe(                                  
-  ggobj = p,                             
-  width_svg = 6,                         
-  height_svg = 6*0.618)
+car_resale <- read_xls("data/ToyotaCorolla.xls", 
+                       "data")
+glimpse(car_resale)
 ```
 
-In this example, clicking a dot opens MOE page of the student. This is triggered by the `window.open()` javascript.
+# 5 Model Visualization
+
+## 5.1 Multiple Regression Model using lm()
+
+The code chunk below is used to calibrate a multiple linear regression model by using *lm()* of Base Stats of R.
+
+```{r}
+model <- lm(Price ~ Age_08_04 + Mfg_Year + KM + 
+              Weight + Guarantee_Period, data = car_resale)
+model
+```
+
+## 5.2 Model Diagnostic: checking for multicolinearity
+
+In the code chunk, [*check_collinearity()*](https://easystats.github.io/performance/reference/check_collinearity.html) of [**performance**](https://easystats.github.io/performance/) package.
+
+```{r}
+check_collinearity(model)
+```
+
+We can also plot the function result
+
+```{r}
+#| eval: false
+check_c <- check_collinearity(model)
+plot(check_c)
+```
 
 ::: {.callout-important appearance="minimal"}
-### Preventing XSS attacks
-
-When running javascript functions, using data not generated by our system, it is important to escape the data for Javascript safety to prevent [Cross-Site Scripting](https://owasp.org/www-community/attacks/xss/) attacks.
-
-One example is if `CLASS` has some values such as `;stealYoInfo();`, it can potentially make users vulnerable. Even if there is no malicious intent, if some values have text that can affect Javascript parsing, the interactive plot may not work as expected.
-
-This particular dataset and Singapore Open Data datasets are trusted so there is less concern for this happening. However, some caution is needed when using untrusted sources.
-
-I will do some tests at a later time to check if `ggiraph` is vulnerable to such attacks so that I can apply measures to prevent XSS.
+Package 'see' is not installing permanently so this does not work
 :::
 
-## 3.4 Coordinating multiple views
+## 5.3 Model Diagnostic: checking normality assumption
 
-We can pass the patchwork plot to `girafe()` to coordinate the interactions of the two plots.
-
-```{r}
-p1 <- ggplot(data=exam_data, 
-       aes(x = MATHS)) +
-  geom_dotplot_interactive(              
-    aes(data_id = ID),              
-    stackgroups = TRUE,                  
-    binwidth = 1,                        
-    method = "histodot") +  
-  coord_cartesian(xlim=c(0,100)) + 
-  scale_y_continuous(NULL,               
-                     breaks = NULL)
-
-p2 <- ggplot(data=exam_data, 
-       aes(x = ENGLISH)) +
-  geom_dotplot_interactive(              
-    aes(data_id = ID),              
-    stackgroups = TRUE,                  
-    binwidth = 1,                        
-    method = "histodot") + 
-  coord_cartesian(xlim=c(0,100)) + 
-  scale_y_continuous(NULL,               
-                     breaks = NULL)
-
-girafe(code = print(p1 + p2), 
-       width_svg = 6,
-       height_svg = 3,
-       options = list(
-         opts_hover(css = "fill: #202020;"),
-         opts_hover_inv(css = "opacity:0.2;")
-         )
-       )
-```
-
-In the example above, hovering a dot in the Maths plot, highlights the corresponding dot in English.
-
-This is useful for seeing how the student scored in both subjects.
-
-# 4 Interactive Visualizations Use plotly
-
-Plotly’s R graphing library create interactive web graphics from **ggplot2** graphs and/or a custom interface to the (MIT-licensed) JavaScript library [**plotly.js**](https://plotly.com/javascript/) inspired by the grammar of graphics. Different from other plotly platform, plot.R is free and open source.
-
-`plotly` converts the R plotting code to JS code for plotting by [**plotly.js**](https://plotly.com/javascript/)**.**
-
-There are two ways to create interactive graph by using plotly, they are:
-
--   by using *plot_ly()*, and
-
--   by using *ggplotly()*
-
-## 4.1 Creating an interactive scatterplot
+In the code chunk, [*check_normality()*](https://easystats.github.io/performance/reference/check_normality.html) of [**performance**](https://easystats.github.io/performance/) package.
 
 ```{r}
-plot_ly(data = exam_data, 
-             x = ~MATHS, 
-             y = ~ENGLISH)
+model1 <- lm(Price ~ Age_08_04 + KM + 
+              Weight + Guarantee_Period, data = car_resale)
 ```
-
-With a few lines of code, it generated an interactive plot with tooltips and with varioous functions like zoom and pan.
-
-## 4.2 Adding color to plotly visualization
 
 ```{r}
-plot_ly(data = exam_data, 
-             x = ~MATHS, 
-             y = ~ENGLISH,
-             color = ~RACE)
+check_n <- check_normality(model1)
 ```
-
-Adding the color also added an interactive legend, and each race can clicked to hide and unhide dots from the plot.
-
-## 4.3 Creating an interactive scatetrplot using ggplotly
-
-We can make an existing ggplot visualization interactive by passing the plot using `ggplotly()`
 
 ```{r}
-p <- ggplot(data=exam_data, 
-            aes(x = MATHS,
-                y = ENGLISH)) +
-  geom_point(size=1) +
-  coord_cartesian(xlim=c(0,100),
-                  ylim=c(0,100))
-ggplotly(p)
+#| eval: true
+plot(check_n)
 ```
 
-## 4.4 Coordinating multiple views
+::: {.callout-important appearance="minimal"}
+Package 'see' is not installing permanently so this does not work
+:::
 
-Coordinating views is done by the following:
+## 5.4 Model Diagnostic: Check model for homogeneity of variances
 
--   [`highlight_key()`](https://www.rdocumentation.org/packages/plotly/versions/4.9.2/topics/highlight_key) of **plotly** package is used as shared data.
-
--   two scatterplots will be created by using ggplot2 functions.
-
--   lastly, [*subplot()*](https://plotly.com/r/subplots/) of **plotly** package is used to place them next to each other side-by-side. (similar to `patchwork`)
+In the code chunk, [*check_heteroscedasticity()*](https://easystats.github.io/performance/reference/check_heteroscedasticity.html) of [**performance**](https://easystats.github.io/performance/) package.
 
 ```{r}
-d <- highlight_key(exam_data)
-p1 <- ggplot(data=d, 
-            aes(x = MATHS,
-                y = ENGLISH)) +
-  geom_point(size=1) +
-  coord_cartesian(xlim=c(0,100),
-                  ylim=c(0,100))
-
-p2 <- ggplot(data=d, 
-            aes(x = MATHS,
-                y = SCIENCE)) +
-  geom_point(size=1) +
-  coord_cartesian(xlim=c(0,100),
-                  ylim=c(0,100))
-subplot(ggplotly(p1),
-        ggplotly(p2))
+check_h <- check_heteroscedasticity(model1)
 ```
-
-# 5 Interactive Data Visualizations using crosstalk
-
-[Crosstalk](https://rstudio.github.io/crosstalk/) is an add-on to the htmlwidgets package. It extends htmlwidgets with a set of classes, functions, and conventions for implementing cross-widget interactions (currently, linked brushing and filtering).
-
-## 5.1 Interactive Data Table: DT Package
-
-It is a wrapper of [DataTables](https://datatables.net/) Javascript library. Data objects in R can be rendered as HTML tables using the JavaScript library ‘DataTables’ (typically via R Markdown or Shiny).
 
 ```{r}
-DT::datatable(exam_data, class= "compact")
+plot(check_h)
 ```
 
-This provides interactive elements like pagination, search and sort with just 1 line of code!
+::: {.callout-important appearance="minimal"}
+Package 'see' is not installing permanently so this does not work
+:::
 
-## 5.2 Rendering plots with data table
+## 5.5 Model Diagnostic: Complete check
+
+We can also perform the complete by using [*check_model()*](https://easystats.github.io/performance/reference/check_model.html).
 
 ```{r}
-d <- highlight_key(exam_data) 
-p <- ggplot(d, 
-            aes(ENGLISH, 
-                MATHS)) + 
-  geom_point(size=1) +
-  coord_cartesian(xlim=c(0,100),
-                  ylim=c(0,100))
-
-gg <- highlight(ggplotly(p),        
-                "plotly_selected")  
-
-crosstalk::bscols(gg,               
-                  DT::datatable(d), 
-                  widths = 5)        
+check_model(model1)
 ```
 
-The scatterplot is rendered beside datatable.
+::: {.callout-important appearance="minimal"}
+Package 'see' is not installing permanently so this does not work
+:::
+
+## 5.6 Visualising Regression Parameters: see methods
+
+```{r}
+plot(parameters(model1))
+```
+
+## 5.7 Visualising Regression Parameters: ggcoefstats() methods
+
+In the code below, [*ggcoefstats()*](https://indrajeetpatil.github.io/ggstatsplot/reference/ggcoefstats.html) of ggstatsplot package to visualise the parameters of a regression model.
+
+```{r}
+ggcoefstats(model1, 
+            output = "plot")
+```
 
 # 6 Reflections
 
-In Take-Home Exercise 1, I was frustrated because I wanted to add interactive elements to my plot, which was beyond my capabilities then.
+It's great that there are functions to visualizing statistics as from the past exercises, it was such a chore to add even a simple reference line based on median/average, i.e., figure out how to do the stat, render it, annotate. What more for more advanced stats?
 
-Although the methods in this exercise were quite simple, I think generating more complex visualizations (e.g. raindrop plot) would be more complicated. However, this is still a great start to learn what I was missing.
-
-`ggplotly` offers a lot of features compared to `ggiraph` but the latter is enough for simple visualization (like adding tooltips to stacked bar graph). Although these interactive elements are great, they must not be overused as it can make the page heavy. Only use them when interaction is absolutely necessary.
+I think these functions are useful. However, [see](https://cran.r-project.org/web/packages/see/index.html) package does not install permanently on my machine so anything that uses `plot()` in this exercise did not render as expected.
