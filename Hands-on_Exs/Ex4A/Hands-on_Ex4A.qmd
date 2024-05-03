@@ -219,14 +219,9 @@ check_collinearity(model)
 We can also plot the function result
 
 ```{r}
-#| eval: false
 check_c <- check_collinearity(model)
 plot(check_c)
 ```
-
-::: {.callout-important appearance="minimal"}
-Package 'see' is not installing permanently so this does not work
-:::
 
 ## 5.3 Model Diagnostic: checking normality assumption
 
@@ -242,13 +237,8 @@ check_n <- check_normality(model1)
 ```
 
 ```{r}
-#| eval: true
 plot(check_n)
 ```
-
-::: {.callout-important appearance="minimal"}
-Package 'see' is not installing permanently so this does not work
-:::
 
 ## 5.4 Model Diagnostic: Check model for homogeneity of variances
 
@@ -262,10 +252,6 @@ check_h <- check_heteroscedasticity(model1)
 plot(check_h)
 ```
 
-::: {.callout-important appearance="minimal"}
-Package 'see' is not installing permanently so this does not work
-:::
-
 ## 5.5 Model Diagnostic: Complete check
 
 We can also perform the complete by using [*check_model()*](https://easystats.github.io/performance/reference/check_model.html).
@@ -273,10 +259,6 @@ We can also perform the complete by using [*check_model()*](https://easystats.gi
 ```{r}
 check_model(model1)
 ```
-
-::: {.callout-important appearance="minimal"}
-Package 'see' is not installing permanently so this does not work
-:::
 
 ## 5.6 Visualising Regression Parameters: see methods
 
@@ -297,4 +279,4 @@ ggcoefstats(model1,
 
 It's great that there are functions to visualizing statistics as from the past exercises, it was such a chore to add even a simple reference line based on median/average, i.e., figure out how to do the stat, render it, annotate. What more for more advanced stats?
 
-I think these functions are useful. However, [see](https://cran.r-project.org/web/packages/see/index.html) package does not install permanently on my machine so anything that uses `plot()` in this exercise did not render as expected.
+I ran into issues installing [see](https://easystats.github.io/see/) package in my first attempt (late in the night) to complete this exercise so I investigated the issue the next day when my mind is clearer. It turns out new version of R and RStudio were released yesterday which made my current installs incompatible with the new package versions. I shared my findings on <https://piazza.com/class/luiwwx5xp1e4ay/post/48>. I realized that some R packages may be backward incompatible.
