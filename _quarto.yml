@@ -17,6 +17,10 @@ website:
             href: Hands-on_Exs/Ex3B/Hands-on_Ex3B.qmd
           - text: "4A: Visualizing Statistical Analysis"
             href: Hands-on_Exs/Ex4A/Hands-on_Ex4A.qmd
+          - text: "4B: Visualizing Uncertainty"
+            href: Hands-on_Exs/Ex4B/Hands-on_Ex4B.qmd
+          - text: "4C: Building Funnel Plot with R"
+            href: Hands-on_Exs/Ex4C/Hands-on_Ex4C.qmd
       - text: In-class Exercises
         menu:
           - text: "1: Introduction to Visual Analytics"

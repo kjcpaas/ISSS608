@@ -32,14 +32,14 @@
     "href": "Hands-on_Exs/Ex3B/Hands-on_Ex3B.html#building-a-static-population-bubble-plot",
     "title": "Hands-on Exercise 3B: Programming Animated Statistical Graphics with R",
     "section": "3.1 Building a static population bubble plot",
-    "text": "3.1 Building a static population bubble plot\nWe will first plot a static bubble plot using geom_dots().\n\nggplot(globalPop, aes(x = Old, y = Young, \n                      size = Population, \n                      colour = Country)) +\n  geom_point(alpha = 0.7, \n             show.legend = FALSE) +\n  scale_colour_manual(values = country_colors) +\n  scale_size(range = c(2, 12)) +\n  labs(title = 'Year: {frame_time}', \n       x = '% Aged', \n       y = '% Young')\n\n\n\n\nThe title has Year: {frame time} as we will use the year plots as the frames in animation."
+    "text": "3.1 Building a static population bubble plot\nWe will first plot a static bubble plot using geom_dots().\n\nggplot(globalPop, aes(x = Old, y = Young, \n                      size = Population, \n                      colour = Country)) +\n  geom_point(alpha = 0.7, \n             show.legend = FALSE) +\n  scale_colour_manual(values = country_colors) +\n  scale_size(range = c(2, 12)) +\n  labs(title = 'Year: {frame_time}', \n       x = '% Aged', \n       y = '% Young')\n\n\n\n\n\n\n\n\nThe title has Year: {frame time} as we will use the year plots as the frames in animation."
   },
   {
     "objectID": "Hands-on_Exs/Ex3B/Hands-on_Ex3B.html#building-the-animated-bubble-plot",
     "href": "Hands-on_Exs/Ex3B/Hands-on_Ex3B.html#building-the-animated-bubble-plot",
     "title": "Hands-on Exercise 3B: Programming Animated Statistical Graphics with R",
     "section": "3.2 Building the animated bubble plot",
-    "text": "3.2 Building the animated bubble plot\nWe will now animate the plot by year by adding the following functions to the existing plot:\n\ntransition_time() of gganimate is used to create transition through distinct states in time (i.e. Year).\nease_aes() is used to control easing of aesthetics. The default is linear. Other methods are: quadratic, cubic, quartic, quintic, sine, circular, exponential, elastic, back, and bounce.\n\n\nggplot(globalPop, aes(x = Old, y = Young, \n                      size = Population, \n                      colour = Country)) +\n  geom_point(alpha = 0.7, \n             show.legend = FALSE) +\n  scale_colour_manual(values = country_colors) +\n  scale_size(range = c(2, 12)) +\n  labs(title = 'Year: {frame_time}', \n       x = '% Aged', \n       y = '% Young') +\n  transition_time(Year) +       \n  ease_aes('linear')\n\n\n\n\nThis generates a gif image of the animation."
+    "text": "3.2 Building the animated bubble plot\nWe will now animate the plot by year by adding the following functions to the existing plot:\n\ntransition_time() of gganimate is used to create transition through distinct states in time (i.e. Year).\nease_aes() is used to control easing of aesthetics. The default is linear. Other methods are: quadratic, cubic, quartic, quintic, sine, circular, exponential, elastic, back, and bounce.\n\n\nggplot(globalPop, aes(x = Old, y = Young, \n                      size = Population, \n                      colour = Country)) +\n  geom_point(alpha = 0.7, \n             show.legend = FALSE) +\n  scale_colour_manual(values = country_colors) +\n  scale_size(range = c(2, 12)) +\n  labs(title = 'Year: {frame_time}', \n       x = '% Aged', \n       y = '% Young') +\n  transition_time(Year) +       \n  ease_aes('linear')\n\n\n\n\n\n\n\n\nThis generates a gif image of the animation."
   },
   {
     "objectID": "Hands-on_Exs/Ex3B/Hands-on_Ex3B.html#building-animated-bubble-plot-using-ggplotly",
@@ -831,5 +831,68 @@
     "title": "Hands-on Exercise 4A: Visualizing Statistical Analysis",
     "section": "5.7 Visualising Regression Parameters: ggcoefstats() methods",
     "text": "5.7 Visualising Regression Parameters: ggcoefstats() methods\nIn the code below, ggcoefstats() of ggstatsplot package to visualise the parameters of a regression model.\n\nggcoefstats(model1, \n            output = \"plot\")"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html",
+    "href": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html",
+    "title": "Hands-on Exercise 4B: Visualizing Uncertainty",
+    "section": "",
+    "text": "This hands-on exercise covers Chapter 11: Visual Uncertainty.\nI learned about the following:\n\nplotting uncertainty through error bars\ncreating hypothetical outcome plots (HOPs) by using ungeviz package"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#loading-the-required-packages",
+    "href": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#loading-the-required-packages",
+    "title": "Hands-on Exercise 4B: Visualizing Uncertainty",
+    "section": "2.1 Loading the required packages",
+    "text": "2.1 Loading the required packages\nFor this exercise we will use the following R packages:\n\ntidyverse, a family of R packages for data science process,\nplotly for creating interactive plot,\ngganimate for creating animation plot,\ngifski for gganimate to generate gif animations\nDT for displaying interactive html table,\ncrosstalk for for implementing cross-widget interactions (currently, linked brushing and filtering), and\nggdist for visualising distribution and uncertainty.\nungeviz for visualizing uncertainty\nknitr for rendering a simple table\n\n\n\n\n\n\n\nI needed to install devtools first by Tools &gt; Install Packages.\nAdded the following libraries from the ones of the chapter as they are also necessary to be install individually:\n\ngifski\nknitr\n\n\n\n\n\npacman::p_load(tidyverse, plotly, gifski, gganimate, DT, crosstalk, ggdist, knitr)\ndevtools::install_github(\"wilkelab/ungeviz\")\nlibrary(ungeviz)"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#loading-the-data",
+    "href": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#loading-the-data",
+    "title": "Hands-on Exercise 4B: Visualizing Uncertainty",
+    "section": "2.2 Loading the data",
+    "text": "2.2 Loading the data\nWe will use the same exam_data dataset from Hands-on Ex 1 and load it into the RStudio environment using read_csv().\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")\nglimpse(exam_data)\n\nRows: 322\nColumns: 7\n$ ID      &lt;chr&gt; \"Student321\", \"Student305\", \"Student289\", \"Student227\", \"Stude…\n$ CLASS   &lt;chr&gt; \"3I\", \"3I\", \"3H\", \"3F\", \"3I\", \"3I\", \"3I\", \"3I\", \"3I\", \"3H\", \"3…\n$ GENDER  &lt;chr&gt; \"Male\", \"Female\", \"Male\", \"Male\", \"Male\", \"Female\", \"Male\", \"M…\n$ RACE    &lt;chr&gt; \"Malay\", \"Malay\", \"Chinese\", \"Chinese\", \"Malay\", \"Malay\", \"Chi…\n$ ENGLISH &lt;dbl&gt; 21, 24, 26, 27, 27, 31, 31, 31, 33, 34, 34, 36, 36, 36, 37, 38…\n$ MATHS   &lt;dbl&gt; 9, 22, 16, 77, 11, 16, 21, 18, 19, 49, 39, 35, 23, 36, 49, 30,…\n$ SCIENCE &lt;dbl&gt; 15, 16, 16, 31, 25, 16, 25, 27, 15, 37, 42, 22, 32, 36, 35, 45…\n\n\nThere are a total of seven attributes in the exam_data tibble data frame. Four of them are categorical data type and the other three are in continuous data type.\n\nThe categorical attributes are: ID, CLASS, GENDER and RACE.\nThe continuous attributes are: MATHS, ENGLISH and SCIENCE."
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#plotting-standard-error-bars-of-point-estimates",
+    "href": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#plotting-standard-error-bars-of-point-estimates",
+    "title": "Hands-on Exercise 4B: Visualizing Uncertainty",
+    "section": "3.1 Plotting standard error bars of point estimates",
+    "text": "3.1 Plotting standard error bars of point estimates\nNow we are ready to plot the standard error bars of mean maths score by race as shown below.\n\n\nShow the code\nggplot(my_sum) +\n  geom_errorbar(\n    aes(x=RACE, \n        ymin=mean-se, \n        ymax=mean+se), \n    width=0.2, \n    colour=\"black\", \n    alpha=0.9, \n    size=0.5) +\n  geom_point(aes\n           (x=RACE, \n            y=mean), \n           stat=\"identity\", \n           color=\"red\",\n           size = 1.5,\n           alpha=1) +\n  ggtitle(\"Standard error of mean maths score by rac\")"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#plotting-confidence-interval-of-point-estimates",
+    "href": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#plotting-confidence-interval-of-point-estimates",
+    "title": "Hands-on Exercise 4B: Visualizing Uncertainty",
+    "section": "3.2 Plotting confidence interval of point estimates",
+    "text": "3.2 Plotting confidence interval of point estimates\nInstead of plotting the standard error bar of point estimates, we can also plot the confidence intervals of mean maths score by race.\n\n\nShow the code\nggplot(my_sum) +\n  geom_errorbar(\n    aes(x=reorder(RACE, -mean), \n        ymin=mean-1.96*se, \n        ymax=mean+1.96*se), \n    width=0.2, \n    colour=\"black\", \n    alpha=0.9, \n    size=0.5) +\n  geom_point(aes\n           (x=RACE, \n            y=mean), \n           stat=\"identity\", \n           color=\"red\",\n           size = 1.5,\n           alpha=1) +\n  labs(x = \"Maths score\",\n       title = \"95% confidence interval of mean maths score by race\")"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#visualizing-the-uncertainty-of-point-estimates-with-interactive-error-bars",
+    "href": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#visualizing-the-uncertainty-of-point-estimates-with-interactive-error-bars",
+    "title": "Hands-on Exercise 4B: Visualizing Uncertainty",
+    "section": "3.3 Visualizing the uncertainty of point estimates with interactive error bars",
+    "text": "3.3 Visualizing the uncertainty of point estimates with interactive error bars\nWe will now plot interactive error bars for the 99% confidence interval of mean maths score by race as shown in the figure below.\n\n\nShow the code\nshared_df = SharedData$new(my_sum)\n\nbscols(widths = c(4,8),\n       ggplotly((ggplot(shared_df) +\n                   geom_errorbar(aes(\n                     x=reorder(RACE, -mean),\n                     ymin=mean-2.58*se, \n                     ymax=mean+2.58*se), \n                     width=0.2, \n                     colour=\"black\", \n                     alpha=0.9, \n                     size=0.5) +\n                   geom_point(aes(\n                     x=RACE, \n                     y=mean, \n                     text = paste(\"Race:\", `RACE`, \n                                  \"&lt;br&gt;N:\", `n`,\n                                  \"&lt;br&gt;Avg. Scores:\", round(mean, digits = 2),\n                                  \"&lt;br&gt;95% CI:[\", \n                                  round((mean-2.58*se), digits = 2), \",\",\n                                  round((mean+2.58*se), digits = 2),\"]\")),\n                     stat=\"identity\", \n                     color=\"red\", \n                     size = 1.5, \n                     alpha=1) + \n                   xlab(\"Race\") + \n                   ylab(\"Average Scores\") + \n                   theme_minimal() + \n                   theme(axis.text.x = element_text(\n                     angle = 45, vjust = 0.5, hjust=1)) +\n                   ggtitle(\"99% Confidence interval of average /&lt;br&gt;maths scores by race\")), \n                tooltip = \"text\"), \n       DT::datatable(shared_df, \n                     rownames = FALSE, \n                     class=\"compact\", \n                     width=\"100%\", \n                     options = list(pageLength = 10,\n                                    scrollX=T), \n                     colnames = c(\"No. of pupils\", \n                                  \"Avg Scores\",\n                                  \"Std Dev\",\n                                  \"Std Error\")) %&gt;%\n         formatRound(columns=c('mean', 'sd', 'se'),\n                     digits=2))"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#using-stat_pointinterval",
+    "href": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#using-stat_pointinterval",
+    "title": "Hands-on Exercise 4B: Visualizing Uncertainty",
+    "section": "4.1 Using stat_pointinterval()",
+    "text": "4.1 Using stat_pointinterval()\nWe will build a visual for displaying distribution of maths scores by race.\n\nexam_data %&gt;%\n  ggplot(aes(x = RACE, \n             y = MATHS)) +\n  stat_pointinterval() +\n  labs(\n    title = \"Visualising confidence intervals of mean math score\",\n    subtitle = \"Mean Point + Multiple-interval plot\")\n\n\n\n\n\n\n\n\nstat_pointinterval() can also be called with extra arguments\n\nexam_data %&gt;%\n  ggplot(aes(x = RACE, y = MATHS)) +\n  stat_pointinterval(.width = 0.95,\n  .point = median,\n  .interval = qi) +\n  labs(\n    title = \"Visualising confidence intervals of median math score\",\n    subtitle = \"Median Point + Multiple-interval plot\")"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#using-stat_pointinterval-makeover",
+    "href": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#using-stat_pointinterval-makeover",
+    "title": "Hands-on Exercise 4B: Visualizing Uncertainty",
+    "section": "4.2 Using stat_pointinterval() (makeover)",
+    "text": "4.2 Using stat_pointinterval() (makeover)\nThe previous plot shows the 95% confidence interval. This plot below will show the 95% (thick line) to 99% (thin line) confidence interval.\n\n\n\n\n\n\nThe default for .width seems to be .width = c(0.66, 0.95) from the docs.\n\n\n\n\nexam_data %&gt;%\n  ggplot(aes(x = RACE, y = MATHS)) +\n  stat_pointinterval(.width = c(0.95, 0.99),\n  .point = median,\n  .interval = qi) +\n  labs(\n    title = \"Visualising confidence intervals of median math score\",\n    subtitle = \"Median Point + Multiple-interval plot\")"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#using-stat_gradientinterval",
+    "href": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#using-stat_gradientinterval",
+    "title": "Hands-on Exercise 4B: Visualizing Uncertainty",
+    "section": "4.3 Using stat_gradientinterval()",
+    "text": "4.3 Using stat_gradientinterval()\nIn the code chunk below, stat_gradientinterval() of ggdist is used to build a visual for displaying distribution of maths scores by race.\n\nexam_data %&gt;%\n  ggplot(aes(x = RACE, \n             y = MATHS)) +\n  stat_gradientinterval(   \n    fill = \"skyblue\",      \n    show.legend = TRUE     \n  ) +                        \n  labs(\n    title = \"Visualising confidence intervals of mean math score\",\n    subtitle = \"Gradient + interval plot\")\n\n\n\n\n\n\n\n\nThis plots gradients based on distribution. The darker color, the more observations with that value."
   }
 ]
