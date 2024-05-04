@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.450">
+<meta name="generator" content="quarto-1.4.553">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -24,7 +24,7 @@ ul.task-list li input[type="checkbox"] {
 }
 /* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -81,7 +81,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   "collapse-after": 3,
   "panel-placement": "end",
   "type": "overlay",
-  "limit": 20,
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -90,12 +96,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-more-match-text": "more match in this document",
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
     "search-detached-cancel-button-title": "Cancel",
     "search-submit-button-title": "Submit",
     "search-label": "Search"
   }
 }</script>
-
 <script src="../../site_libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
 <script src="../../site_libs/d3-bundle-5.16.0/d3-bundle.min.js"></script>
 <script src="../../site_libs/d3-lasso-0.0.5/d3-lasso.min.js"></script>
@@ -127,9 +133,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg navbar-dark ">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container">
+      <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">ISSS608</span>
     </a>
@@ -141,54 +147,66 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-hands-on-exercises" role="button" data-bs-toggle="dropdown" aria-expanded="false" rel="" target="">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-hands-on-exercises" role="button" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Hands-on Exercises</span>
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-hands-on-exercises">    
         <li>
-    <a class="dropdown-item" href="../../Hands-on_Exs/Ex1/Hands-on_Ex1.html" rel="" target="">
+    <a class="dropdown-item" href="../../Hands-on_Exs/Ex1/Hands-on_Ex1.html">
  <span class="dropdown-text">1: A Layered Grammar of Graphics: ggplot2 methods</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../../Hands-on_Exs/Ex2/Hands-on_Ex2.html" rel="" target="">
+    <a class="dropdown-item" href="../../Hands-on_Exs/Ex2/Hands-on_Ex2.html">
  <span class="dropdown-text">2: Beyond ggplot Fundamentals</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../../Hands-on_Exs/Ex3A/Hands-on_Ex3A.html" rel="" target="">
+    <a class="dropdown-item" href="../../Hands-on_Exs/Ex3A/Hands-on_Ex3A.html">
  <span class="dropdown-text">3A: Programming Interactive Data Visualisation with R</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../../Hands-on_Exs/Ex3B/Hands-on_Ex3B.html" rel="" target="">
+    <a class="dropdown-item" href="../../Hands-on_Exs/Ex3B/Hands-on_Ex3B.html">
  <span class="dropdown-text">3B: Programming Animated Statistical Graphics with R</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Exs/Ex4A/Hands-on_Ex4A.html">
+ <span class="dropdown-text">4A: Visualizing Statistical Analysis</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Exs/Ex4B/Hands-on_Ex4B.html">
+ <span class="dropdown-text">4B: Visualizing Uncertainty</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Exs/Ex4C/Hands-on_Ex4C.html">
+ <span class="dropdown-text">4C: Building Funnel Plot with R</span></a>
   </li>  
     </ul>
   </li>
   <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-in-class-exercises" role="button" data-bs-toggle="dropdown" aria-expanded="false" rel="" target="">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-in-class-exercises" role="button" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">In-class Exercises</span>
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-in-class-exercises">    
         <li>
-    <a class="dropdown-item" href="../../In-class_Exs/Ex1/In-class_Ex1.html" rel="" target="">
+    <a class="dropdown-item" href="../../In-class_Exs/Ex1/In-class_Ex1.html">
  <span class="dropdown-text">1: Introduction to Visual Analytics</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../../In-class_Exs/Ex2/In-class_Ex2.html" rel="" target="">
+    <a class="dropdown-item" href="../../In-class_Exs/Ex2/In-class_Ex2.html">
  <span class="dropdown-text">2: Visualizing Distribution</span></a>
   </li>  
     </ul>
   </li>
   <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-take-home-exercises" role="button" data-bs-toggle="dropdown" aria-expanded="false" rel="" target="">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-take-home-exercises" role="button" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Take-home Exercises</span>
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-take-home-exercises">    
         <li>
-    <a class="dropdown-item" href="../../Take-home_Exs/Ex1/Take-home_Ex1.html" rel="" target="">
+    <a class="dropdown-item" href="../../Take-home_Exs/Ex1/Take-home_Ex1.html">
  <span class="dropdown-text">1: Singapore Private Residential Property Market for 2024 Q1</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../../Take-home_Exs/Ex2/Take-home_Ex2.html" rel="" target="">
+    <a class="dropdown-item" href="../../Take-home_Exs/Ex2/Take-home_Ex2.html">
  <span class="dropdown-text">2: DataVis Makeover</span></a>
   </li>  
     </ul>
@@ -196,13 +214,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../../index.html" rel="" target="">
- <span class="menu-text">Home</span></a>
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
   </li>  
 </ul>
-            <div class="quarto-navbar-tools">
-</div>
           </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+</div>
       </div> <!-- /container-fluid -->
     </nav>
 </header>
@@ -290,7 +308,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </div>
   
 
+
 </header>
+
 
 <section id="overview" class="level1">
 <h1>1 Overview</h1>
@@ -713,7 +733,6 @@ Preventing XSS attacks
 <div class="cell">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(exam_data, <span class="at">class=</span> <span class="st">"compact"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-
 <div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-e115a39eb2f6964a3c75" style="width:100%;height:auto;"></div>
 <script type="application/json" data-for="htmlwidget-e115a39eb2f6964a3c75">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59","60","61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77","78","79","80","81","82","83","84","85","86","87","88","89","90","91","92","93","94","95","96","97","98","99","100","101","102","103","104","105","106","107","108","109","110","111","112","113","114","115","116","117","118","119","120","121","122","123","124","125","126","127","128","129","130","131","132","133","134","135","136","137","138","139","140","141","142","143","144","145","146","147","148","149","150","151","152","153","154","155","156","157","158","159","160","161","162","163","164","165","166","167","168","169","170","171","172","173","174","175","176","177","178","179","180","181","182","183","184","185","186","187","188","189","190","191","192","193","194","195","196","197","198","199","200","201","202","203","204","205","206","207","208","209","210","211","212","213","214","215","216","217","218","219","220","221","222","223","224","225","226","227","228","229","230","231","232","233","234","235","236","237","238","239","240","241","242","243","244","245","246","247","248","249","250","251","252","253","254","255","256","257","258","259","260","261","262","263","264","265","266","267","268","269","270","271","272","273","274","275","276","277","278","279","280","281","282","283","284","285","286","287","288","289","290","291","292","293","294","295","296","297","298","299","300","301","302","303","304","305","306","307","308","309","310","311","312","313","314","315","316","317","318","319","320","321","322"],["Student321","Student305","Student289","Student227","Student318","Student306","Student313","Student316","Student312","Student297","Student314","Student278","Student302","Student323","Student296","Student311","Student304","Student307","Student259","Student273","Student292","Student303","Student177","Student253","Student294","Student287","Student293","Student290","Student295","Student319","Student309","Student315","Student288","Student301","Student248","Student277","Student171","Student324","Student258","Student282","Student298","Student317","Student276","Student286","Student310","Student215","Student200","Student202","Student264","Student322","Student117","Student199","Student251","Student320","Student188","Student231","Student255","Student262","Student265","Student271","Student272","Student279","Student283","Student284","Student241","Student261","Student291","Student299","Student198","Student201","Student212","Student226","Student240","Student266","Student274","Student179","Student185","Student224","Student280","Student281","Student163","Student225","Student115","Student203","Student246","Student263","Student082","Student114","Student119","Student191","Student206","Student219","Student244","Student269","Student186","Student189","Student210","Student221","Student245","Student260","Student085","Student106","Student148","Student220","Student235","Student270","Student285","Student300","Student141","Student157","Student175","Student176","Student184","Student209","Student252","Student275","Student098","Student105","Student155","Student156","Student167","Student228","Student234","Student238","Student133","Student162","Student180","Student197","Student208","Student213","Student218","Student229","Student242","Student256","Student112","Student140","Student183","Student211","Student223","Student232","Student233","Student243","Student249","Student254","Student026","Student097","Student116","Student145","Student159","Student190","Student207","Student250","Student268","Student204","Student216","Student247","Student257","Student021","Student126","Student192","Student205","Student230","Student237","Student048","Student096","Student100","Student103","Student131","Student161","Student173","Student182","Student217","Student267","Student020","Student073","Student079","Student132","Student136","Student147","Student151","Student168","Student025","Student046","Student087","Student089","Student090","Student094","Student099","Student111","Student118","Student120","Student122","Student143","Student146","Student150","Student153","Student170","Student174","Student181","Student214","Student088","Student101","Student113","Student137","Student139","Student158","Student169","Student236","Student067","Student074","Student093","Student110","Student154","Student178","Student195","Student011","Student024","Student035","Student083","Student124","Student165","Student166","Student172","Student187","Student053","Student054","Student063","Student068","Student072","Student104","Student109","Student125","Student129","Student134","Student142","Student164","Student194","Student196","Student222","Student006","Student032","Student045","Student070","Student092","Student108","Student138","Student149","Student152","Student160","Student019","Student023","Student028","Student065","Student069","Student080","Student086","Student091","Student095","Student107","Student144","Student004","Student034","Student055","Student060","Student078","Student081","Student239","Student005","Student052","Student062","Student102","Student121","Student123","Student128","Student008","Student047","Student058","Student064","Student130","Student014","Student018","Student029","Student050","Student066","Student075","Student084","Student127","Student003","Student037","Student041","Student043","Student051","Student057","Student027","Student031","Student044","Student049","Student056","Student059","Student061","Student076","Student135","Student001","Student033","Student038","Student071","Student077","Student009","Student022","Student042","Student007","Student030","Student040","Student039","Student002","Student013","Student017","Student016","Student015","Student010","Student012","Student036"],["3I","3I","3H","3F","3I","3I","3I","3I","3I","3H","3I","3H","3I","3I","3H","3I","3I","3I","3G","3H","3H","3I","3E","3G","3H","3H","3H","3H","3H","3I","3I","3I","3H","3I","3G","3H","3E","3I","3G","3H","3H","3I","3H","3H","3I","3F","3F","3F","3G","3I","3C","3F","3G","3I","3E","3F","3G","3G","3G","3H","3H","3H","3H","3H","3G","3G","3H","3H","3F","3F","3F","3F","3G","3G","3H","3E","3E","3F","3H","3H","3E","3F","3C","3F","3G","3G","3C","3C","3D","3E","3F","3F","3G","3H","3E","3E","3F","3F","3G","3G","3C","3C","3D","3F","3G","3H","3H","3H","3D","3E","3E","3E","3E","3F","3G","3H","3C","3C","3D","3E","3E","3F","3G","3G","3D","3E","3E","3F","3F","3F","3F","3F","3G","3G","3C","3D","3E","3F","3F","3F","3F","3G","3G","3G","3A","3C","3C","3D","3E","3E","3F","3G","3H","3F","3F","3G","3G","3A","3D","3E","3F","3F","3G","3B","3C","3C","3C","3D","3E","3E","3E","3F","3G","3A","3B","3C","3D","3D","3D","3D","3E","3A","3B","3C","3C","3C","3C","3C","3C","3D","3D","3D","3D","3D","3D","3D","3E","3E","3E","3F","3C","3C","3C","3D","3D","3E","3E","3G","3B","3B","3C","3C","3D","3E","3F","3A","3A","3A","3C","3D","3E","3E","3E","3E","3B","3B","3B","3B","3B","3C","3C","3D","3D","3D","3D","3E","3E","3F","3F","3A","3A","3B","3B","3C","3C","3D","3D","3D","3E","3A","3A","3A","3B","3B","3C","3C","3C","3C","3C","3D","3A","3A","3B","3B","3B","3C","3G","3A","3B","3B","3C","3D","3D","3D","3A","3B","3B","3B","3D","3A","3A","3A","3B","3B","3B","3C","3D","3A","3A","3B","3B","3B","3B","3A","3A","3B","3B","3B","3B","3B","3B","3D","3A","3A","3A","3B","3B","3A","3A","3B","3A","3A","3A","3A","3A","3A","3A","3A","3A","3A","3A","3A"],["Male","Female","Male","Male","Male","Female","Male","Male","Male","Male","Male","Female","Female","Male","Male","Female","Female","Female","Male","Female","Male","Female","Male","Male","Male","Male","Male","Male","Male","Male","Female","Male","Male","Female","Male","Female","Female","Male","Male","Female","Male","Male","Female","Male","Female","Female","Female","Female","Male","Male","Male","Female","Male","Male","Male","Male","Male","Male","Male","Female","Female","Female","Female","Female","Female","Male","Male","Male","Female","Female","Female","Male","Female","Female","Female","Male","Male","Male","Female","Female","Female","Male","Male","Female","Female","Male","Female","Male","Female","Male","Female","Male","Female","Female","Male","Male","Female","Male","Female","Male","Female","Male","Male","Male","Female","Female","Female","Female","Male","Female","Male","Male","Male","Female","Male","Female","Male","Male","Male","Female","Female","Male","Female","Female","Female","Female","Male","Female","Female","Female","Male","Male","Female","Male","Male","Male","Male","Female","Male","Female","Female","Female","Male","Male","Male","Male","Male","Male","Female","Male","Female","Male","Female","Female","Female","Female","Male","Male","Female","Male","Female","Male","Female","Female","Male","Male","Male","Female","Female","Female","Male","Male","Female","Female","Male","Female","Female","Male","Male","Male","Female","Male","Female","Female","Female","Female","Female","Male","Male","Female","Female","Female","Male","Male","Male","Male","Female","Male","Male","Female","Female","Male","Male","Male","Male","Female","Female","Female","Male","Male","Female","Male","Male","Male","Female","Female","Male","Male","Female","Female","Female","Female","Female","Male","Female","Female","Female","Male","Male","Male","Male","Female","Female","Female","Male","Female","Female","Female","Male","Female","Male","Female","Male","Female","Male","Male","Male","Male","Female","Female","Male","Male","Female","Male","Female","Female","Female","Female","Male","Male","Female","Male","Female","Female","Female","Female","Female","Female","Female","Female","Male","Female","Female","Female","Female","Female","Female","Female","Female","Female","Female","Male","Female","Male","Male","Female","Female","Female","Male","Female","Female","Female","Female","Male","Male","Female","Female","Female","Female","Female","Male","Female","Female","Male","Male","Male","Male","Female","Male","Female","Female","Male","Female","Male","Female","Female","Female","Female","Female","Female","Female","Male"],["Malay","Malay","Chinese","Chinese","Malay","Malay","Chinese","Malay","Malay","Indian","Chinese","Malay","Chinese","Chinese","Chinese","Chinese","Malay","Malay","Malay","Malay","Malay","Malay","Chinese","Others","Malay","Malay","Malay","Malay","Indian","Indian","Malay","Malay","Chinese","Malay","Chinese","Malay","Chinese","Chinese","Malay","Chinese","Malay","Malay","Malay","Malay","Malay","Chinese","Chinese","Chinese","Indian","Malay","Chinese","Chinese","Chinese","Malay","Chinese","Chinese","Chinese","Malay","Chinese","Chinese","Malay","Indian","Malay","Chinese","Malay","Malay","Malay","Malay","Chinese","Chinese","Malay","Malay","Malay","Chinese","Malay","Chinese","Malay","Malay","Malay","Indian","Malay","Malay","Chinese","Chinese","Malay","Indian","Chinese","Chinese","Chinese","Chinese","Malay","Malay","Malay","Chinese","Chinese","Chinese","Chinese","Malay","Malay","Malay","Chinese","Chinese","Chinese","Chinese","Malay","Chinese","Chinese","Others","Indian","Chinese","Malay","Chinese","Malay","Malay","Chinese","Malay","Chinese","Chinese","Chinese","Chinese","Malay","Malay","Malay","Chinese","Malay","Malay","Chinese","Chinese","Malay","Malay","Chinese","Chinese","Chinese","Malay","Chinese","Chinese","Malay","Others","Malay","Chinese","Chinese","Malay","Chinese","Chinese","Chinese","Malay","Chinese","Chinese","Malay","Others","Malay","Chinese","Malay","Malay","Chinese","Chinese","Malay","Chinese","Others","Malay","Malay","Malay","Malay","Chinese","Malay","Chinese","Chinese","Others","Malay","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Malay","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Malay","Chinese","Chinese","Chinese","Chinese","Chinese","Malay","Chinese","Indian","Malay","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Malay","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Malay","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Malay","Chinese","Chinese","Chinese","Chinese","Malay","Chinese","Chinese","Malay","Chinese","Malay","Malay","Malay","Chinese","Chinese","Indian","Malay","Others","Malay","Chinese","Chinese","Chinese","Chinese","Chinese","Malay","Malay","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Malay","Chinese","Chinese","Malay","Chinese","Chinese","Malay","Chinese","Malay","Chinese","Others","Chinese","Chinese","Malay","Malay","Malay","Chinese","Indian","Chinese","Chinese","Chinese","Chinese","Chinese","Malay","Chinese","Chinese","Chinese","Chinese","Chinese","Malay","Chinese","Chinese","Chinese","Chinese","Chinese","Malay","Malay","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Chinese","Indian","Chinese","Chinese","Malay","Chinese","Chinese","Chinese","Chinese","Chinese","Others","Chinese","Chinese","Chinese"],[21,24,26,27,27,31,31,31,33,34,34,36,36,36,37,38,39,39,40,40,40,40,41,41,41,42,42,43,43,43,44,44,45,45,46,46,48,48,49,49,49,49,50,50,50,51,52,52,52,52,53,53,53,53,54,54,54,54,54,54,54,54,55,55,56,56,56,56,57,57,57,57,57,57,57,58,58,58,58,58,59,59,60,60,60,60,61,61,61,61,61,61,61,61,62,62,62,62,62,62,63,63,63,63,63,63,63,63,64,64,64,64,64,64,64,64,65,65,65,65,65,65,65,65,66,66,66,66,66,66,66,66,66,66,67,67,67,67,67,67,67,67,67,67,68,68,68,68,68,68,68,68,68,69,69,69,69,70,70,70,70,70,70,71,71,71,71,71,71,71,71,71,71,72,72,72,72,72,72,72,72,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,74,74,74,74,74,74,74,74,75,75,75,75,75,75,75,76,76,76,76,76,76,76,76,76,77,77,77,77,77,77,77,77,77,77,77,77,77,77,77,78,78,78,78,78,78,78,78,78,78,79,79,79,79,79,79,79,79,79,79,79,80,80,80,80,80,80,80,81,81,81,81,81,81,81,82,82,82,82,82,83,83,83,83,83,83,83,83,84,84,84,84,84,84,85,85,85,85,85,85,85,85,85,86,86,86,86,86,87,87,87,88,88,88,89,90,90,90,91,92,93,93,96],[9,22,16,77,11,16,21,18,19,49,39,35,23,36,49,30,21,24,54,36,40,20,71,51,32,32,37,30,35,25,24,19,50,32,55,31,56,41,30,44,41,34,35,56,58,74,71,55,42,58,90,77,51,25,65,78,54,59,38,52,33,48,43,56,52,37,44,52,74,67,63,75,49,47,50,69,78,64,47,40,58,74,72,75,43,68,85,79,62,88,62,63,58,52,85,58,74,58,45,79,64,84,74,71,50,70,46,67,78,66,66,64,65,69,36,54,90,80,68,78,79,65,49,81,76,61,71,72,64,70,63,80,63,64,73,86,72,70,68,95,80,53,81,74,87,63,79,83,74,67,69,60,61,75,67,62,44,90,70,66,70,84,63,82,65,82,75,75,79,89,77,74,63,91,83,60,71,96,79,74,52,91,65,85,74,73,69,79,66,81,72,77,74,79,85,83,83,75,77,82,88,75,78,86,87,82,59,60,84,83,85,76,58,68,70,91,88,89,75,67,82,80,71,88,79,85,69,93,79,91,81,85,80,74,89,54,78,80,77,75,85,83,95,86,78,78,83,61,71,77,94,90,91,86,73,79,82,86,92,86,89,88,89,79,97,76,56,79,85,87,78,82,74,76,78,86,81,87,80,93,90,87,89,97,80,76,81,91,91,85,97,83,90,98,91,92,86,86,74,87,85,86,90,95,91,91,91,95,90,92,91,89,87,97,93,97,85,95,90,93,97,99],[15,16,16,31,25,16,25,27,15,37,42,22,32,36,35,45,21,35,26,24,31,32,40,37,26,27,23,31,38,24,24,35,27,30,17,34,49,41,32,19,32,31,40,36,50,54,47,39,16,41,46,57,45,48,40,60,32,45,46,52,37,53,45,45,57,34,46,59,62,67,55,58,45,64,39,57,66,60,47,46,36,45,52,61,44,63,68,50,49,52,55,60,46,46,74,59,68,58,52,57,49,44,63,64,48,53,50,65,76,67,54,49,63,55,41,54,63,73,66,65,51,60,41,78,56,56,72,61,69,61,64,74,50,61,54,76,63,68,59,84,56,44,74,59,66,50,77,65,58,59,65,59,64,54,69,58,50,72,68,63,58,73,42,72,57,72,52,74,68,83,72,68,58,77,69,37,61,77,79,78,55,74,75,71,68,69,62,74,53,65,70,76,72,66,71,74,57,69,68,62,72,80,71,77,65,75,61,46,80,75,71,72,67,64,73,74,72,71,63,53,67,75,62,71,77,78,72,82,76,72,69,78,66,67,80,68,72,69,72,70,84,65,70,84,70,65,79,74,49,70,79,80,85,81,58,69,61,75,61,77,73,78,85,77,83,69,52,62,82,81,70,71,70,70,82,78,65,78,67,84,83,89,84,88,79,56,60,82,74,78,88,70,80,80,78,84,83,77,75,79,82,81,85,84,87,88,88,82,91,81,86,83,85,90,89,90,89,91,87,90,84,96],["Name = Student321\n Class = 3I","Name = Student305\n Class = 3I","Name = Student289\n Class = 3H","Name = Student227\n Class = 3F","Name = Student318\n Class = 3I","Name = Student306\n Class = 3I","Name = Student313\n Class = 3I","Name = Student316\n Class = 3I","Name = Student312\n Class = 3I","Name = Student297\n Class = 3H","Name = Student314\n Class = 3I","Name = Student278\n Class = 3H","Name = Student302\n Class = 3I","Name = Student323\n Class = 3I","Name = Student296\n Class = 3H","Name = Student311\n Class = 3I","Name = Student304\n Class = 3I","Name = Student307\n Class = 3I","Name = Student259\n Class = 3G","Name = Student273\n Class = 3H","Name = Student292\n Class = 3H","Name = Student303\n Class = 3I","Name = Student177\n Class = 3E","Name = Student253\n Class = 3G","Name = Student294\n Class = 3H","Name = Student287\n Class = 3H","Name = Student293\n Class = 3H","Name = Student290\n Class = 3H","Name = Student295\n Class = 3H","Name = Student319\n Class = 3I","Name = Student309\n Class = 3I","Name = Student315\n Class = 3I","Name = Student288\n Class = 3H","Name = Student301\n Class = 3I","Name = Student248\n Class = 3G","Name = Student277\n Class = 3H","Name = Student171\n Class = 3E","Name = Student324\n Class = 3I","Name = Student258\n Class = 3G","Name = Student282\n Class = 3H","Name = Student298\n Class = 3H","Name = Student317\n Class = 3I","Name = Student276\n Class = 3H","Name = Student286\n Class = 3H","Name = Student310\n Class = 3I","Name = Student215\n Class = 3F","Name = Student200\n Class = 3F","Name = Student202\n Class = 3F","Name = Student264\n Class = 3G","Name = Student322\n Class = 3I","Name = Student117\n Class = 3C","Name = Student199\n Class = 3F","Name = Student251\n Class = 3G","Name = Student320\n Class = 3I","Name = Student188\n Class = 3E","Name = Student231\n Class = 3F","Name = Student255\n Class = 3G","Name = Student262\n Class = 3G","Name = Student265\n Class = 3G","Name = Student271\n Class = 3H","Name = Student272\n Class = 3H","Name = Student279\n Class = 3H","Name = Student283\n Class = 3H","Name = Student284\n Class = 3H","Name = Student241\n Class = 3G","Name = Student261\n Class = 3G","Name = Student291\n Class = 3H","Name = Student299\n Class = 3H","Name = Student198\n Class = 3F","Name = Student201\n Class = 3F","Name = Student212\n Class = 3F","Name = Student226\n Class = 3F","Name = Student240\n Class = 3G","Name = Student266\n Class = 3G","Name = Student274\n Class = 3H","Name = Student179\n Class = 3E","Name = Student185\n Class = 3E","Name = Student224\n Class = 3F","Name = Student280\n Class = 3H","Name = Student281\n Class = 3H","Name = Student163\n Class = 3E","Name = Student225\n Class = 3F","Name = Student115\n Class = 3C","Name = Student203\n Class = 3F","Name = Student246\n Class = 3G","Name = Student263\n Class = 3G","Name = Student082\n Class = 3C","Name = Student114\n Class = 3C","Name = Student119\n Class = 3D","Name = Student191\n Class = 3E","Name = Student206\n Class = 3F","Name = Student219\n Class = 3F","Name = Student244\n Class = 3G","Name = Student269\n Class = 3H","Name = Student186\n Class = 3E","Name = Student189\n Class = 3E","Name = Student210\n Class = 3F","Name = Student221\n Class = 3F","Name = Student245\n Class = 3G","Name = Student260\n Class = 3G","Name = Student085\n Class = 3C","Name = Student106\n Class = 3C","Name = Student148\n Class = 3D","Name = Student220\n Class = 3F","Name = Student235\n Class = 3G","Name = Student270\n Class = 3H","Name = Student285\n Class = 3H","Name = Student300\n Class = 3H","Name = Student141\n Class = 3D","Name = Student157\n Class = 3E","Name = Student175\n Class = 3E","Name = Student176\n Class = 3E","Name = Student184\n Class = 3E","Name = Student209\n Class = 3F","Name = Student252\n Class = 3G","Name = Student275\n Class = 3H","Name = Student098\n Class = 3C","Name = Student105\n Class = 3C","Name = Student155\n Class = 3D","Name = Student156\n Class = 3E","Name = Student167\n Class = 3E","Name = Student228\n Class = 3F","Name = Student234\n Class = 3G","Name = Student238\n Class = 3G","Name = Student133\n Class = 3D","Name = Student162\n Class = 3E","Name = Student180\n Class = 3E","Name = Student197\n Class = 3F","Name = Student208\n Class = 3F","Name = Student213\n Class = 3F","Name = Student218\n Class = 3F","Name = Student229\n Class = 3F","Name = Student242\n Class = 3G","Name = Student256\n Class = 3G","Name = Student112\n Class = 3C","Name = Student140\n Class = 3D","Name = Student183\n Class = 3E","Name = Student211\n Class = 3F","Name = Student223\n Class = 3F","Name = Student232\n Class = 3F","Name = Student233\n Class = 3F","Name = Student243\n Class = 3G","Name = Student249\n Class = 3G","Name = Student254\n Class = 3G","Name = Student026\n Class = 3A","Name = Student097\n Class = 3C","Name = Student116\n Class = 3C","Name = Student145\n Class = 3D","Name = Student159\n Class = 3E","Name = Student190\n Class = 3E","Name = Student207\n Class = 3F","Name = Student250\n Class = 3G","Name = Student268\n Class = 3H","Name = Student204\n Class = 3F","Name = Student216\n Class = 3F","Name = Student247\n Class = 3G","Name = Student257\n Class = 3G","Name = Student021\n Class = 3A","Name = Student126\n Class = 3D","Name = Student192\n Class = 3E","Name = Student205\n Class = 3F","Name = Student230\n Class = 3F","Name = Student237\n Class = 3G","Name = Student048\n Class = 3B","Name = Student096\n Class = 3C","Name = Student100\n Class = 3C","Name = Student103\n Class = 3C","Name = Student131\n Class = 3D","Name = Student161\n Class = 3E","Name = Student173\n Class = 3E","Name = Student182\n Class = 3E","Name = Student217\n Class = 3F","Name = Student267\n Class = 3G","Name = Student020\n Class = 3A","Name = Student073\n Class = 3B","Name = Student079\n Class = 3C","Name = Student132\n Class = 3D","Name = Student136\n Class = 3D","Name = Student147\n Class = 3D","Name = Student151\n Class = 3D","Name = Student168\n Class = 3E","Name = Student025\n Class = 3A","Name = Student046\n Class = 3B","Name = Student087\n Class = 3C","Name = Student089\n Class = 3C","Name = Student090\n Class = 3C","Name = Student094\n Class = 3C","Name = Student099\n Class = 3C","Name = Student111\n Class = 3C","Name = Student118\n Class = 3D","Name = Student120\n Class = 3D","Name = Student122\n Class = 3D","Name = Student143\n Class = 3D","Name = Student146\n Class = 3D","Name = Student150\n Class = 3D","Name = Student153\n Class = 3D","Name = Student170\n Class = 3E","Name = Student174\n Class = 3E","Name = Student181\n Class = 3E","Name = Student214\n Class = 3F","Name = Student088\n Class = 3C","Name = Student101\n Class = 3C","Name = Student113\n Class = 3C","Name = Student137\n Class = 3D","Name = Student139\n Class = 3D","Name = Student158\n Class = 3E","Name = Student169\n Class = 3E","Name = Student236\n Class = 3G","Name = Student067\n Class = 3B","Name = Student074\n Class = 3B","Name = Student093\n Class = 3C","Name = Student110\n Class = 3C","Name = Student154\n Class = 3D","Name = Student178\n Class = 3E","Name = Student195\n Class = 3F","Name = Student011\n Class = 3A","Name = Student024\n Class = 3A","Name = Student035\n Class = 3A","Name = Student083\n Class = 3C","Name = Student124\n Class = 3D","Name = Student165\n Class = 3E","Name = Student166\n Class = 3E","Name = Student172\n Class = 3E","Name = Student187\n Class = 3E","Name = Student053\n Class = 3B","Name = Student054\n Class = 3B","Name = Student063\n Class = 3B","Name = Student068\n Class = 3B","Name = Student072\n Class = 3B","Name = Student104\n Class = 3C","Name = Student109\n Class = 3C","Name = Student125\n Class = 3D","Name = Student129\n Class = 3D","Name = Student134\n Class = 3D","Name = Student142\n Class = 3D","Name = Student164\n Class = 3E","Name = Student194\n Class = 3E","Name = Student196\n Class = 3F","Name = Student222\n Class = 3F","Name = Student006\n Class = 3A","Name = Student032\n Class = 3A","Name = Student045\n Class = 3B","Name = Student070\n Class = 3B","Name = Student092\n Class = 3C","Name = Student108\n Class = 3C","Name = Student138\n Class = 3D","Name = Student149\n Class = 3D","Name = Student152\n Class = 3D","Name = Student160\n Class = 3E","Name = Student019\n Class = 3A","Name = Student023\n Class = 3A","Name = Student028\n Class = 3A","Name = Student065\n Class = 3B","Name = Student069\n Class = 3B","Name = Student080\n Class = 3C","Name = Student086\n Class = 3C","Name = Student091\n Class = 3C","Name = Student095\n Class = 3C","Name = Student107\n Class = 3C","Name = Student144\n Class = 3D","Name = Student004\n Class = 3A","Name = Student034\n Class = 3A","Name = Student055\n Class = 3B","Name = Student060\n Class = 3B","Name = Student078\n Class = 3B","Name = Student081\n Class = 3C","Name = Student239\n Class = 3G","Name = Student005\n Class = 3A","Name = Student052\n Class = 3B","Name = Student062\n Class = 3B","Name = Student102\n Class = 3C","Name = Student121\n Class = 3D","Name = Student123\n Class = 3D","Name = Student128\n Class = 3D","Name = Student008\n Class = 3A","Name = Student047\n Class = 3B","Name = Student058\n Class = 3B","Name = Student064\n Class = 3B","Name = Student130\n Class = 3D","Name = Student014\n Class = 3A","Name = Student018\n Class = 3A","Name = Student029\n Class = 3A","Name = Student050\n Class = 3B","Name = Student066\n Class = 3B","Name = Student075\n Class = 3B","Name = Student084\n Class = 3C","Name = Student127\n Class = 3D","Name = Student003\n Class = 3A","Name = Student037\n Class = 3A","Name = Student041\n Class = 3B","Name = Student043\n Class = 3B","Name = Student051\n Class = 3B","Name = Student057\n Class = 3B","Name = Student027\n Class = 3A","Name = Student031\n Class = 3A","Name = Student044\n Class = 3B","Name = Student049\n Class = 3B","Name = Student056\n Class = 3B","Name = Student059\n Class = 3B","Name = Student061\n Class = 3B","Name = Student076\n Class = 3B","Name = Student135\n Class = 3D","Name = Student001\n Class = 3A","Name = Student033\n Class = 3A","Name = Student038\n Class = 3A","Name = Student071\n Class = 3B","Name = Student077\n Class = 3B","Name = Student009\n Class = 3A","Name = Student022\n Class = 3A","Name = Student042\n Class = 3B","Name = Student007\n Class = 3A","Name = Student030\n Class = 3A","Name = Student040\n Class = 3A","Name = Student039\n Class = 3A","Name = Student002\n Class = 3A","Name = Student013\n Class = 3A","Name = Student017\n Class = 3A","Name = Student016\n Class = 3A","Name = Student015\n Class = 3A","Name = Student010\n Class = 3A","Name = Student012\n Class = 3A","Name = Student036\n Class = 3A"],["window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent321\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent305\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent289\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent227\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent318\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent306\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent313\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent316\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent312\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent297\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent314\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent278\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent302\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent323\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent296\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent311\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent304\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent307\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent259\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent273\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent292\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent303\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent177\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent253\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent294\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent287\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent293\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent290\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent295\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent319\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent309\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent315\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent288\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent301\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent248\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent277\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent171\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent324\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent258\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent282\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent298\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent317\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent276\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent286\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent310\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent215\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent200\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent202\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent264\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent322\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent117\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent199\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent251\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent320\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent188\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent231\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent255\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent262\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent265\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent271\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent272\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent279\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent283\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent284\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent241\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent261\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent291\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent299\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent198\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent201\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent212\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent226\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent240\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent266\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent274\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent179\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent185\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent224\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent280\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent281\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent163\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent225\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent115\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent203\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent246\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent263\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent082\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent114\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent119\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent191\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent206\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent219\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent244\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent269\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent186\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent189\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent210\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent221\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent245\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent260\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent085\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent106\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent148\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent220\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent235\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent270\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent285\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent300\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent141\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent157\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent175\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent176\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent184\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent209\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent252\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent275\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent098\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent105\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent155\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent156\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent167\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent228\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent234\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent238\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent133\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent162\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent180\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent197\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent208\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent213\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent218\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent229\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent242\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent256\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent112\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent140\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent183\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent211\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent223\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent232\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent233\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent243\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent249\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent254\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent026\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent097\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent116\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent145\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent159\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent190\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent207\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent250\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent268\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent204\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent216\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent247\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent257\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent021\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent126\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent192\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent205\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent230\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent237\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent048\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent096\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent100\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent103\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent131\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent161\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent173\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent182\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent217\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent267\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent020\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent073\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent079\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent132\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent136\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent147\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent151\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent168\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent025\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent046\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent087\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent089\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent090\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent094\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent099\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent111\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent118\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent120\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent122\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent143\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent146\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent150\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent153\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent170\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent174\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent181\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent214\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent088\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent101\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent113\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent137\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent139\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent158\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent169\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent236\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent067\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent074\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent093\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent110\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent154\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent178\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent195\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent011\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent024\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent035\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent083\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent124\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent165\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent166\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent172\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent187\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent053\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent054\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent063\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent068\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent072\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent104\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent109\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent125\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent129\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent134\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent142\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent164\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent194\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent196\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent222\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent006\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent032\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent045\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent070\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent092\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent108\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent138\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent149\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent152\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent160\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent019\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent023\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent028\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent065\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent069\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent080\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent086\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent091\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent095\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent107\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent144\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent004\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent034\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent055\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent060\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent078\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent081\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent239\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent005\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent052\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent062\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent102\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent121\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent123\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent128\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent008\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent047\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent058\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent064\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent130\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent014\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent018\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent029\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent050\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent066\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent075\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent084\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent127\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent003\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent037\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent041\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent043\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent051\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent057\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent027\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent031\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent044\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent049\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent056\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent059\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent061\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent076\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent135\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent001\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent033\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent038\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent071\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent077\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent009\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent022\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent042\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent007\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent030\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent040\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent039\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent002\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent013\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent017\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent016\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent015\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent010\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent012\")","window.open(\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20schoolStudent036\")"]],"container":"<table class=\"compact\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>ID<\/th>\n      <th>CLASS<\/th>\n      <th>GENDER<\/th>\n      <th>RACE<\/th>\n      <th>ENGLISH<\/th>\n      <th>MATHS<\/th>\n      <th>SCIENCE<\/th>\n      <th>tooltip<\/th>\n      <th>onclick<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[5,6,7]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false},"selection":{"mode":"multiple","selected":null,"target":"row","selectable":null}},"evals":[],"jsHooks":[]}</script>
 </div>
@@ -738,7 +757,6 @@ Preventing XSS attacks
 <span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>                  DT<span class="sc">::</span><span class="fu">datatable</span>(d), </span>
 <span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>                  <span class="at">widths =</span> <span class="dv">5</span>)        </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-
 <div class="container-fluid crosstalk-bscols">
 <div class="row">
 <div class="col-xs-5">
@@ -845,10 +863,27 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
-  function tippyHover(el, contentFn) {
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
-      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -858,8 +893,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start'
+      placement: 'bottom-start',
     };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -871,7 +915,130 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      return note.innerHTML;
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
     });
   }
       let selectedAnnoteEl;
@@ -915,6 +1082,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
+            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -940,6 +1108,32 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -1000,6 +1194,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 });
 </script>
 </div> <!-- /content -->
+
 
 
 
