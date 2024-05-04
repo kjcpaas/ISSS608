@@ -19,7 +19,7 @@ website:
             href: Hands-on_Exs/Ex4A/Hands-on_Ex4A.qmd
           - text: "4B: Visualizing Uncertainty"
             href: Hands-on_Exs/Ex4B/Hands-on_Ex4B.qmd
-          - text: "4C: Funnel Plots for Fair Comparison"
+          - text: "4C: Building Funnel Plot with R"
             href: Hands-on_Exs/Ex4C/Hands-on_Ex4C.qmd
       - text: In-class Exercises
         menu:
