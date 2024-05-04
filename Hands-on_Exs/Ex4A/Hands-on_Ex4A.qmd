@@ -213,7 +213,7 @@ model
 In the code chunk, [*check_collinearity()*](https://easystats.github.io/performance/reference/check_collinearity.html) of [**performance**](https://easystats.github.io/performance/) package.
 
 ```{r}
-check_collinearity(model)
+t <- check_collinearity(model)
 ```
 
 We can also plot the function result
@@ -226,6 +226,10 @@ plot(check_c)
 ## 5.3 Model Diagnostic: checking normality assumption
 
 In the code chunk, [*check_normality()*](https://easystats.github.io/performance/reference/check_normality.html) of [**performance**](https://easystats.github.io/performance/) package.
+
+::: {.callout-tip appearance="simple"}
+Since Age and Mfg Year have high correlation, we will remove one of them. We will retain Age.
+:::
 
 ```{r}
 model1 <- lm(Price ~ Age_08_04 + KM + 
@@ -254,7 +258,7 @@ plot(check_h)
 
 ## 5.5 Model Diagnostic: Complete check
 
-We can also perform the complete by using [*check_model()*](https://easystats.github.io/performance/reference/check_model.html).
+We can also perform the complete set of tests by using [*check_model()*](https://easystats.github.io/performance/reference/check_model.html).
 
 ```{r}
 check_model(model1)

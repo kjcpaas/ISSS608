@@ -168,11 +168,11 @@
     "text": "3.2 Makeover 1\nFrom the plot above, the values are really low so we will adjust the range of y-axis, along with changing the data_type from the default “SR” (indirectly standardised ratios) to “PR” (proportions).\n\nfunnel_plot(\n  .data = covid19,\n  numerator = Death,\n  denominator = Positive,\n  group = `Sub-district`,\n  data_type = \"PR\",\n  x_range = c(0, 6500),\n  y_range = c(0, 0.05)\n)"
   },
   {
-    "objectID": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#makeover-3",
-    "href": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#makeover-3",
+    "objectID": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#makeover-2",
+    "href": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#makeover-2",
     "title": "Hands-on Exercise 4C: Building Funnel Plot with R",
-    "section": "3.3 Makeover 3",
-    "text": "3.3 Makeover 3\n\nfunnel_plot(\n  .data = covid19,\n  numerator = Death,\n  denominator = Positive,\n  group = `Sub-district`,\n  data_type = \"PR\",   \n  xrange = c(0, 6500),  \n  yrange = c(0, 0.05),\n  label = NA,\n  title = \"Cumulative COVID-19 Fatality Rate by Cumulative Total Number of COVID-19 Positive Cases\", #&lt;&lt;           \n  x_label = \"Cumulative COVID-19 Positive Cases\", #&lt;&lt;\n  y_label = \"Cumulative Fatality Rate\"  #&lt;&lt;\n)\n\n\n\n\n\n\n\n\nA funnel plot object with 267 points of which 7 are outliers. \nPlot is adjusted for overdispersion. \n\n\nThings to learn from the code chunk above.\n\nlabel = NA argument is to remove the default label outliers feature.\ntitle argument is used to add plot title.\nx_label and y_label arguments are used to add/edit x-axis and y-axis titles."
+    "section": "3.3 Makeover 2",
+    "text": "3.3 Makeover 2\n\nfunnel_plot(\n  .data = covid19,\n  numerator = Death,\n  denominator = Positive,\n  group = `Sub-district`,\n  data_type = \"PR\",   \n  xrange = c(0, 6500),  \n  yrange = c(0, 0.05),\n  label = NA,\n  title = \"Cumulative COVID-19 Fatality Rate by Cumulative Total Number of COVID-19 Positive Cases\", #&lt;&lt;           \n  x_label = \"Cumulative COVID-19 Positive Cases\", #&lt;&lt;\n  y_label = \"Cumulative Fatality Rate\"  #&lt;&lt;\n)\n\n\n\n\n\n\n\n\nA funnel plot object with 267 points of which 7 are outliers. \nPlot is adjusted for overdispersion. \n\n\nThings to learn from the code chunk above.\n\nlabel = NA argument is to remove the default label outliers feature.\ntitle argument is used to add plot title.\nx_label and y_label arguments are used to add/edit x-axis and y-axis titles."
   },
   {
     "objectID": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#computing-the-basic-derived-fields",
@@ -425,6 +425,48 @@
     "title": "Hands-on Exercise 4A: Visualizing Statistical Analysis",
     "section": "5.7 Visualising Regression Parameters: ggcoefstats() methods",
     "text": "5.7 Visualising Regression Parameters: ggcoefstats() methods\nIn the code below, ggcoefstats() of ggstatsplot package to visualise the parameters of a regression model.\n\nggcoefstats(model1, \n            output = \"plot\")"
+  },
+  {
+    "objectID": "In-class_Exs/Ex4/In-class_Ex4.html",
+    "href": "In-class_Exs/Ex4/In-class_Ex4.html",
+    "title": "In-class Exercise 4: Visualizing Stats and Models",
+    "section": "",
+    "text": "ggstatsplot enable plotting without calculating the statistics separately."
+  },
+  {
+    "objectID": "In-class_Exs/Ex4/In-class_Ex4.html#loading-the-required-packages",
+    "href": "In-class_Exs/Ex4/In-class_Ex4.html#loading-the-required-packages",
+    "title": "In-class Exercise 4: Visualizing Stats and Models",
+    "section": "2.1 Loading the required packages",
+    "text": "2.1 Loading the required packages\nFor this exercise we will use the following R packages:\n\ntidyverse, a family of modern R packages specially designed to support data science, analysis and communication task including creating static statistical graphs.\nggstatsplot, extension of ggplot2 package for creating graphics with details from statistical tests included in the information-rich plots themselves.\n\n\npacman::p_load(tidyverse, ggstatsplot)\nset.seed(1234)"
+  },
+  {
+    "objectID": "In-class_Exs/Ex4/In-class_Ex4.html#loading-the-data",
+    "href": "In-class_Exs/Ex4/In-class_Ex4.html#loading-the-data",
+    "title": "In-class Exercise 4: Visualizing Stats and Models",
+    "section": "2.2 Loading the data",
+    "text": "2.2 Loading the data\nWe will use the same exam_data dataset from Hands-on Ex 1 and load it into the RStudio environment using read_csv().\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")\nglimpse(exam_data)\n\nRows: 322\nColumns: 7\n$ ID      &lt;chr&gt; \"Student321\", \"Student305\", \"Student289\", \"Student227\", \"Stude…\n$ CLASS   &lt;chr&gt; \"3I\", \"3I\", \"3H\", \"3F\", \"3I\", \"3I\", \"3I\", \"3I\", \"3I\", \"3H\", \"3…\n$ GENDER  &lt;chr&gt; \"Male\", \"Female\", \"Male\", \"Male\", \"Male\", \"Female\", \"Male\", \"M…\n$ RACE    &lt;chr&gt; \"Malay\", \"Malay\", \"Chinese\", \"Chinese\", \"Malay\", \"Malay\", \"Chi…\n$ ENGLISH &lt;dbl&gt; 21, 24, 26, 27, 27, 31, 31, 31, 33, 34, 34, 36, 36, 36, 37, 38…\n$ MATHS   &lt;dbl&gt; 9, 22, 16, 77, 11, 16, 21, 18, 19, 49, 39, 35, 23, 36, 49, 30,…\n$ SCIENCE &lt;dbl&gt; 15, 16, 16, 31, 25, 16, 25, 27, 15, 37, 42, 22, 32, 36, 35, 45…\n\n\nThere are a total of seven attributes in the exam_data tibble data frame. Four of them are categorical data type and the other three are in continuous data type.\n\nThe categorical attributes are: ID, CLASS, GENDER and RACE.\nThe continuous attributes are: MATHS, ENGLISH and SCIENCE."
+  },
+  {
+    "objectID": "In-class_Exs/Ex4/In-class_Ex4.html#using-gghistostats",
+    "href": "In-class_Exs/Ex4/In-class_Ex4.html#using-gghistostats",
+    "title": "In-class Exercise 4: Visualizing Stats and Models",
+    "section": "3.1 Using gghistostats",
+    "text": "3.1 Using gghistostats\n\n3.1.1 By stats type\n\nparametricnprobustbayes\n\n\nIt used mean.\n\ngghistostats(\n  data = exam_data,\n  x = ENGLISH,\n  type = \"parametric\",\n  test.value = 60,\n  bin.args = list(color = \"black\",\n                  fill = \"grey50\",\n                  alpha = 0.7),\n  normal.curve = FALSE,\n  normal.curve.args = list(linewidth = 2),\n  xlab = \"English scores\"\n)\n\n\n\n\n\n\n\n\n\n\nIt used median.\n\ngghistostats(\n  data = exam_data,\n  x = ENGLISH,\n  type = \"np\",\n  test.value = 60,\n  bin.args = list(color = \"black\",\n                  fill = \"grey50\",\n                  alpha = 0.7),\n  normal.curve = FALSE,\n  normal.curve.args = list(linewidth = 2),\n  xlab = \"English scores\"\n)\n\n\n\n\n\n\n\n\n\n\n\ngghistostats(\n  data = exam_data,\n  x = ENGLISH,\n  type = \"robust\",\n  test.value = 60,\n  bin.args = list(color = \"black\",\n                  fill = \"grey50\",\n                  alpha = 0.7),\n  normal.curve = FALSE,\n  normal.curve.args = list(linewidth = 2),\n  xlab = \"English scores\"\n)\n\n\n\n\n\n\n\n\n\n\n\ngghistostats(\n  data = exam_data,\n  x = ENGLISH,\n  type = \"bayes\",\n  test.value = 60,\n  bin.args = list(color = \"black\",\n                  fill = \"grey50\",\n                  alpha = 0.7),\n  normal.curve = FALSE,\n  normal.curve.args = list(linewidth = 2),\n  xlab = \"English scores\"\n)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nReference lines default to corresponding mean, median, etc can be controlled by the centrality argument.\n\n\n\n\n\n3.1.2 Plotting Normal Distribution Curve\nPrevious plot, by default, do not have the normal distribution curve. Setting normal.curve = TRUE adds the normal distribution curve.\n\ngghistostats(\n  data = exam_data,\n  x = ENGLISH,\n  type = \"bayesian\",\n  test.value = 60,\n  bin.args = list(color = \"black\",\n                  fill = \"grey50\",\n                  alpha = 0.7),\n  normal.curve = TRUE,\n  normal.curve.args = list(linewidth = 0.5),\n  xlab = \"English scores\"\n)\n\n\n\n\n\n\n\n\n\n\n3.1.3 Extracting calculated stats\n\np &lt;- gghistostats(\n  data = exam_data,\n  x = ENGLISH,\n  type = \"parametric\",\n  test.value = 60,\n  bin.args = list(\n    color = \"black\",\n    fill = \"grey50\",\n    alpha = 0.7\n  ),\n  normal.curve = FALSE,\n  normal.curve.args = list(linewidth = 2),\n  xlab = \"English scores\"\n)\n\nextract_stats(p)\n\n$subtitle_data\n# A tibble: 1 × 15\n     mu statistic df.error  p.value method            alternative effectsize\n  &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;             &lt;chr&gt;       &lt;chr&gt;     \n1    60      8.77      321 1.04e-16 One Sample t-test two.sided   Hedges' g \n  estimate conf.level conf.low conf.high conf.method conf.distribution n.obs\n     &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;       &lt;chr&gt;             &lt;int&gt;\n1    0.488       0.95    0.372     0.603 ncp         t                   322\n  expression\n  &lt;list&gt;    \n1 &lt;language&gt;\n\n$caption_data\n# A tibble: 1 × 16\n  term       effectsize      estimate conf.level conf.low conf.high    pd\n  &lt;chr&gt;      &lt;chr&gt;              &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;\n1 Difference Bayesian t-test     7.20       0.95     5.48      8.79     1\n  prior.distribution prior.location prior.scale    bf10 method         \n  &lt;chr&gt;                       &lt;dbl&gt;       &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;          \n1 cauchy                          0       0.707 4.54e13 Bayesian t-test\n  conf.method log_e_bf10 n.obs expression\n  &lt;chr&gt;            &lt;dbl&gt; &lt;int&gt; &lt;list&gt;    \n1 ETI               31.4   322 &lt;language&gt;\n\n$pairwise_comparisons_data\nNULL\n\n$descriptive_data\nNULL\n\n$one_sample_data\nNULL\n\n$tidy_data\nNULL\n\n$glance_data\nNULL"
+  },
+  {
+    "objectID": "In-class_Exs/Ex4/In-class_Ex4.html#ggwithinstats",
+    "href": "In-class_Exs/Ex4/In-class_Ex4.html#ggwithinstats",
+    "title": "In-class Exercise 4: Visualizing Stats and Models",
+    "section": "3.2 ggwithinstats",
+    "text": "3.2 ggwithinstats\nWe need to pivot table long to have these columns: ID, SUBJECT, SCORE.\n\nexam_long &lt;-exam_data %&gt;% pivot_longer(\n  cols = ENGLISH:SCIENCE,\n  names_to = \"SUBJECT\",\n  values_to = \"SCORE\") %&gt;%\n  filter(CLASS == \"3A\")\n\n\nggwithinstats(\n  data = filter(exam_long, SUBJECT %in% c(\"MATHS\", \"SCIENCE\")),\n  x = SUBJECT,\n  y = SCORE,\n  type = \"np\"\n)"
+  },
+  {
+    "objectID": "In-class_Exs/Ex4/In-class_Ex4.html#ggscatterstats",
+    "href": "In-class_Exs/Ex4/In-class_Ex4.html#ggscatterstats",
+    "title": "In-class Exercise 4: Visualizing Stats and Models",
+    "section": "3.3 ggscatterstats",
+    "text": "3.3 ggscatterstats\nThe best fit line is controlled by smooth.line.args\n\nggscatterstats(\n  data = exam_data,\n  x = MATHS,\n  y = ENGLISH,\n  marginal = TRUE, # Show the histogram\n  label.var = ID,\n  label.expression = ENGLISH &gt; 90 & MATHS &gt; 90\n)"
   },
   {
     "objectID": "In-class_Exs/Ex1/In-class_Ex1.html",

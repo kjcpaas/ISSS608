@@ -107,7 +107,7 @@ funnel_plot(
 )
 ```
 
-## 3.3 Makeover 3
+## 3.3 Makeover 2
 
 ```{r}
 funnel_plot(
