@@ -1,0 +1,15 @@
+{
+  "hash": "3227a643993c708443d299ac47346b65",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Hands-on Exercise 5: Visualizing and Analyzing Text Data\"\nauthor: \"Kristine Joy Paas\"\ndate: \"3 May 2024\"\ndate-modified: \"last-modified\"\nformat: html\nexecute: \n  echo: true\n  eval: true\n  warning: false\n  freeze: true\n---\n\n\n# 1 Overview\n\nThis hands-on exercise covers [Chapter 29: Visualising and Analysing Text Data with R: tidytext methods](https://r4va.netlify.app/chap29).\n\nI learned about the following:\n\n-   understand tidytext framework for processing, analysing and visualising text data,\n\n-   write function for importing multiple files into R,\n\n-   combine multiple files into a single data frame,\n\n-   clean and wrangle text data by using tidyverse approach,\n\n-   visualize words with Word Cloud,\n\n-   compute term frequency–inverse document frequency (TF-IDF) using tidytext method, and\n\n-   visualizing texts and terms relationship.\n\n# 2 Getting Started\n\n## 2.1 Loading the required packages\n\nFor this exercise we will use the following R packages:\n\n-   tidytext, tidyverse (mainly readr, purrr, stringr, ggplot2)\n\n-   widyr,\n\n-   wordcloud and ggwordcloud,\n\n-   textplot (required igraph, tidygraph and ggraph, )\n\n-   DT,\n\n-   lubridate and hms\n\n\n::: {.cell}\n\n```{.r .cell-code}\npacman::p_load(tidytext, widyr, wordcloud, DT, ggwordcloud, textplot, lubridate, hms, tidyverse, tidygraph, ggraph, igraph)\n```\n:::\n\n\n## 2.2 Importing Multiple Text Files from Multiple Folders\n\n### 2.2.1 Creating a folder list\n\n\n::: {.cell}\n\n```{.r .cell-code}\nnews20 <- \"data/20news/\"\n```\n:::\n\n\n### 2.2.2 Define a function to read all files from a folder into a data frame\n\n\n::: {.cell}\n\n```{.r .cell-code}\nread_folder <- function(infolder) {\n  tibble(file = dir(infolder, \n                    full.names = TRUE)) %>%\n    mutate(text = map(file, \n                      read_lines)) %>%\n    transmute(id = basename(file), \n              text) %>%\n    unnest(text)\n}\n```\n:::\n\n\n## 2.3 Importing Multiple Text Files from Multiple Folders\n\n### 2.3.1 Reading in all the messages from the 20news folder\n\n\n::: {.cell}\n\n```{.r .cell-code}\nraw_text <- tibble(folder = \n                     dir(news20, \n                         full.names = TRUE)) %>%\n  mutate(folder_out = map(folder, \n                          read_folder)) %>%\n  unnest(cols = c(folder_out)) %>%\n  transmute(newsgroup = basename(folder), \n            id, text)\nwrite_rds(raw_text, \"data/rds/news20.rds\")\n```\n:::\n\n\n# Reflections\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

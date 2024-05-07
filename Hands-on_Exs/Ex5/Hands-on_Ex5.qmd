@@ -1,0 +1,95 @@
+---
+title: "Hands-on Exercise 5: Visualizing and Analyzing Text Data"
+author: "Kristine Joy Paas"
+date: "3 May 2024"
+date-modified: "last-modified"
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+  freeze: true
+---
+
+# 1 Overview
+
+This hands-on exercise covers [Chapter 29: Visualising and Analysing Text Data with R: tidytext methods](https://r4va.netlify.app/chap29).
+
+I learned about the following:
+
+-   understand tidytext framework for processing, analysing and visualising text data,
+
+-   write function for importing multiple files into R,
+
+-   combine multiple files into a single data frame,
+
+-   clean and wrangle text data by using tidyverse approach,
+
+-   visualize words with Word Cloud,
+
+-   compute term frequency–inverse document frequency (TF-IDF) using tidytext method, and
+
+-   visualizing texts and terms relationship.
+
+# 2 Getting Started
+
+## 2.1 Loading the required packages
+
+For this exercise we will use the following R packages:
+
+-   tidytext, tidyverse (mainly readr, purrr, stringr, ggplot2)
+
+-   widyr,
+
+-   wordcloud and ggwordcloud,
+
+-   textplot (required igraph, tidygraph and ggraph, )
+
+-   DT,
+
+-   lubridate and hms
+
+```{r}
+#| label: setup
+pacman::p_load(tidytext, widyr, wordcloud, DT, ggwordcloud, textplot, lubridate, hms, tidyverse, tidygraph, ggraph, igraph)
+```
+
+## 2.2 Importing Multiple Text Files from Multiple Folders
+
+### 2.2.1 Creating a folder list
+
+```{r}
+news20 <- "data/20news/"
+```
+
+### 2.2.2 Define a function to read all files from a folder into a data frame
+
+```{r}
+read_folder <- function(infolder) {
+  tibble(file = dir(infolder, 
+                    full.names = TRUE)) %>%
+    mutate(text = map(file, 
+                      read_lines)) %>%
+    transmute(id = basename(file), 
+              text) %>%
+    unnest(text)
+}
+```
+
+## 2.3 Importing Multiple Text Files from Multiple Folders
+
+### 2.3.1 Reading in all the messages from the 20news folder
+
+```{r}
+raw_text <- tibble(folder = 
+                     dir(news20, 
+                         full.names = TRUE)) %>%
+  mutate(folder_out = map(folder, 
+                          read_folder)) %>%
+  unnest(cols = c(folder_out)) %>%
+  transmute(newsgroup = basename(folder), 
+            id, text)
+write_rds(raw_text, "data/rds/news20.rds")
+```
+
+# Reflections

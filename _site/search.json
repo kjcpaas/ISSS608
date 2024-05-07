@@ -133,165 +133,375 @@
     "text": "4.2 Building animated bubble plot using plot_ly()\nWe can also use plotly() by specifying frame in the plot.\n\nbp &lt;- globalPop %&gt;%\n  plot_ly(x = ~Old, \n          y = ~Young, \n          size = ~Population, \n          color = ~Continent,\n          sizes = c(2, 100),\n          frame = ~Year, \n          text = ~Country, \n          hoverinfo = \"text\",\n          type = 'scatter',\n          mode = 'markers'\n          ) %&gt;%\n  layout(showlegend = FALSE)\nbp\n\n\n\n\n\nUnlike the ggplotly() method, this does not render interactive legends and the zoom and pan fuctions. Hoever, it renders much faster so this is a good alternative to previous visualization."
   },
   {
-    "objectID": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html",
-    "href": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html",
-    "title": "Hands-on Exercise 4C: Building Funnel Plot with R",
+    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html",
+    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html",
+    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
     "section": "",
-    "text": "This hands-on exercise covers Chapter 12: Funnel Plots for Fair Comparisons.\nI learned about the following:\n\ngenerating funnel plots"
+    "text": "This hands-on exercise covers Chapter 2: Beyond ggplot Fundamentals.\nI learned about the following:\n\nPackages to extend ggplot2\nImporting custom fonts\nComposing figures using multiple graphs"
   },
   {
-    "objectID": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#loading-the-required-packages",
-    "href": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#loading-the-required-packages",
-    "title": "Hands-on Exercise 4C: Building Funnel Plot with R",
-    "section": "2.1 Loading the required packages",
-    "text": "2.1 Loading the required packages\nFor this exercise we will use the following R packages:\n\nreadr for importing csv into R.\nFunnelPlotR for creating funnel plot.\nggplot2 for creating funnel plot manually.\nknitr for building static html table.\nplotly for creating interactive funnel plot.\n\n\npacman::p_load(tidyverse, FunnelPlotR, plotly, knitr)"
+    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#loading-the-required-libraries",
+    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#loading-the-required-libraries",
+    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
+    "section": "Loading the required libraries",
+    "text": "Loading the required libraries\nIn Hands-on Ex 1, we only used tidyverse and ggplot2. In this exercise, 4 other R packages will be used:\n\nggrepel: an R package provides geoms for ggplot2 to repel overlapping text labels.\nggthemes: an R package provides some extra themes, geoms, and scales for ‘ggplot2’.\nhrbrthemes: an R package provides typography-centric themes and theme components for ggplot2.\npatchwork: an R package for preparing composite figure created using ggplot2.\n\n\npacman::p_load(ggrepel, patchwork, \n               ggthemes, hrbrthemes,\n               tidyverse)"
   },
   {
-    "objectID": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#loading-the-data",
-    "href": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#loading-the-data",
-    "title": "Hands-on Exercise 4C: Building Funnel Plot with R",
-    "section": "2.2 Loading the data",
-    "text": "2.2 Loading the data\nIn this section, COVID-19_DKI_Jakarta will be used. The data was downloaded from Open Data Covid-19 Provinsi DKI Jakarta portal. For this hands-on exercise, we are going to compare the cumulative COVID-19 cases and death by sub-district (i.e. kelurahan) as at 31st July 2021, DKI Jakarta.\nThe code chunk below imports the data into R and save it into a tibble data frame object called covid19.\n\ncovid19 &lt;- read_csv(\"data/COVID-19_DKI_Jakarta.csv\") %&gt;%\n  mutate_if(is.character, as.factor)\n\nkable(head(covid19, 10))\n\n\n\n\n\n\n\n\n\n\n\n\n\nSub-district ID\nCity\nDistrict\nSub-district\nPositive\nRecovered\nDeath\n\n\n\n\n3172051003\nJAKARTA UTARA\nPADEMANGAN\nANCOL\n1776\n1691\n26\n\n\n3173041007\nJAKARTA BARAT\nTAMBORA\nANGKE\n1783\n1720\n29\n\n\n3175041005\nJAKARTA TIMUR\nKRAMAT JATI\nBALE KAMBANG\n2049\n1964\n31\n\n\n3175031003\nJAKARTA TIMUR\nJATINEGARA\nBALI MESTER\n827\n797\n13\n\n\n3175101006\nJAKARTA TIMUR\nCIPAYUNG\nBAMBU APUS\n2866\n2792\n27\n\n\n3174031002\nJAKARTA SELATAN\nMAMPANG PRAPATAN\nBANGKA\n1828\n1757\n26\n\n\n3175051002\nJAKARTA TIMUR\nPASAR REBO\nBARU\n2541\n2433\n37\n\n\n3175041004\nJAKARTA TIMUR\nKRAMAT JATI\nBATU AMPAR\n3608\n3445\n68\n\n\n3171071002\nJAKARTA PUSAT\nTANAH ABANG\nBENDUNGAN HILIR\n2012\n1937\n38\n\n\n3175031002\nJAKARTA TIMUR\nJATINEGARA\nBIDARA CINA\n2900\n2773\n52"
+    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#loading-the-data",
+    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#loading-the-data",
+    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
+    "section": "Loading the data",
+    "text": "Loading the data\nWe will use the same exam_data dataset from Hands-on Ex 1 and load it into the RStudio environment using read_csv().\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")\nglimpse(exam_data)\n\nRows: 322\nColumns: 7\n$ ID      &lt;chr&gt; \"Student321\", \"Student305\", \"Student289\", \"Student227\", \"Stude…\n$ CLASS   &lt;chr&gt; \"3I\", \"3I\", \"3H\", \"3F\", \"3I\", \"3I\", \"3I\", \"3I\", \"3I\", \"3H\", \"3…\n$ GENDER  &lt;chr&gt; \"Male\", \"Female\", \"Male\", \"Male\", \"Male\", \"Female\", \"Male\", \"M…\n$ RACE    &lt;chr&gt; \"Malay\", \"Malay\", \"Chinese\", \"Chinese\", \"Malay\", \"Malay\", \"Chi…\n$ ENGLISH &lt;dbl&gt; 21, 24, 26, 27, 27, 31, 31, 31, 33, 34, 34, 36, 36, 36, 37, 38…\n$ MATHS   &lt;dbl&gt; 9, 22, 16, 77, 11, 16, 21, 18, 19, 49, 39, 35, 23, 36, 49, 30,…\n$ SCIENCE &lt;dbl&gt; 15, 16, 16, 31, 25, 16, 25, 27, 15, 37, 42, 22, 32, 36, 35, 45…\n\n\nThere are a total of seven attributes in the exam_data tibble data frame. Four of them are categorical data type and the other three are in continuous data type.\n\nThe categorical attributes are: ID, CLASS, GENDER and RACE.\nThe continuous attributes are: MATHS, ENGLISH and SCIENCE."
   },
   {
-    "objectID": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#basic-plot",
-    "href": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#basic-plot",
-    "title": "Hands-on Exercise 4C: Building Funnel Plot with R",
-    "section": "3.1 Basic Plot",
-    "text": "3.1 Basic Plot\nThe code chunk below plots a funnel plot.\n\nfunnel_plot(\n  .data = covid19,\n  numerator = Positive,\n  denominator = Death,\n  group = `Sub-district`\n)\n\n\n\n\n\n\n\n\nA funnel plot object with 267 points of which 0 are outliers. \nPlot is adjusted for overdispersion. \n\n\nThings to learn from the code chunk above.\n\ngroup in this function is different from the scatterplot. Here, it defines the level of the points to be plotted i.e. Sub-district, District or City. If Cityc is chosen, there are only six data points.\nBy default, data_typeargument is “SR”.\nlimit: Plot limits, accepted values are: 95 or 99, corresponding to 95% or 99.8% quantiles of the distribution."
+    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#working-with-ggreprel",
+    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#working-with-ggreprel",
+    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
+    "section": "Working with ggreprel",
+    "text": "Working with ggreprel\nggrepel is an extension of ggplot2 package which provides geoms for ggplot2 to repel overlapping text like below.\nWe simply replace geom_text() by geom_text_repel() and geom_label() by geom_label_repel.\n\n\nShow the code\nggplot(data=exam_data, \n       aes(x= MATHS, \n           y=ENGLISH)) +\n  geom_point() +\n  geom_smooth(method=lm, \n              linewidth=0.5) +  \n  geom_label_repel(aes(label = ID), \n             fontface=\"bold\") +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100)) +\n  ggtitle(\"English scores versus Maths scores for Primary 3\")"
   },
   {
-    "objectID": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#makeover-1",
-    "href": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#makeover-1",
-    "title": "Hands-on Exercise 4C: Building Funnel Plot with R",
-    "section": "3.2 Makeover 1",
-    "text": "3.2 Makeover 1\nFrom the plot above, the values are really low so we will adjust the range of y-axis, along with changing the data_type from the default “SR” (indirectly standardised ratios) to “PR” (proportions).\n\nfunnel_plot(\n  .data = covid19,\n  numerator = Death,\n  denominator = Positive,\n  group = `Sub-district`,\n  data_type = \"PR\",\n  x_range = c(0, 6500),\n  y_range = c(0, 0.05)\n)"
+    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#working-with-ggtheme-package",
+    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#working-with-ggtheme-package",
+    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
+    "section": "Working with ggtheme package",
+    "text": "Working with ggtheme package\nggthemes provides ‘ggplot2’ themes that replicate the look of plots by Edward Tufte, Stephen Few, Fivethirtyeight, The Economist, ‘Stata’, ‘Excel’, and The Wall Street Journal, among others.\nSome of the themes provided by the package are show below:\n\nCalcThe EconomistThe Economist (white)ExcelExcel (new)FivethirtyeightSolarizedStataThe Wall Street Journal\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_calc()\n\n\n\n\n\n\n\n\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_economist()\n\n\n\n\n\n\n\n\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_economist_white()\n\n\n\n\n\n\n\n\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_excel()\n\n\n\n\n\n\n\n\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_excel_new()\n\n\n\n\n\n\n\n\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_fivethirtyeight()\n\n\n\n\n\n\n\n\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_solarized()\n\n\n\n\n\n\n\n\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_stata()\n\n\n\n\n\n\n\n\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_wsj()"
   },
   {
-    "objectID": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#makeover-2",
-    "href": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#makeover-2",
-    "title": "Hands-on Exercise 4C: Building Funnel Plot with R",
-    "section": "3.3 Makeover 2",
-    "text": "3.3 Makeover 2\n\nfunnel_plot(\n  .data = covid19,\n  numerator = Death,\n  denominator = Positive,\n  group = `Sub-district`,\n  data_type = \"PR\",   \n  xrange = c(0, 6500),  \n  yrange = c(0, 0.05),\n  label = NA,\n  title = \"Cumulative COVID-19 Fatality Rate by Cumulative Total Number of COVID-19 Positive Cases\", #&lt;&lt;           \n  x_label = \"Cumulative COVID-19 Positive Cases\", #&lt;&lt;\n  y_label = \"Cumulative Fatality Rate\"  #&lt;&lt;\n)\n\n\n\n\n\n\n\n\nA funnel plot object with 267 points of which 7 are outliers. \nPlot is adjusted for overdispersion. \n\n\nThings to learn from the code chunk above.\n\nlabel = NA argument is to remove the default label outliers feature.\ntitle argument is used to add plot title.\nx_label and y_label arguments are used to add/edit x-axis and y-axis titles."
+    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#working-with-hbrthemes-package",
+    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#working-with-hbrthemes-package",
+    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
+    "section": "Working with hbrthemes package",
+    "text": "Working with hbrthemes package\nhrbrthemes package provides a base theme that focuses on typographic elements, including where various labels are placed as well as the fonts that are used.\n\n\n\n\n\n\nImporting required fonts\n\n\n\n\n\nSome of the themes use custom fonts. To install these fonts, the corresponding import command must be run first, e.g.\n\nimport_econ_sans()\n\nThis will show where there fonts are located.\nNext, import the font in the location to your system.\n\nMac: https://support.apple.com/en-sg/guide/font-book/fntbk1000/mac\nWindows: https://support.microsoft.com/en-us/office/add-a-font-b7c5f17c-4426-4b53-967f-455339c564c1\nLinux: https://linuxiac.com/how-to-install-fonts-on-linux\n\nIn future exercises, if these themes will be used, these steps must be added to the setup code chunk.\n\n\n\nSome of the themes provided by the package are show below:\n\nft_rcipsumipsum_esipsum_interipsum_gs\n\n\n\n\n\n\n\n\nNote\n\n\n\nImport Roboto Condensed font first:\n\nimport_roboto_condensed()\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_ft_rc()\n\n\n\n\n\n\n\n\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_ipsum()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nThis requires the Econ Sans font to be installed and imported first:\n\nimport_econ_sans()\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_ipsum_es()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nImport Inter font first:\n\nimport_inter()\n\nAfter installing the font, run:\n\nextrafont::font_import()\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_ipsum_inter()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nThis requires the Goldman Sans Condensed font to be installed and imported first:\n\nimport_goldman_sans()\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_ipsum_gs()"
   },
   {
-    "objectID": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#computing-the-basic-derived-fields",
-    "href": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#computing-the-basic-derived-fields",
-    "title": "Hands-on Exercise 4C: Building Funnel Plot with R",
-    "section": "4.1 Computing the basic derived fields",
-    "text": "4.1 Computing the basic derived fields\nTo plot the funnel plot from scratch, we need to derive cumulative death rate and standard error of cumulative death rate.\n\ndf &lt;- covid19 %&gt;%\n  mutate(rate = Death / Positive) %&gt;%\n  mutate(rate.se = sqrt((rate*(1-rate)) / (Positive))) %&gt;%\n  filter(rate &gt; 0)\n\n\n\n\n\n\n\nIn this code, we supply the numerator and denominator in rate corresponding to the ones supplies in funnel_plot().\n\n\n\nNext, the fit.mean is computed by using the code chunk below.\n\nfit.mean &lt;- weighted.mean(df$rate, 1/df$rate.se^2)"
+    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#base-graphs",
+    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#base-graphs",
+    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
+    "section": "Base Graphs",
+    "text": "Base Graphs\n\nDistribution of Maths scoresDistribution of English scoresEnglish vs Maths scores for Primary 3\n\n\n\n\nShow the code\np1 &lt;- ggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") + \n  coord_cartesian(xlim=c(0,100)) +\n  ggtitle(\"Distribution of Maths scores\")\np1\n\n\n\n\n\n\n\n\n\n\n\n\n\nShow the code\np2 &lt;- ggplot(data=exam_data, \n             aes(x = ENGLISH)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  coord_cartesian(xlim=c(0,100)) +\n  ggtitle(\"Distribution of English scores\")\np2\n\n\n\n\n\n\n\n\n\n\n\n\n\nShow the code\np3 &lt;- ggplot(data=exam_data, \n             aes(x= MATHS, \n                 y=ENGLISH)) +\n  geom_point() +\n  geom_smooth(method=lm, \n              size=0.5) +  \n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100)) +\n  ggtitle(\"English vs Maths scores (Primary 3)\")\np3"
   },
   {
-    "objectID": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#calculate-lower-and-upper-limits-for-95-and-99.9-ci",
-    "href": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#calculate-lower-and-upper-limits-for-95-and-99.9-ci",
-    "title": "Hands-on Exercise 4C: Building Funnel Plot with R",
-    "section": "4.2 Calculate lower and upper limits for 95% and 99.9% CI",
-    "text": "4.2 Calculate lower and upper limits for 95% and 99.9% CI\nThe code chunk below is used to compute the lower and upper limits for 95% confidence interval.\n\nnumber.seq &lt;- seq(1, max(df$Positive), 1)\nnumber.ll95 &lt;- fit.mean - 1.96 * sqrt((fit.mean*(1-fit.mean)) / (number.seq)) \nnumber.ul95 &lt;- fit.mean + 1.96 * sqrt((fit.mean*(1-fit.mean)) / (number.seq)) \nnumber.ll999 &lt;- fit.mean - 3.29 * sqrt((fit.mean*(1-fit.mean)) / (number.seq)) \nnumber.ul999 &lt;- fit.mean + 3.29 * sqrt((fit.mean*(1-fit.mean)) / (number.seq)) \ndfCI &lt;- data.frame(number.ll95, number.ul95, number.ll999, \n                   number.ul999, number.seq, fit.mean)"
+    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#creating-composite-graphics-pathwork-methods",
+    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#creating-composite-graphics-pathwork-methods",
+    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
+    "section": "Creating Composite Graphics: pathwork methods",
+    "text": "Creating Composite Graphics: pathwork methods\nThere are several ggplot2 extension’s functions support the needs to prepare composite figure by combining several graphs such as grid.arrange() of gridExtra package and plot_grid() of cowplot package. In this section, I am going to shared with you an ggplot2 extension called patchwork which is specially designed for combining separate ggplot2 graphs into a single figure.\nPatchwork package has a very simple syntax where we can create layouts super easily. Here’s the general syntax that combines:\n\nTwo-Column Layout using the Plus Sign +.\nParenthesis () to create a subplot group.\nTwo-Row Layout using the Division Sign /"
   },
   {
-    "objectID": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#plotting-a-static-funnel-plot",
-    "href": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#plotting-a-static-funnel-plot",
-    "title": "Hands-on Exercise 4C: Building Funnel Plot with R",
-    "section": "4.3 Plotting a static funnel plot",
-    "text": "4.3 Plotting a static funnel plot\n\n\nShow the code\np &lt;- ggplot(df, aes(x = Positive, y = rate)) +\n  geom_point(aes(label=`Sub-district`), \n             alpha=0.4) +\n  geom_line(data = dfCI, \n            aes(x = number.seq, \n                y = number.ll95), \n            size = 0.4, \n            colour = \"grey40\", \n            linetype = \"dashed\") +\n  geom_line(data = dfCI, \n            aes(x = number.seq, \n                y = number.ul95), \n            size = 0.4, \n            colour = \"grey40\", \n            linetype = \"dashed\") +\n  geom_line(data = dfCI, \n            aes(x = number.seq, \n                y = number.ll999), \n            size = 0.4, \n            colour = \"grey40\") +\n  geom_line(data = dfCI, \n            aes(x = number.seq, \n                y = number.ul999), \n            size = 0.4, \n            colour = \"grey40\") +\n  geom_hline(data = dfCI, \n             aes(yintercept = fit.mean), \n             size = 0.4, \n             colour = \"grey40\") +\n  coord_cartesian(ylim=c(0,0.05)) +\n  annotate(\"text\", x = 1, y = -0.13, label = \"95%\", size = 3, colour = \"grey40\") + \n  annotate(\"text\", x = 4.5, y = -0.18, label = \"99%\", size = 3, colour = \"grey40\") + \n  ggtitle(\"Cumulative Fatality Rate by Cumulative Number of COVID-19 Cases\") +\n  xlab(\"Cumulative Number of COVID-19 Cases\") + \n  ylab(\"Cumulative Fatality Rate\") +\n  theme_light() +\n  theme(plot.title = element_text(size=12),\n        legend.position = c(0.91,0.85), \n        legend.title = element_text(size=7),\n        legend.text = element_text(size=7),\n        legend.background = element_rect(colour = \"grey60\", linetype = \"dotted\"),\n        legend.key.height = unit(0.3, \"cm\"))\np"
+    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#combining-two-ggplot2-graphs-using",
+    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#combining-two-ggplot2-graphs-using",
+    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
+    "section": "Combining two ggplot2 graphs using ‘+’",
+    "text": "Combining two ggplot2 graphs using ‘+’\nUsing + is the simplest way to combine multiple graphs. This will show them side by side\n\np1 + p2"
   },
   {
-    "objectID": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#interactive-plot-with-plotly",
-    "href": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#interactive-plot-with-plotly",
-    "title": "Hands-on Exercise 4C: Building Funnel Plot with R",
-    "section": "4.4 Interactive plot with plotly",
-    "text": "4.4 Interactive plot with plotly\nThe funnel plot created using ggplot2 functions can be made interactive with ggplotly() of plotly r package.\n\nfp_ggplotly &lt;- ggplotly(p,\n  tooltip = c(\"label\", \n              \"x\", \n              \"y\"))\nfp_ggplotly"
+    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#combining-three-ggplot2-graphs-using-pathwork",
+    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#combining-three-ggplot2-graphs-using-pathwork",
+    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
+    "section": "Combining three ggplot2 graphs using pathwork",
+    "text": "Combining three ggplot2 graphs using pathwork\nAside from +, patchwork provides other operators we can use to compose plots:\n\n“/” operator to stack two ggplot2 graphs,\n“|” operator to place the plots beside each other,\n“()” operator the define the sequence of the plotting.\n\nFor example, if we want to stack the two bar graphs, and show the scatterplot to the right, we can do:\n\n(p1 / p2) | p3"
   },
   {
-    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html",
-    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html",
-    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
+    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#tagging-composed-graphs",
+    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#tagging-composed-graphs",
+    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
+    "section": "Tagging composed graphs",
+    "text": "Tagging composed graphs\npatchwork provides auto-tagging capabilities so the individual graphs can more easily be referred in text.\n\n((p1 / p2) | p3) +\n  plot_annotation(tag_levels = '1')\n\n\n\n\n\n\n\n\nFor example, we can refer to the Distributions of Maths scores graph as Graph 1, corresponding to the annotation provided."
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#creating-figure-with-insert",
+    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#creating-figure-with-insert",
+    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
+    "section": "Creating figure with insert",
+    "text": "Creating figure with insert\nBeside providing functions to place plots next to each other based on the provided layout. With inset_element() of patchwork, we can place one or several plots or graphic elements freely on top or below another plot.\n\np3 + inset_element(p2, \n                   left = 0.02, \n                   bottom = 0.7, \n                   right = 0.5, \n                   top = 1)\n\n\n\n\n\n\n\n\nThis is useful for providing supplementary details to the main graph."
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#applying-themes-to-the-composite-figure",
+    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#applying-themes-to-the-composite-figure",
+    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
+    "section": "Applying themes to the composite figure",
+    "text": "Applying themes to the composite figure\nWe can apply the theme by using & theme_() to the patchwork result.\n\nThe Economist (ggtheme)Ipsum_es (hrbrtheme)\n\n\n\npatchwork &lt;- (p1 / p2) | p3\npatchwork & theme_economist()\n\n\n\n\n\n\n\n\n\n\n\npatchwork &lt;- (p1 / p2) | p3\npatchwork & theme_ipsum_es()"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html",
+    "href": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html",
+    "title": "Hands-on Exercise 4B: Visualizing Uncertainty",
     "section": "",
-    "text": "This hands-on exercise covers Chapter 3: Programming Interactive Data Visualisation with R.\nI learned about the following:\n\nCreating interactive data visualizations"
+    "text": "This hands-on exercise covers Chapter 11: Visual Uncertainty.\nI learned about the following:\n\nplotting uncertainty through error bars\ncreating hypothetical outcome plots (HOPs) by using ungeviz package"
   },
   {
-    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#loading-the-required-packages",
-    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#loading-the-required-packages",
-    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
+    "objectID": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#loading-the-required-packages",
+    "href": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#loading-the-required-packages",
+    "title": "Hands-on Exercise 4B: Visualizing Uncertainty",
     "section": "2.1 Loading the required packages",
-    "text": "2.1 Loading the required packages\nFor this exercise we will use the following R packages:\n\nggiraph for making ‘ggplot’ graphics interactive.\nplotly, R library for plotting interactive statistical graphs.\nDT provides an R interface to the JavaScript library DataTables that create interactive table on html page.\ntidyverse, a family of modern R packages specially designed to support data science, analysis and communication task including creating static statistical graphs.\npatchwork for combining multiple ggplot2 graphs into one figure.\n\n\npacman::p_load(ggiraph, plotly, \n               DT, patchwork,\n               tidyverse)"
+    "text": "2.1 Loading the required packages\nFor this exercise we will use the following R packages:\n\ntidyverse, a family of R packages for data science process,\nplotly for creating interactive plot,\ngganimate for creating animation plot,\ngifski for gganimate to generate gif animations\nDT for displaying interactive html table,\ncrosstalk for for implementing cross-widget interactions (currently, linked brushing and filtering), and\nggdist for visualising distribution and uncertainty.\nungeviz for visualizing uncertainty\nknitr for rendering a simple table\n\n\n\n\n\n\n\nI needed to install devtools first by Tools &gt; Install Packages.\nAdded the following libraries from the ones of the chapter as they are also necessary to be install individually:\n\ngifski\nknitr\n\n\n\n\n\npacman::p_load(tidyverse, plotly, gifski, gganimate, DT, crosstalk, ggdist, knitr)\ndevtools::install_github(\"wilkelab/ungeviz\")\nlibrary(ungeviz)"
   },
   {
-    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#loading-the-data",
-    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#loading-the-data",
-    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
+    "objectID": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#loading-the-data",
+    "href": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#loading-the-data",
+    "title": "Hands-on Exercise 4B: Visualizing Uncertainty",
     "section": "2.2 Loading the data",
     "text": "2.2 Loading the data\nWe will use the same exam_data dataset from Hands-on Ex 1 and load it into the RStudio environment using read_csv().\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")\nglimpse(exam_data)\n\nRows: 322\nColumns: 7\n$ ID      &lt;chr&gt; \"Student321\", \"Student305\", \"Student289\", \"Student227\", \"Stude…\n$ CLASS   &lt;chr&gt; \"3I\", \"3I\", \"3H\", \"3F\", \"3I\", \"3I\", \"3I\", \"3I\", \"3I\", \"3H\", \"3…\n$ GENDER  &lt;chr&gt; \"Male\", \"Female\", \"Male\", \"Male\", \"Male\", \"Female\", \"Male\", \"M…\n$ RACE    &lt;chr&gt; \"Malay\", \"Malay\", \"Chinese\", \"Chinese\", \"Malay\", \"Malay\", \"Chi…\n$ ENGLISH &lt;dbl&gt; 21, 24, 26, 27, 27, 31, 31, 31, 33, 34, 34, 36, 36, 36, 37, 38…\n$ MATHS   &lt;dbl&gt; 9, 22, 16, 77, 11, 16, 21, 18, 19, 49, 39, 35, 23, 36, 49, 30,…\n$ SCIENCE &lt;dbl&gt; 15, 16, 16, 31, 25, 16, 25, 27, 15, 37, 42, 22, 32, 36, 35, 45…\n\n\nThere are a total of seven attributes in the exam_data tibble data frame. Four of them are categorical data type and the other three are in continuous data type.\n\nThe categorical attributes are: ID, CLASS, GENDER and RACE.\nThe continuous attributes are: MATHS, ENGLISH and SCIENCE."
   },
   {
-    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#tooltips",
-    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#tooltips",
-    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
-    "section": "3.1 Tooltips",
-    "text": "3.1 Tooltips\n\n3.1.2 Adding tooltips\nInstead of geom_dotplot() provided by ggplot2, we will use ggiraph’s geom_dotplot_interactive() with the tooltip aesthetic to add the label in the content.\nAfter defining the plot, we will pass this to girafe() to generate the interactive element in our webpage.\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(\n    aes(tooltip = ID),\n    stackgroups = TRUE, \n    binwidth = 1, \n    method = \"histodot\") +\n  scale_y_continuous(NULL, \n                     breaks = NULL)\ngirafe(\n  ggobj = p,\n  width_svg = 6,\n  height_svg = 6*0.618\n)\n\n\n\n\n\nHovering on a dot in a plot shows the ID, which we set as the tooltip content.\n\n\n3.1.2 Adding multiple information in tooltip\nOne way we can add multiple information in tooltip is by setting tooltip value in dataframe with the data to be presented.\n\nexam_data$tooltip &lt;- c(paste0(     \n  \"Name = \", exam_data$ID,         \n  \"\\n Class = \", exam_data$CLASS)) \n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(\n    aes(tooltip = exam_data$tooltip), \n    stackgroups = TRUE,\n    binwidth = 1,\n    method = \"histodot\") +\n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(\n  ggobj = p,\n  width_svg = 8,\n  height_svg = 8*0.618\n)\n\n\n\n\n\nThe tooltip now has the student Name and Class when hovering on the dots.\n\n\n3.1.3 Styling the tooltip\nThe tooltip can be styled using CSS as the rendering is done on the webpage, and no processing of style by ggplot2. This style is passed to the girafe() function.\nFor example, we can change the background to white, instead of the default black. We will also change the font to Arial.\n\ntooltip_css &lt;- \"background-color:white; #&lt;&lt;\nfont-style:bold; color:black; font-family: Arial\" #&lt;&lt;\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(              \n    aes(tooltip = ID),                   \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") +               \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(                                  \n  ggobj = p,                             \n  width_svg = 6,                         \n  height_svg = 6*0.618,\n  options = list(    #&lt;&lt;\n    opts_tooltip(    #&lt;&lt;\n      css = tooltip_css)) #&lt;&lt;\n)"
+    "objectID": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#plotting-standard-error-bars-of-point-estimates",
+    "href": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#plotting-standard-error-bars-of-point-estimates",
+    "title": "Hands-on Exercise 4B: Visualizing Uncertainty",
+    "section": "3.1 Plotting standard error bars of point estimates",
+    "text": "3.1 Plotting standard error bars of point estimates\nNow we are ready to plot the standard error bars of mean maths score by race as shown below.\n\n\nShow the code\nggplot(my_sum) +\n  geom_errorbar(\n    aes(x=RACE, \n        ymin=mean-se, \n        ymax=mean+se), \n    width=0.2, \n    colour=\"black\", \n    alpha=0.9, \n    size=0.5) +\n  geom_point(aes\n           (x=RACE, \n            y=mean), \n           stat=\"identity\", \n           color=\"red\",\n           size = 1.5,\n           alpha=1) +\n  ggtitle(\"Standard error of mean maths score by rac\")"
   },
   {
-    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#hover",
-    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#hover",
-    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
-    "section": "3.2 Hover",
-    "text": "3.2 Hover\n\n3.2.1 Adding hover effect\nWe can add hover effect by adding data_id aesthetic to geom_dotplot_interactive().\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(           \n    aes(data_id = CLASS),             \n    stackgroups = TRUE,               \n    binwidth = 1,                        \n    method = \"histodot\") +               \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(                                  \n  ggobj = p,                             \n  width_svg = 6,                         \n  height_svg = 6*0.618                      \n)\n\n\n\n\n\nHovering on a dot show the other dots with the same value in CLASS. This is useful for highlight plot elements related to the data.\n\n\n3.2.2 Styling hover effect\nWe can also use CSS to style the hover effect. The styles are passed to the girafe() function.\nopts_hover - style of the hovered and related data\nopts_hover_inv - style of unrelated data\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(              \n    aes(data_id = CLASS),              \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") +               \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(                                  \n  ggobj = p,                             \n  width_svg = 6,                         \n  height_svg = 6*0.618,\n  options = list(                        \n    opts_hover(css = \"fill: blue;\"),  \n    opts_hover_inv(css = \"opacity:0.4;\") \n  )                                        \n)\n\n\n\n\n\n\n\n3.2.3 Combining tooltip and hover\nWe can also combine both tooltips and hover effect to highlight related data and provide guiding text on the tootltip.\nThis can be done by setting both tooltip and data_id aesthetics on geom_dotplot_interactive().\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(              \n    aes(tooltip = paste(\"Class:\", CLASS), \n        data_id = CLASS),              \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") +               \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(                                  \n  ggobj = p,                             \n  width_svg = 6,                         \n  height_svg = 6*0.618,\n  options = list(                        \n    opts_tooltip(css = \"background-color:white; font-style:bold; color:black; font-family: Arial\"),\n    opts_hover(css = \"fill: blue;\"),  \n    opts_hover_inv(css = \"opacity:0.4;\") \n  )                                        \n)\n\n\n\n\n\nWith this, the tooltip shows the class and highlights the other dots associated with the class."
+    "objectID": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#plotting-confidence-interval-of-point-estimates",
+    "href": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#plotting-confidence-interval-of-point-estimates",
+    "title": "Hands-on Exercise 4B: Visualizing Uncertainty",
+    "section": "3.2 Plotting confidence interval of point estimates",
+    "text": "3.2 Plotting confidence interval of point estimates\nInstead of plotting the standard error bar of point estimates, we can also plot the confidence intervals of mean maths score by race.\n\n\nShow the code\nggplot(my_sum) +\n  geom_errorbar(\n    aes(x=reorder(RACE, -mean), \n        ymin=mean-1.96*se, \n        ymax=mean+1.96*se), \n    width=0.2, \n    colour=\"black\", \n    alpha=0.9, \n    size=0.5) +\n  geom_point(aes\n           (x=RACE, \n            y=mean), \n           stat=\"identity\", \n           color=\"red\",\n           size = 1.5,\n           alpha=1) +\n  labs(x = \"Maths score\",\n       title = \"95% confidence interval of mean maths score by race\")"
   },
   {
-    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#onclick-effect",
-    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#onclick-effect",
-    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
-    "section": "3.3 onclick() effect",
-    "text": "3.3 onclick() effect\nThis provides functionality to run Javascript code when clicking on a plot element.\n\nexam_data$onclick &lt;- sprintf(\"window.open(\\\"%s%s\\\")\",\n\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20school\",\nas.character(exam_data$ID))\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(              \n    aes(onclick = onclick),              \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") +               \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(                                  \n  ggobj = p,                             \n  width_svg = 6,                         \n  height_svg = 6*0.618)\n\n\n\n\n\nIn this example, clicking a dot opens MOE page of the student. This is triggered by the window.open() javascript.\n\n\n\n\n\n\nPreventing XSS attacks\n\n\n\nWhen running javascript functions, using data not generated by our system, it is important to escape the data for Javascript safety to prevent Cross-Site Scripting attacks.\nOne example is if CLASS has some values such as ;stealYoInfo();, it can potentially make users vulnerable. Even if there is no malicious intent, if some values have text that can affect Javascript parsing, the interactive plot may not work as expected.\nThis particular dataset and Singapore Open Data datasets are trusted so there is less concern for this happening. However, some caution is needed when using untrusted sources.\nI will do some tests at a later time to check if ggiraph is vulnerable to such attacks so that I can apply measures to prevent XSS."
+    "objectID": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#visualizing-the-uncertainty-of-point-estimates-with-interactive-error-bars",
+    "href": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#visualizing-the-uncertainty-of-point-estimates-with-interactive-error-bars",
+    "title": "Hands-on Exercise 4B: Visualizing Uncertainty",
+    "section": "3.3 Visualizing the uncertainty of point estimates with interactive error bars",
+    "text": "3.3 Visualizing the uncertainty of point estimates with interactive error bars\nWe will now plot interactive error bars for the 99% confidence interval of mean maths score by race as shown in the figure below.\n\n\nShow the code\nshared_df = SharedData$new(my_sum)\n\nbscols(widths = c(4,8),\n       ggplotly((ggplot(shared_df) +\n                   geom_errorbar(aes(\n                     x=reorder(RACE, -mean),\n                     ymin=mean-2.58*se, \n                     ymax=mean+2.58*se), \n                     width=0.2, \n                     colour=\"black\", \n                     alpha=0.9, \n                     size=0.5) +\n                   geom_point(aes(\n                     x=RACE, \n                     y=mean, \n                     text = paste(\"Race:\", `RACE`, \n                                  \"&lt;br&gt;N:\", `n`,\n                                  \"&lt;br&gt;Avg. Scores:\", round(mean, digits = 2),\n                                  \"&lt;br&gt;95% CI:[\", \n                                  round((mean-2.58*se), digits = 2), \",\",\n                                  round((mean+2.58*se), digits = 2),\"]\")),\n                     stat=\"identity\", \n                     color=\"red\", \n                     size = 1.5, \n                     alpha=1) + \n                   xlab(\"Race\") + \n                   ylab(\"Average Scores\") + \n                   theme_minimal() + \n                   theme(axis.text.x = element_text(\n                     angle = 45, vjust = 0.5, hjust=1)) +\n                   ggtitle(\"99% Confidence interval of average /&lt;br&gt;maths scores by race\")), \n                tooltip = \"text\"), \n       DT::datatable(shared_df, \n                     rownames = FALSE, \n                     class=\"compact\", \n                     width=\"100%\", \n                     options = list(pageLength = 10,\n                                    scrollX=T), \n                     colnames = c(\"No. of pupils\", \n                                  \"Avg Scores\",\n                                  \"Std Dev\",\n                                  \"Std Error\")) %&gt;%\n         formatRound(columns=c('mean', 'sd', 'se'),\n                     digits=2))"
   },
   {
-    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#coordinating-multiple-views",
-    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#coordinating-multiple-views",
-    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
-    "section": "3.4 Coordinating multiple views",
-    "text": "3.4 Coordinating multiple views\nWe can pass the patchwork plot to girafe() to coordinate the interactions of the two plots.\n\np1 &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(              \n    aes(data_id = ID),              \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") +  \n  coord_cartesian(xlim=c(0,100)) + \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\n\np2 &lt;- ggplot(data=exam_data, \n       aes(x = ENGLISH)) +\n  geom_dotplot_interactive(              \n    aes(data_id = ID),              \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") + \n  coord_cartesian(xlim=c(0,100)) + \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\n\ngirafe(code = print(p1 + p2), \n       width_svg = 6,\n       height_svg = 3,\n       options = list(\n         opts_hover(css = \"fill: #202020;\"),\n         opts_hover_inv(css = \"opacity:0.2;\")\n         )\n       )\n\n\n\n\n\nIn the example above, hovering a dot in the Maths plot, highlights the corresponding dot in English.\nThis is useful for seeing how the student scored in both subjects."
+    "objectID": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#using-stat_pointinterval",
+    "href": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#using-stat_pointinterval",
+    "title": "Hands-on Exercise 4B: Visualizing Uncertainty",
+    "section": "4.1 Using stat_pointinterval()",
+    "text": "4.1 Using stat_pointinterval()\nWe will build a visual for displaying distribution of maths scores by race.\n\nexam_data %&gt;%\n  ggplot(aes(x = RACE, \n             y = MATHS)) +\n  stat_pointinterval() +\n  labs(\n    title = \"Visualising confidence intervals of mean math score\",\n    subtitle = \"Mean Point + Multiple-interval plot\")\n\n\n\n\n\n\n\n\nstat_pointinterval() can also be called with extra arguments\n\nexam_data %&gt;%\n  ggplot(aes(x = RACE, y = MATHS)) +\n  stat_pointinterval(.width = 0.95,\n  .point = median,\n  .interval = qi) +\n  labs(\n    title = \"Visualising confidence intervals of median math score\",\n    subtitle = \"Median Point + Multiple-interval plot\")"
   },
   {
-    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#creating-an-interactive-scatterplot",
-    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#creating-an-interactive-scatterplot",
-    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
-    "section": "4.1 Creating an interactive scatterplot",
-    "text": "4.1 Creating an interactive scatterplot\n\nplot_ly(data = exam_data, \n             x = ~MATHS, \n             y = ~ENGLISH)\n\n\n\n\n\nWith a few lines of code, it generated an interactive plot with tooltips and with varioous functions like zoom and pan."
+    "objectID": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#using-stat_pointinterval-makeover",
+    "href": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#using-stat_pointinterval-makeover",
+    "title": "Hands-on Exercise 4B: Visualizing Uncertainty",
+    "section": "4.2 Using stat_pointinterval() (makeover)",
+    "text": "4.2 Using stat_pointinterval() (makeover)\nThe previous plot shows the 95% confidence interval. This plot below will show the 95% (thick line) to 99% (thin line) confidence interval.\n\n\n\n\n\n\nThe default for .width seems to be .width = c(0.66, 0.95) from the docs.\n\n\n\n\nexam_data %&gt;%\n  ggplot(aes(x = RACE, y = MATHS)) +\n  stat_pointinterval(.width = c(0.95, 0.99),\n  .point = median,\n  .interval = qi) +\n  labs(\n    title = \"Visualising confidence intervals of median math score\",\n    subtitle = \"Median Point + Multiple-interval plot\")"
   },
   {
-    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#adding-color-to-plotly-visualization",
-    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#adding-color-to-plotly-visualization",
-    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
-    "section": "4.2 Adding color to plotly visualization",
-    "text": "4.2 Adding color to plotly visualization\n\nplot_ly(data = exam_data, \n             x = ~MATHS, \n             y = ~ENGLISH,\n             color = ~RACE)\n\n\n\n\n\nAdding the color also added an interactive legend, and each race can clicked to hide and unhide dots from the plot."
+    "objectID": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#using-stat_gradientinterval",
+    "href": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#using-stat_gradientinterval",
+    "title": "Hands-on Exercise 4B: Visualizing Uncertainty",
+    "section": "4.3 Using stat_gradientinterval()",
+    "text": "4.3 Using stat_gradientinterval()\nIn the code chunk below, stat_gradientinterval() of ggdist is used to build a visual for displaying distribution of maths scores by race.\n\nexam_data %&gt;%\n  ggplot(aes(x = RACE, \n             y = MATHS)) +\n  stat_gradientinterval(   \n    fill = \"skyblue\",      \n    show.legend = TRUE     \n  ) +                        \n  labs(\n    title = \"Visualising confidence intervals of mean math score\",\n    subtitle = \"Gradient + interval plot\")\n\n\n\n\n\n\n\n\nThis plots gradients based on distribution. The darker color, the more observations with that value."
   },
   {
-    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#creating-an-interactive-scatetrplot-using-ggplotly",
-    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#creating-an-interactive-scatetrplot-using-ggplotly",
-    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
-    "section": "4.3 Creating an interactive scatetrplot using ggplotly",
-    "text": "4.3 Creating an interactive scatetrplot using ggplotly\nWe can make an existing ggplot visualization interactive by passing the plot using ggplotly()\n\np &lt;- ggplot(data=exam_data, \n            aes(x = MATHS,\n                y = ENGLISH)) +\n  geom_point(size=1) +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100))\nggplotly(p)"
+    "objectID": "Hands-on_Exs/Ex1/Hands-on_Ex1.html",
+    "href": "Hands-on_Exs/Ex1/Hands-on_Ex1.html",
+    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics: ggplot2 methods",
+    "section": "",
+    "text": "This hands-on exercise covers Chapter 1: A Layered Grammar of Graphics: ggplot2 methods.\nI learned about the following:\n\nUseful functions and components in ggplot2 .\nGrammar of Graphics to guide how data is visualized"
   },
   {
-    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#coordinating-multiple-views-1",
-    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#coordinating-multiple-views-1",
-    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
-    "section": "4.4 Coordinating multiple views",
-    "text": "4.4 Coordinating multiple views\nCoordinating views is done by the following:\n\nhighlight_key() of plotly package is used as shared data.\ntwo scatterplots will be created by using ggplot2 functions.\nlastly, subplot() of plotly package is used to place them next to each other side-by-side. (similar to patchwork)\n\n\nd &lt;- highlight_key(exam_data)\np1 &lt;- ggplot(data=d, \n            aes(x = MATHS,\n                y = ENGLISH)) +\n  geom_point(size=1) +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100))\n\np2 &lt;- ggplot(data=d, \n            aes(x = MATHS,\n                y = SCIENCE)) +\n  geom_point(size=1) +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100))\nsubplot(ggplotly(p1),\n        ggplotly(p2))"
+    "objectID": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#loading-the-required-libraries",
+    "href": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#loading-the-required-libraries",
+    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics: ggplot2 methods",
+    "section": "Loading the required libraries",
+    "text": "Loading the required libraries\n\n\n\n\n\n\nMark this chunk for setup so it ensures loading of required libraries when another code chunk is run\n\n\n\n\npacman::p_load(tidyverse)"
   },
   {
-    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#interactive-data-table-dt-package",
-    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#interactive-data-table-dt-package",
-    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
-    "section": "5.1 Interactive Data Table: DT Package",
-    "text": "5.1 Interactive Data Table: DT Package\nIt is a wrapper of DataTables Javascript library. Data objects in R can be rendered as HTML tables using the JavaScript library ‘DataTables’ (typically via R Markdown or Shiny).\n\nDT::datatable(exam_data, class= \"compact\")\n\n\n\n\n\nThis provides interactive elements like pagination, search and sort with just 1 line of code!"
+    "objectID": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#loading-the-data",
+    "href": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#loading-the-data",
+    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics: ggplot2 methods",
+    "section": "Loading the data",
+    "text": "Loading the data\nWe first need to download the provided data set from eLearn and put it under the data folder.\n\n\n\n\n\n\nFile structure\n\n\n\n\n\n\n\n\n\nNext, read the data by using read_csv() from readr package.\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")\nglimpse(exam_data)\n\nRows: 322\nColumns: 7\n$ ID      &lt;chr&gt; \"Student321\", \"Student305\", \"Student289\", \"Student227\", \"Stude…\n$ CLASS   &lt;chr&gt; \"3I\", \"3I\", \"3H\", \"3F\", \"3I\", \"3I\", \"3I\", \"3I\", \"3I\", \"3H\", \"3…\n$ GENDER  &lt;chr&gt; \"Male\", \"Female\", \"Male\", \"Male\", \"Male\", \"Female\", \"Male\", \"M…\n$ RACE    &lt;chr&gt; \"Malay\", \"Malay\", \"Chinese\", \"Chinese\", \"Malay\", \"Malay\", \"Chi…\n$ ENGLISH &lt;dbl&gt; 21, 24, 26, 27, 27, 31, 31, 31, 33, 34, 34, 36, 36, 36, 37, 38…\n$ MATHS   &lt;dbl&gt; 9, 22, 16, 77, 11, 16, 21, 18, 19, 49, 39, 35, 23, 36, 49, 30,…\n$ SCIENCE &lt;dbl&gt; 15, 16, 16, 31, 25, 16, 25, 27, 15, 37, 42, 22, 32, 36, 35, 45…"
   },
   {
-    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#rendering-plots-with-data-table",
-    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#rendering-plots-with-data-table",
-    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
-    "section": "5.2 Rendering plots with data table",
-    "text": "5.2 Rendering plots with data table\n\nd &lt;- highlight_key(exam_data) \np &lt;- ggplot(d, \n            aes(ENGLISH, \n                MATHS)) + \n  geom_point(size=1) +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100))\n\ngg &lt;- highlight(ggplotly(p),        \n                \"plotly_selected\")  \n\ncrosstalk::bscols(gg,               \n                  DT::datatable(d), \n                  widths = 5)        \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nThe scatterplot is rendered beside datatable."
+    "objectID": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#data",
+    "href": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#data",
+    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics: ggplot2 methods",
+    "section": "Data",
+    "text": "Data\nThe data layer contains the dataset to be visualized.\n\nggplot(data=exam_data)\n\n\n\n\n\n\n\n\nThis generated an empty plot as no visual elements have been added to ggplot2 call."
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#aesthetic-mappings",
+    "href": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#aesthetic-mappings",
+    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics: ggplot2 methods",
+    "section": "Aesthetic Mappings",
+    "text": "Aesthetic Mappings\nThe aesthetic mappings take attributes of the data and and use them to influence visual characteristics, such as position, colour, size, shape, or transparency. Each visual characteristic can thus encode an aspect of the data and be used to convey information.\nAll aesthetics of a plot are specified in the aes() function call.\n\nggplot(data=exam_data, \n       aes(x= MATHS))\n\n\n\n\n\n\n\n\nThis maps the MATHS column of exam_data to the x-axis of the plot. The axis range is based on the range of this dataset.\n\nmin(exam_data[\"MATHS\"])\n\n[1] 9\n\n\n\nmax(exam_data[\"MATHS\"])\n\n[1] 99"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#geometrics",
+    "href": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#geometrics",
+    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics: ggplot2 methods",
+    "section": "Geometrics",
+    "text": "Geometrics\n\nTypes\nGeometric objects are the actual marks we put on a plot. Examples include:\n\ngeom_point for drawing individual points (e.g., a scatter plot)\ngeom_line for drawing lines (e.g., for a line charts)\ngeom_smooth for drawing smoothed lines (e.g., for simple trends or approximations)\ngeom_bar for drawing bars (e.g., for bar charts)\ngeom_histogram for drawing binned values (e.g. a histogram)\ngeom_polygon for drawing arbitrary shapes\ngeom_map for drawing polygons in the shape of a map! (You can access the data to use for these maps by using the map_data() function).\n\nA plot can have multiple geometrics. Other available geometrics can be found in https://ggplot2.tidyverse.org/reference/#section-layer-geoms.\n\n\ngeom_bar()\ngeom_bar() plots a bar chart.\n\nggplot(data=exam_data, \n       aes(x=RACE)) +\n  geom_bar()\n\n\n\n\n\n\n\n\n\n\ngeom_dotplot()\ngeom_dotplot() is appropriate for binned data.\n\nggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot(dotsize = 0.5)\n\n\n\n\n\n\n\n\nVertical scale is misleading so let’s just remove it.\n\n\n\n\n\n\nNote\n\n\n\n\nscale_y_continuous() is used to turn off the y-axis, and\nbinwidth argument is used to change the binwidth to 2.5.\n\n\n\n\nggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot(binwidth=2.5,         \n               dotsize = 0.5) +      \n  scale_y_continuous(NULL,           \n                     breaks = NULL)  \n\n\n\n\n\n\n\n\n\n\ngeom_histogram()\ngeom_histogram() is for generating a histogram. (default bin = 30)\n\nggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_histogram()\n\n\n\n\n\n\n\n\nLet’s change the histogram bin and color.\n\nggplot(data=exam_data, \n       aes(x= MATHS)) +\n  geom_histogram(bins=20,            \n                 color=\"black\",      \n                 fill=\"light blue\")  \n\n\n\n\n\n\n\n\n\n\nChanging geometry by using aes()\nIn this example, we partition the data (e.g. Female vs Male) and color each bar corresponding to the partition differently.\n\nggplot(data=exam_data, \n       aes(x= MATHS, \n           fill = GENDER)) +\n  geom_histogram(bins=20, \n                 color=\"grey30\")\n\n\n\n\n\n\n\n\n\n\ngeom_density()\ngeom-density() computes and plots kernel density estimate, which is a smoothed version of the histogram.\nThis is appropriate for continuous data.\n\nggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_density()           \n\n\n\n\n\n\n\n\nIt can be used with partitioned data as well.\n\nggplot(data=exam_data, \n       aes(x = MATHS, \n           colour = GENDER)) +\n  geom_density()\n\n\n\n\n\n\n\n\n\n\ngeom_boxplot()\ngeom_boxplot() displays continuous value list. It visualises five summary statistics (the median, two hinges and two whiskers), and all “outlying” points individually.\nIt is appropriate for visualizing the distribution of a dataset.\n\nggplot(data=exam_data, \n       aes(y = MATHS,       \n           x= GENDER)) +    \n  geom_boxplot()            \n\n\n\n\n\n\n\n\nNotches are used in box plots to help visually assess whether the medians of distributions differ. If the notches do not overlap, this is evidence that the medians are different.\nNotches can be used by supplying notches=true.\n\nggplot(data=exam_data, \n       aes(y = MATHS, \n           x= GENDER)) +\n  geom_boxplot(notch=TRUE)\n\n\n\n\n\n\n\n\n\n\ngeom_violin()\ngeom_violin is designed for creating violin plot. Violin plots are a way of comparing multiple data distributions. With ordinary density curves, it is difficult to compare more than just a few distributions because the lines visually interfere with each other. With a violin plot, it’s easier to compare several distributions since they’re placed side by side.\n\nggplot(data=exam_data, \n       aes(y = MATHS, \n           x= GENDER)) +\n  geom_violin()\n\n\n\n\n\n\n\n\n\n\ngeom_point()\ngeom_point() is especially useful for creating scatterplot.\nThe plot below shows the plot of Maths and English grades.\n\nggplot(data=exam_data, \n       aes(x= MATHS, \n           y=ENGLISH)) +\n  geom_point()            \n\n\n\n\n\n\n\n\n\n\nCombining geom objects\nMultiple geom objects can be combined in a single plot like below, combining a boxplot and scatterplot.\n\nggplot(data=exam_data, \n       aes(y = MATHS, \n           x= GENDER)) +\n  geom_boxplot() +                    \n  geom_point(position=\"jitter\", \n             size = 0.5)"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#statistics",
+    "href": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#statistics",
+    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics: ggplot2 methods",
+    "section": "Statistics",
+    "text": "Statistics\nThe Statistics functions statistically transform data, usually as some form of summary. For example:\n\nfrequency of values of a variable (bar graph)\n\na mean\na confidence limit\n\nThere are two ways to use these functions:\n\nadd a stat_() function and override the default geom, or\nadd a geom_() function and override the default stat.\n\n\n\nAdding mean to the boxplot\nThe boxplot show summary of the dataset based on quantiles. Hence, we can see the median but not the mean.\n\nggplot(data=exam_data, \n       aes(y = MATHS, x= GENDER)) +\n  geom_boxplot()\n\n\n\n\n\n\n\n\nWe can add the mean by using the stat_summary() function.\n\nggplot(data=exam_data, \n       aes(y = MATHS, x= GENDER)) +\n  geom_boxplot() +\n  stat_summary(geom = \"point\",       \n               fun=\"mean\",         \n               colour =\"red\",        \n               size=4)               \n\n\n\n\n\n\n\n\nThis adds a red dot corresponding to the mean to the boxplot.\n\n\nGenerating the stat using the geom_() functions\nAlternatively, the result above can also be generated by using geom_point() with stat parameter.\n\nggplot(data=exam_data, \n       aes(y = MATHS, x= GENDER)) +\n  geom_boxplot() +\n  geom_point(stat=\"summary\",        \n             fun=\"mean\",           \n             colour =\"red\",          \n             size=4)          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\nImportant\n\n\n\nUsing fun.y generated the warning below:\nWarning: The `fun.y` argument of `stat_summary()` is deprecated as of ggplot2 3.3.0.\nPlease use the `fun` argument instead.\nHence, I replace fun.y with just fun.\n\n\n\n\nGenerating best fit curve\nBest fit curve can be generated by using geom_smooth(). We can add this to the English vs Maths scatterplot previously generated.\n\nggplot(data=exam_data, \n       aes(x= MATHS, y=ENGLISH)) +\n  geom_point() +\n  geom_smooth(linewidth=0.5, color=\"red\")\n\n\n\n\n\n\n\n\nWe can also generate a best fit line by specifying method=lm instead of the default loess.\n\nggplot(data=exam_data, \n       aes(x= MATHS, y=ENGLISH)) +\n  geom_point() +\n  geom_smooth(method=\"lm\", linewidth=0.5, color=\"red\")"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#facets",
+    "href": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#facets",
+    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics: ggplot2 methods",
+    "section": "Facets",
+    "text": "Facets\nFacetting generates small multiples (sometimes also called trellis plot), each displaying a different subset of the data. They are an alternative to aesthetics for displaying additional discrete variables. ggplot2 supports two types of factes, namely: facet_grid() and facet_wrap.\n\nfacet_wrap()\nfacet_wrap wraps a 1d sequence of panels into 2d. This is generally a better use of screen space than facet_grid because most displays are roughly rectangular.\nThe code chunk below generates multiple histograms for Maths grades for each class.\n\nggplot(data=exam_data, \n       aes(x= MATHS)) +\n  geom_histogram(bins=20) +\n    facet_wrap(~ CLASS)\n\n\n\n\n\n\n\n\n\n\nfacet_grid()\nfacet_grid() forms a matrix of panels defined by row and column facetting variables. It is most useful when you have two discrete variables, and all combinations of the variables exist in the data.\nThe code chunk below visualizes the same data above but using facet_grid().\n\nggplot(data=exam_data, \n       aes(x= MATHS)) +\n  geom_histogram(bins=20) +\n    facet_grid(~ CLASS)"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#coordinates",
+    "href": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#coordinates",
+    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics: ggplot2 methods",
+    "section": "Coordinates",
+    "text": "Coordinates\nThe Coordinates functions map the position of objects onto the plane of the plot. There are a number of different possible coordinate systems to use, they are:\n\ncoord_cartesian(): the default cartesian coordinate systems, where you specify x and y values (e.g. allows you to zoom in or out).\ncoord_flip(): a cartesian system with the x and y flipped.\ncoord_fixed(): a cartesian system with a “fixed” aspect ratio (e.g. 1.78 for a “widescreen” plot).\ncoord_quickmap():\n\n\nFlipping coordinates\nBy the default, the bar chart of ggplot2 is in vertical form.\n\nggplot(data=exam_data, \n       aes(x=RACE)) +\n  geom_bar()\n\n\n\n\n\n\n\n\nWe can transform the vertical to horizontal bars by using coord_flip().\n\nggplot(data=exam_data, \n       aes(x=RACE)) +\n  geom_bar() +\n  coord_flip()\n\n\n\n\n\n\n\n\n\n\nChanging axis range\nThe scatterplot below may be misleading as the axis range are different.\n\nggplot(data=exam_data, \n       aes(x= MATHS, y=ENGLISH)) +\n  geom_point() +\n  geom_smooth(method=lm, linewidth=0.5)\n\n\n\n\n\n\n\n\nThis is because by default, the axis range was generated based on the min and max values in the dataset.\nWe can apply context and set axis ranges based on the real life min and max values (0 and 100, respectively).\n\nggplot(data=exam_data, \n       aes(x= MATHS, y=ENGLISH)) +\n  geom_point() +\n  geom_smooth(method=lm, \n              linewidth=0.5) +  \n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100))"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#themes",
+    "href": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#themes",
+    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics: ggplot2 methods",
+    "section": "Themes",
+    "text": "Themes\nThemes control elements of the graph not related to the data. For example:\n\nbackground colour\nsize of fonts\ngridlines\ncolour of labels\n\nBuilt-in themes include: - theme_gray() (default) - theme_bw() - theme_classic()\nA list of theme can be found at this link. Each theme element can be conceived of as either a line (e.g. x-axis), a rectangle (e.g. graph background), or text (e.g. axis title).\nApplying the built-in themes is as simple as applying the theme_* functions.\n\nggplot(data=exam_data,\n       aes(x=RACE)) +\n  geom_bar() +\n  coord_flip() +\n  theme_linedraw()"
+  },
+  {
+    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html",
+    "href": "In-class_Exs/Ex2/In-class_Ex2.html",
+    "title": "In-class Exercise 2: Visualizing distribution",
+    "section": "",
+    "text": "From exercise published on https://r4va.netlify.app/chap09\nI learned the following:\n\nDifferent ways to visualize distribution\nRidgeline plot using ggridges\nRaincloud plot using ggdists"
+  },
+  {
+    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#loading-the-r-packages",
+    "href": "In-class_Exs/Ex2/In-class_Ex2.html#loading-the-r-packages",
+    "title": "In-class Exercise 2: Visualizing distribution",
+    "section": "2.1 Loading the R packages",
+    "text": "2.1 Loading the R packages\n\npacman::p_load(tidyverse, ggdist, ggthemes, ggridges, colorspace)"
+  },
+  {
+    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#importing-the-data",
+    "href": "In-class_Exs/Ex2/In-class_Ex2.html#importing-the-data",
+    "title": "In-class Exercise 2: Visualizing distribution",
+    "section": "2.2 Importing the data",
+    "text": "2.2 Importing the data\n\nexam_df &lt;- read_csv(\"data/Exam_data.csv\")"
+  },
+  {
+    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#histogram",
+    "href": "In-class_Exs/Ex2/In-class_Ex2.html#histogram",
+    "title": "In-class Exercise 2: Visualizing distribution",
+    "section": "3.1 Histogram",
+    "text": "3.1 Histogram\n\nggplot(exam_df, aes(x=ENGLISH)) +\n  geom_histogram(color = \"#1696d2\",\n               adjust = 0.65,\n               alpha = 0.6)"
+  },
+  {
+    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#probability-density-diagram",
+    "href": "In-class_Exs/Ex2/In-class_Ex2.html#probability-density-diagram",
+    "title": "In-class Exercise 2: Visualizing distribution",
+    "section": "3.2 Probability Density Diagram",
+    "text": "3.2 Probability Density Diagram\nIt uses geom_density() from ggdist package.\n\nggplot(exam_df, aes(x=ENGLISH)) +\n  geom_density(color = \"#1696d2\",\n               adjust = 0.65,\n               alpha = 0.6,)"
+  },
+  {
+    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#alternative-design",
+    "href": "In-class_Exs/Ex2/In-class_Ex2.html#alternative-design",
+    "title": "In-class Exercise 2: Visualizing distribution",
+    "section": "3.3 Alternative design",
+    "text": "3.3 Alternative design\n\nmedian_eng &lt;- median(exam_df$ENGLISH)\nmean_eng &lt;- mean(exam_df$ENGLISH)\nstd_eng &lt;- sd(exam_df$ENGLISH)\n\nggplot(exam_df, aes(x=ENGLISH)) +\n  geom_density(color = \"#1696d2\",\n               adjust = 0.65,\n               alpha = 0.6,) +\n  stat_function(\n    fun=dnorm,\n    args = list(mean=mean_eng, sd = std_eng),\n    col = \"grey30\",\n    size = 0.8)+\n    geom_vline(aes(xintercept=mean_eng), color = \"#4d5887\", linewidth = 0.6, linetype = \"dashed\")+\n  annotate(geom = \"text\",\n           x = mean_eng - 10,\n           y = 0.04,\n           label = paste0(\"Mean ENGLISH:\", round(mean_eng), 2),\n           color = \"#4d5887\") +\n  geom_vline(aes(xintercept=median_eng), color = \"#4d5887\", linewidth = 0.6) +\n  annotate(geom = \"text\",\n           x = median_eng + 10,\n           y = 0.04,\n           label = paste0(\"Median ENGLISH:\", round(median_eng), 2),\n           color = \"#4d5887\")"
+  },
+  {
+    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#plotting-ridgeline-graph-ggridges-method",
+    "href": "In-class_Exs/Ex2/In-class_Ex2.html#plotting-ridgeline-graph-ggridges-method",
+    "title": "In-class Exercise 2: Visualizing distribution",
+    "section": "4.1 Plotting ridgeline graph: ggridges method",
+    "text": "4.1 Plotting ridgeline graph: ggridges method\nggridges package provides two main geom to plot gridgeline plots, they are: geom_ridgeline() and geom_density_ridges().\ngeom_ridgeline() plots the graph using the height values from the data directly. It is useful when the height values refer to a column directly.\nFor this particular dataset, it is more appropriate to use geom_density_ridges() as we need to plot the distribution of students’ English score. If we had tallied and aggregated the number of students who scores within score ranges, geom_ridgeline() might be appropriate but it isn’t the case.\n\n\nShow ggplot2 code\nggplot(exam_df, \n       aes(x = ENGLISH, \n           y = CLASS)) +\n  geom_density_ridges(\n    scale = 3,\n    rel_min_height = 0.01,\n    bandwidth = 3.4,\n    fill = lighten(\"#7097BB\", .3),\n    color = \"white\"\n  ) +\n  scale_x_continuous(\n    name = \"English grades\",\n    expand = c(0, 0)\n    ) +\n  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +\n  theme_ridges()"
+  },
+  {
+    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#varying-colors-along-the-x-axis",
+    "href": "In-class_Exs/Ex2/In-class_Ex2.html#varying-colors-along-the-x-axis",
+    "title": "In-class Exercise 2: Visualizing distribution",
+    "section": "4.2 Varying colors along the x-axis",
+    "text": "4.2 Varying colors along the x-axis\nSometimes we would like to have the area under a ridgeline not filled with a single solid color but rather with colors that vary in some form along the x axis. This effect can be achieved by using either geom_ridgeline_gradient() or geom_density_ridges_gradient(). Both geoms work just like geom_ridgeline() and geom_density_ridges(), except that they allow for varying fill colors. However, they do not allow for alpha transparency in the fill. For technical reasons, we can have changing fill colors or transparency but not both.\nIf we need emphasize the actual values with color gradient, using colors is appropriate. However, It may not be necessary when there are fewer ridge graphs, since the farthest graph is still relatively close to the axis.\nHowever, in the plot below, it can be more easily seen that 3I scored lowest, while 3A scored the highest among the different classes. Hence, in this case, colors are really valuable.\n\n\nShow ggplot2 code\nggplot(exam_df, \n       aes(x = ENGLISH, \n           y = CLASS,\n           fill = after_stat(x))) + # changed from stat() as it is deprecated\n  geom_density_ridges_gradient(\n    scale = 3,\n    rel_min_height = 0.01) +\n  scale_fill_viridis_c(name = \"Temp. [F]\",\n                       option = \"C\") +\n  scale_x_continuous(\n    name = \"English grades\",\n    expand = c(0, 0)\n  ) +\n  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +\n  theme_ridges()"
+  },
+  {
+    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#mapping-the-probabilities-directly-into-color",
+    "href": "In-class_Exs/Ex2/In-class_Ex2.html#mapping-the-probabilities-directly-into-color",
+    "title": "In-class Exercise 2: Visualizing distribution",
+    "section": "4.3 Mapping the probabilities directly into color",
+    "text": "4.3 Mapping the probabilities directly into color\nBeside providing additional geom objects to support the need to plot ridgeline plot, ggridges package also provides a stat function called stat_density_ridges() that replaces stat_density() of ggplot2.\nFigure below is plotted by mapping the probabilities calculated by using stat(ecdf) which represent the empirical cumulative density function for the distribution of English score.\n\n\n\n\n\n\nWe are using the probabilities from stat(ecdf) in the fill aesthetic of the plot so the probabilities affect the color fill.\n\n\n\n\n\nShow ggplot2 code\nggplot(exam_df,\n       aes(x = ENGLISH, \n           y = CLASS, \n           fill = 0.5 - abs(0.5-stat(ecdf)))) +\n  stat_density_ridges(geom = \"density_ridges_gradient\", \n                      calc_ecdf = TRUE) +\n  scale_fill_viridis_c(name = \"Tail probability\",\n                       direction = -1) +\n  theme_ridges()"
+  },
+  {
+    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#ridgeline-plots-with-quantile-lines",
+    "href": "In-class_Exs/Ex2/In-class_Ex2.html#ridgeline-plots-with-quantile-lines",
+    "title": "In-class Exercise 2: Visualizing distribution",
+    "section": "4.4 Ridgeline plots with quantile lines",
+    "text": "4.4 Ridgeline plots with quantile lines\nBy using geom_density_ridges_gradient(), we can colour the ridgeline plot by quantile, via the calculated stat(quantile) aesthetic as shown in the figure below.\n\n\nShow ggplot2 code\nggplot(exam_df,\n       aes(x = ENGLISH, \n           y = CLASS, \n           fill = factor(stat(quantile))\n           )) +\n  stat_density_ridges(\n    geom = \"density_ridges_gradient\",\n    calc_ecdf = TRUE, \n    quantiles = 4,\n    quantile_lines = TRUE) +\n  scale_fill_viridis_d(name = \"Quartiles\") +\n  theme_ridges()\n\n\n\n\n\n\n\n\n\nInstead of using number to define the quantiles, we can also specify quantiles by cut points such as 2.5% and 97.5% tails to colour the ridgeline plot as shown in the figure below.\n\n\nShow ggplot2 code\nggplot(exam_df,\n       aes(x = ENGLISH, \n           y = CLASS, \n           fill = factor(stat(quantile))\n           )) +\n  stat_density_ridges(\n    geom = \"density_ridges_gradient\",\n    calc_ecdf = TRUE, \n    quantiles = c(0.025, 0.975)\n    ) +\n  scale_fill_manual(\n    name = \"Probability\",\n    values = c(\"#FF0000A0\", \"#A0A0A0A0\", \"#0000FFA0\"),\n    labels = c(\"(0, 0.025]\", \"(0.025, 0.975]\", \"(0.975, 1]\")\n  ) +\n  theme_ridges()"
+  },
+  {
+    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#plotting-a-half-eye-plot",
+    "href": "In-class_Exs/Ex2/In-class_Ex2.html#plotting-a-half-eye-plot",
+    "title": "In-class Exercise 2: Visualizing distribution",
+    "section": "5.1 Plotting a Half-eye plot",
+    "text": "5.1 Plotting a Half-eye plot\nWe will plot a Half-Eye graph by using stat_halfeye() of ggdist package.\nIt contains a half-density and slab interval graph.\n\nWith slab intervalWithout slab interval\n\n\nThe slab interval is similar to a box plot and it shows the relevant quantiles of the data.\n\n\nShow ggplot2 code\nggplot(exam_df, \n       aes(x = RACE, \n           y = ENGLISH)) +\n  stat_halfeye(adjust = 0.5,\n               justification = -0.2)\n\n\n\n\n\n\n\n\n\n\n\nSetting .width = 0, point_colour = NA will remove the slab interval. Slab interval may be useful for some use cases but rendering a box plot or removing it together may be more useful for visualization.\n\n\nShow ggplot2 code\nggplot(exam_df, \n       aes(x = RACE, \n           y = ENGLISH)) +\n  stat_halfeye(adjust = 0.5,\n               justification = -0.2,\n               .width = 0,\n               point_colour = NA)"
+  },
+  {
+    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#adding-a-boxplot",
+    "href": "In-class_Exs/Ex2/In-class_Ex2.html#adding-a-boxplot",
+    "title": "In-class Exercise 2: Visualizing distribution",
+    "section": "5.2 Adding a boxplot",
+    "text": "5.2 Adding a boxplot\nWe can replace the slab interval with a narrow boxplot. It provides more aesthetic presentation of the distribution and fills the gap between the half-eye plot and the gridlines.\n\n\nShow ggplot2 code\nggplot(exam_df, \n       aes(x = RACE, \n           y = ENGLISH)) +\n  stat_halfeye(adjust = 0.5,\n               justification = -0.2,\n               .width = 0,\n               point_colour = NA) +\n  geom_boxplot(width = .20,\n               outlier.shape = NA)"
+  },
+  {
+    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#adding-volume-information",
+    "href": "In-class_Exs/Ex2/In-class_Ex2.html#adding-volume-information",
+    "title": "In-class Exercise 2: Visualizing distribution",
+    "section": "5.3 Adding Volume information",
+    "text": "5.3 Adding Volume information\nThe distribution plot so far gives information on the relative distribution. However, it is hard to know the absolute volume within each bin. We can use stat_dots() of ggdist package to generate this.\nWe will plot it on the same side as the half-eye plot.\n\n\nShow ggplot2 code\nggplot(exam_df, \n       aes(x = RACE, \n           y = ENGLISH)) +\n  stat_halfeye(adjust = 0.5,\n               justification = -0.2,\n               .width = 0,\n               point_colour = NA) +\n  geom_boxplot(width = .20,\n               outlier.shape = NA) +\n  stat_dots(side = \"left\", \n            justification = 1.2, \n            binwidth = .5,\n            dotsize = 2)\n\n\n\n\n\n\n\n\n\nBy adding the volume dots, we can see that the Others plot actually has less observations that the other Race values, even though the curve looks taller. It reduces misinterpretation of the data."
+  },
+  {
+    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#finishing-touches",
+    "href": "In-class_Exs/Ex2/In-class_Ex2.html#finishing-touches",
+    "title": "In-class Exercise 2: Visualizing distribution",
+    "section": "5.4 Finishing touches",
+    "text": "5.4 Finishing touches\nLastly, we can flip the coordinates and add a theme to make it more presentable.\n\nggplot(exam_df, \n       aes(x = RACE, \n           y = ENGLISH)) +\n  stat_halfeye(adjust = 0.5,\n               justification = -0.2,\n               .width = 0,\n               point_colour = NA) +\n  geom_boxplot(width = .20,\n               outlier.shape = NA) +\n  stat_dots(side = \"left\", \n            justification = 1.2, \n            binwidth = .5,\n            dotsize = 1.5) +\n  coord_flip() +\n  theme_economist()"
+  },
+  {
+    "objectID": "In-class_Exs/Ex1/In-class_Ex1.html",
+    "href": "In-class_Exs/Ex1/In-class_Ex1.html",
+    "title": "In-class Exercise 1",
+    "section": "",
+    "text": "pacman::p_load(tidyverse)\n\nUsing read_csv() imports as tibble data frame\n\nrealis &lt;- read_csv(\"data/realis2019.csv\")\n\nUsing read.csv() will import as data.frame.\n\nrealis.csv &lt;- read.csv(\"data/realis2019.csv\")"
+  },
+  {
+    "objectID": "In-class_Exs/Ex4/In-class_Ex4.html",
+    "href": "In-class_Exs/Ex4/In-class_Ex4.html",
+    "title": "In-class Exercise 4: Visualizing Stats and Models",
+    "section": "",
+    "text": "ggstatsplot enable plotting without calculating the statistics separately."
+  },
+  {
+    "objectID": "In-class_Exs/Ex4/In-class_Ex4.html#loading-the-required-packages",
+    "href": "In-class_Exs/Ex4/In-class_Ex4.html#loading-the-required-packages",
+    "title": "In-class Exercise 4: Visualizing Stats and Models",
+    "section": "2.1 Loading the required packages",
+    "text": "2.1 Loading the required packages\nFor this exercise we will use the following R packages:\n\ntidyverse, a family of modern R packages specially designed to support data science, analysis and communication task including creating static statistical graphs.\nggstatsplot, extension of ggplot2 package for creating graphics with details from statistical tests included in the information-rich plots themselves.\n\n\npacman::p_load(tidyverse, ggstatsplot)\nset.seed(1234)"
+  },
+  {
+    "objectID": "In-class_Exs/Ex4/In-class_Ex4.html#loading-the-data",
+    "href": "In-class_Exs/Ex4/In-class_Ex4.html#loading-the-data",
+    "title": "In-class Exercise 4: Visualizing Stats and Models",
+    "section": "2.2 Loading the data",
+    "text": "2.2 Loading the data\nWe will use the same exam_data dataset from Hands-on Ex 1 and load it into the RStudio environment using read_csv().\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")\nglimpse(exam_data)\n\nRows: 322\nColumns: 7\n$ ID      &lt;chr&gt; \"Student321\", \"Student305\", \"Student289\", \"Student227\", \"Stude…\n$ CLASS   &lt;chr&gt; \"3I\", \"3I\", \"3H\", \"3F\", \"3I\", \"3I\", \"3I\", \"3I\", \"3I\", \"3H\", \"3…\n$ GENDER  &lt;chr&gt; \"Male\", \"Female\", \"Male\", \"Male\", \"Male\", \"Female\", \"Male\", \"M…\n$ RACE    &lt;chr&gt; \"Malay\", \"Malay\", \"Chinese\", \"Chinese\", \"Malay\", \"Malay\", \"Chi…\n$ ENGLISH &lt;dbl&gt; 21, 24, 26, 27, 27, 31, 31, 31, 33, 34, 34, 36, 36, 36, 37, 38…\n$ MATHS   &lt;dbl&gt; 9, 22, 16, 77, 11, 16, 21, 18, 19, 49, 39, 35, 23, 36, 49, 30,…\n$ SCIENCE &lt;dbl&gt; 15, 16, 16, 31, 25, 16, 25, 27, 15, 37, 42, 22, 32, 36, 35, 45…\n\n\nThere are a total of seven attributes in the exam_data tibble data frame. Four of them are categorical data type and the other three are in continuous data type.\n\nThe categorical attributes are: ID, CLASS, GENDER and RACE.\nThe continuous attributes are: MATHS, ENGLISH and SCIENCE."
+  },
+  {
+    "objectID": "In-class_Exs/Ex4/In-class_Ex4.html#using-gghistostats",
+    "href": "In-class_Exs/Ex4/In-class_Ex4.html#using-gghistostats",
+    "title": "In-class Exercise 4: Visualizing Stats and Models",
+    "section": "3.1 Using gghistostats",
+    "text": "3.1 Using gghistostats\n\n3.1.1 By stats type\n\nparametricnprobustbayes\n\n\nIt used mean.\n\ngghistostats(\n  data = exam_data,\n  x = ENGLISH,\n  type = \"parametric\",\n  test.value = 60,\n  bin.args = list(color = \"black\",\n                  fill = \"grey50\",\n                  alpha = 0.7),\n  normal.curve = FALSE,\n  normal.curve.args = list(linewidth = 2),\n  xlab = \"English scores\"\n)\n\n\n\n\n\n\n\n\n\n\nIt used median.\n\ngghistostats(\n  data = exam_data,\n  x = ENGLISH,\n  type = \"np\",\n  test.value = 60,\n  bin.args = list(color = \"black\",\n                  fill = \"grey50\",\n                  alpha = 0.7),\n  normal.curve = FALSE,\n  normal.curve.args = list(linewidth = 2),\n  xlab = \"English scores\"\n)\n\n\n\n\n\n\n\n\n\n\n\ngghistostats(\n  data = exam_data,\n  x = ENGLISH,\n  type = \"robust\",\n  test.value = 60,\n  bin.args = list(color = \"black\",\n                  fill = \"grey50\",\n                  alpha = 0.7),\n  normal.curve = FALSE,\n  normal.curve.args = list(linewidth = 2),\n  xlab = \"English scores\"\n)\n\n\n\n\n\n\n\n\n\n\n\ngghistostats(\n  data = exam_data,\n  x = ENGLISH,\n  type = \"bayes\",\n  test.value = 60,\n  bin.args = list(color = \"black\",\n                  fill = \"grey50\",\n                  alpha = 0.7),\n  normal.curve = FALSE,\n  normal.curve.args = list(linewidth = 2),\n  xlab = \"English scores\"\n)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nReference lines default to corresponding mean, median, etc can be controlled by the centrality argument.\n\n\n\n\n\n3.1.2 Plotting Normal Distribution Curve\nPrevious plot, by default, do not have the normal distribution curve. Setting normal.curve = TRUE adds the normal distribution curve.\n\ngghistostats(\n  data = exam_data,\n  x = ENGLISH,\n  type = \"bayesian\",\n  test.value = 60,\n  bin.args = list(color = \"black\",\n                  fill = \"grey50\",\n                  alpha = 0.7),\n  normal.curve = TRUE,\n  normal.curve.args = list(linewidth = 0.5),\n  xlab = \"English scores\"\n)\n\n\n\n\n\n\n\n\n\n\n3.1.3 Extracting calculated stats\n\np &lt;- gghistostats(\n  data = exam_data,\n  x = ENGLISH,\n  type = \"parametric\",\n  test.value = 60,\n  bin.args = list(\n    color = \"black\",\n    fill = \"grey50\",\n    alpha = 0.7\n  ),\n  normal.curve = FALSE,\n  normal.curve.args = list(linewidth = 2),\n  xlab = \"English scores\"\n)\n\nextract_stats(p)\n\n$subtitle_data\n# A tibble: 1 × 15\n     mu statistic df.error  p.value method            alternative effectsize\n  &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;             &lt;chr&gt;       &lt;chr&gt;     \n1    60      8.77      321 1.04e-16 One Sample t-test two.sided   Hedges' g \n  estimate conf.level conf.low conf.high conf.method conf.distribution n.obs\n     &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;       &lt;chr&gt;             &lt;int&gt;\n1    0.488       0.95    0.372     0.603 ncp         t                   322\n  expression\n  &lt;list&gt;    \n1 &lt;language&gt;\n\n$caption_data\n# A tibble: 1 × 16\n  term       effectsize      estimate conf.level conf.low conf.high    pd\n  &lt;chr&gt;      &lt;chr&gt;              &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;\n1 Difference Bayesian t-test     7.20       0.95     5.48      8.79     1\n  prior.distribution prior.location prior.scale    bf10 method         \n  &lt;chr&gt;                       &lt;dbl&gt;       &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;          \n1 cauchy                          0       0.707 4.54e13 Bayesian t-test\n  conf.method log_e_bf10 n.obs expression\n  &lt;chr&gt;            &lt;dbl&gt; &lt;int&gt; &lt;list&gt;    \n1 ETI               31.4   322 &lt;language&gt;\n\n$pairwise_comparisons_data\nNULL\n\n$descriptive_data\nNULL\n\n$one_sample_data\nNULL\n\n$tidy_data\nNULL\n\n$glance_data\nNULL"
+  },
+  {
+    "objectID": "In-class_Exs/Ex4/In-class_Ex4.html#ggwithinstats",
+    "href": "In-class_Exs/Ex4/In-class_Ex4.html#ggwithinstats",
+    "title": "In-class Exercise 4: Visualizing Stats and Models",
+    "section": "3.2 ggwithinstats",
+    "text": "3.2 ggwithinstats\nWe need to pivot table long to have these columns: ID, SUBJECT, SCORE.\n\nexam_long &lt;-exam_data %&gt;% pivot_longer(\n  cols = ENGLISH:SCIENCE,\n  names_to = \"SUBJECT\",\n  values_to = \"SCORE\") %&gt;%\n  filter(CLASS == \"3A\")\n\n\nggwithinstats(\n  data = filter(exam_long, SUBJECT %in% c(\"MATHS\", \"SCIENCE\")),\n  x = SUBJECT,\n  y = SCORE,\n  type = \"np\"\n)"
+  },
+  {
+    "objectID": "In-class_Exs/Ex4/In-class_Ex4.html#ggscatterstats",
+    "href": "In-class_Exs/Ex4/In-class_Ex4.html#ggscatterstats",
+    "title": "In-class Exercise 4: Visualizing Stats and Models",
+    "section": "3.3 ggscatterstats",
+    "text": "3.3 ggscatterstats\nThe best fit line is controlled by smooth.line.args\n\nggscatterstats(\n  data = exam_data,\n  x = MATHS,\n  y = ENGLISH,\n  marginal = TRUE, # Show the histogram\n  label.var = ID,\n  label.expression = ENGLISH &gt; 90 & MATHS &gt; 90\n)"
   },
   {
     "objectID": "Hands-on_Exs/Ex4A/Hands-on_Ex4A.html",
@@ -427,375 +637,193 @@
     "text": "5.7 Visualising Regression Parameters: ggcoefstats() methods\nIn the code below, ggcoefstats() of ggstatsplot package to visualise the parameters of a regression model.\n\nggcoefstats(model1, \n            output = \"plot\")"
   },
   {
-    "objectID": "In-class_Exs/Ex4/In-class_Ex4.html",
-    "href": "In-class_Exs/Ex4/In-class_Ex4.html",
-    "title": "In-class Exercise 4: Visualizing Stats and Models",
+    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html",
+    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html",
+    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
     "section": "",
-    "text": "ggstatsplot enable plotting without calculating the statistics separately."
+    "text": "This hands-on exercise covers Chapter 3: Programming Interactive Data Visualisation with R.\nI learned about the following:\n\nCreating interactive data visualizations"
   },
   {
-    "objectID": "In-class_Exs/Ex4/In-class_Ex4.html#loading-the-required-packages",
-    "href": "In-class_Exs/Ex4/In-class_Ex4.html#loading-the-required-packages",
-    "title": "In-class Exercise 4: Visualizing Stats and Models",
+    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#loading-the-required-packages",
+    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#loading-the-required-packages",
+    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
     "section": "2.1 Loading the required packages",
-    "text": "2.1 Loading the required packages\nFor this exercise we will use the following R packages:\n\ntidyverse, a family of modern R packages specially designed to support data science, analysis and communication task including creating static statistical graphs.\nggstatsplot, extension of ggplot2 package for creating graphics with details from statistical tests included in the information-rich plots themselves.\n\n\npacman::p_load(tidyverse, ggstatsplot)\nset.seed(1234)"
+    "text": "2.1 Loading the required packages\nFor this exercise we will use the following R packages:\n\nggiraph for making ‘ggplot’ graphics interactive.\nplotly, R library for plotting interactive statistical graphs.\nDT provides an R interface to the JavaScript library DataTables that create interactive table on html page.\ntidyverse, a family of modern R packages specially designed to support data science, analysis and communication task including creating static statistical graphs.\npatchwork for combining multiple ggplot2 graphs into one figure.\n\n\npacman::p_load(ggiraph, plotly, \n               DT, patchwork,\n               tidyverse)"
   },
   {
-    "objectID": "In-class_Exs/Ex4/In-class_Ex4.html#loading-the-data",
-    "href": "In-class_Exs/Ex4/In-class_Ex4.html#loading-the-data",
-    "title": "In-class Exercise 4: Visualizing Stats and Models",
+    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#loading-the-data",
+    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#loading-the-data",
+    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
     "section": "2.2 Loading the data",
     "text": "2.2 Loading the data\nWe will use the same exam_data dataset from Hands-on Ex 1 and load it into the RStudio environment using read_csv().\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")\nglimpse(exam_data)\n\nRows: 322\nColumns: 7\n$ ID      &lt;chr&gt; \"Student321\", \"Student305\", \"Student289\", \"Student227\", \"Stude…\n$ CLASS   &lt;chr&gt; \"3I\", \"3I\", \"3H\", \"3F\", \"3I\", \"3I\", \"3I\", \"3I\", \"3I\", \"3H\", \"3…\n$ GENDER  &lt;chr&gt; \"Male\", \"Female\", \"Male\", \"Male\", \"Male\", \"Female\", \"Male\", \"M…\n$ RACE    &lt;chr&gt; \"Malay\", \"Malay\", \"Chinese\", \"Chinese\", \"Malay\", \"Malay\", \"Chi…\n$ ENGLISH &lt;dbl&gt; 21, 24, 26, 27, 27, 31, 31, 31, 33, 34, 34, 36, 36, 36, 37, 38…\n$ MATHS   &lt;dbl&gt; 9, 22, 16, 77, 11, 16, 21, 18, 19, 49, 39, 35, 23, 36, 49, 30,…\n$ SCIENCE &lt;dbl&gt; 15, 16, 16, 31, 25, 16, 25, 27, 15, 37, 42, 22, 32, 36, 35, 45…\n\n\nThere are a total of seven attributes in the exam_data tibble data frame. Four of them are categorical data type and the other three are in continuous data type.\n\nThe categorical attributes are: ID, CLASS, GENDER and RACE.\nThe continuous attributes are: MATHS, ENGLISH and SCIENCE."
   },
   {
-    "objectID": "In-class_Exs/Ex4/In-class_Ex4.html#using-gghistostats",
-    "href": "In-class_Exs/Ex4/In-class_Ex4.html#using-gghistostats",
-    "title": "In-class Exercise 4: Visualizing Stats and Models",
-    "section": "3.1 Using gghistostats",
-    "text": "3.1 Using gghistostats\n\n3.1.1 By stats type\n\nparametricnprobustbayes\n\n\nIt used mean.\n\ngghistostats(\n  data = exam_data,\n  x = ENGLISH,\n  type = \"parametric\",\n  test.value = 60,\n  bin.args = list(color = \"black\",\n                  fill = \"grey50\",\n                  alpha = 0.7),\n  normal.curve = FALSE,\n  normal.curve.args = list(linewidth = 2),\n  xlab = \"English scores\"\n)\n\n\n\n\n\n\n\n\n\n\nIt used median.\n\ngghistostats(\n  data = exam_data,\n  x = ENGLISH,\n  type = \"np\",\n  test.value = 60,\n  bin.args = list(color = \"black\",\n                  fill = \"grey50\",\n                  alpha = 0.7),\n  normal.curve = FALSE,\n  normal.curve.args = list(linewidth = 2),\n  xlab = \"English scores\"\n)\n\n\n\n\n\n\n\n\n\n\n\ngghistostats(\n  data = exam_data,\n  x = ENGLISH,\n  type = \"robust\",\n  test.value = 60,\n  bin.args = list(color = \"black\",\n                  fill = \"grey50\",\n                  alpha = 0.7),\n  normal.curve = FALSE,\n  normal.curve.args = list(linewidth = 2),\n  xlab = \"English scores\"\n)\n\n\n\n\n\n\n\n\n\n\n\ngghistostats(\n  data = exam_data,\n  x = ENGLISH,\n  type = \"bayes\",\n  test.value = 60,\n  bin.args = list(color = \"black\",\n                  fill = \"grey50\",\n                  alpha = 0.7),\n  normal.curve = FALSE,\n  normal.curve.args = list(linewidth = 2),\n  xlab = \"English scores\"\n)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nReference lines default to corresponding mean, median, etc can be controlled by the centrality argument.\n\n\n\n\n\n3.1.2 Plotting Normal Distribution Curve\nPrevious plot, by default, do not have the normal distribution curve. Setting normal.curve = TRUE adds the normal distribution curve.\n\ngghistostats(\n  data = exam_data,\n  x = ENGLISH,\n  type = \"bayesian\",\n  test.value = 60,\n  bin.args = list(color = \"black\",\n                  fill = \"grey50\",\n                  alpha = 0.7),\n  normal.curve = TRUE,\n  normal.curve.args = list(linewidth = 0.5),\n  xlab = \"English scores\"\n)\n\n\n\n\n\n\n\n\n\n\n3.1.3 Extracting calculated stats\n\np &lt;- gghistostats(\n  data = exam_data,\n  x = ENGLISH,\n  type = \"parametric\",\n  test.value = 60,\n  bin.args = list(\n    color = \"black\",\n    fill = \"grey50\",\n    alpha = 0.7\n  ),\n  normal.curve = FALSE,\n  normal.curve.args = list(linewidth = 2),\n  xlab = \"English scores\"\n)\n\nextract_stats(p)\n\n$subtitle_data\n# A tibble: 1 × 15\n     mu statistic df.error  p.value method            alternative effectsize\n  &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;             &lt;chr&gt;       &lt;chr&gt;     \n1    60      8.77      321 1.04e-16 One Sample t-test two.sided   Hedges' g \n  estimate conf.level conf.low conf.high conf.method conf.distribution n.obs\n     &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;       &lt;chr&gt;             &lt;int&gt;\n1    0.488       0.95    0.372     0.603 ncp         t                   322\n  expression\n  &lt;list&gt;    \n1 &lt;language&gt;\n\n$caption_data\n# A tibble: 1 × 16\n  term       effectsize      estimate conf.level conf.low conf.high    pd\n  &lt;chr&gt;      &lt;chr&gt;              &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;\n1 Difference Bayesian t-test     7.20       0.95     5.48      8.79     1\n  prior.distribution prior.location prior.scale    bf10 method         \n  &lt;chr&gt;                       &lt;dbl&gt;       &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;          \n1 cauchy                          0       0.707 4.54e13 Bayesian t-test\n  conf.method log_e_bf10 n.obs expression\n  &lt;chr&gt;            &lt;dbl&gt; &lt;int&gt; &lt;list&gt;    \n1 ETI               31.4   322 &lt;language&gt;\n\n$pairwise_comparisons_data\nNULL\n\n$descriptive_data\nNULL\n\n$one_sample_data\nNULL\n\n$tidy_data\nNULL\n\n$glance_data\nNULL"
+    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#tooltips",
+    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#tooltips",
+    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
+    "section": "3.1 Tooltips",
+    "text": "3.1 Tooltips\n\n3.1.2 Adding tooltips\nInstead of geom_dotplot() provided by ggplot2, we will use ggiraph’s geom_dotplot_interactive() with the tooltip aesthetic to add the label in the content.\nAfter defining the plot, we will pass this to girafe() to generate the interactive element in our webpage.\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(\n    aes(tooltip = ID),\n    stackgroups = TRUE, \n    binwidth = 1, \n    method = \"histodot\") +\n  scale_y_continuous(NULL, \n                     breaks = NULL)\ngirafe(\n  ggobj = p,\n  width_svg = 6,\n  height_svg = 6*0.618\n)\n\n\n\n\n\nHovering on a dot in a plot shows the ID, which we set as the tooltip content.\n\n\n3.1.2 Adding multiple information in tooltip\nOne way we can add multiple information in tooltip is by setting tooltip value in dataframe with the data to be presented.\n\nexam_data$tooltip &lt;- c(paste0(     \n  \"Name = \", exam_data$ID,         \n  \"\\n Class = \", exam_data$CLASS)) \n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(\n    aes(tooltip = exam_data$tooltip), \n    stackgroups = TRUE,\n    binwidth = 1,\n    method = \"histodot\") +\n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(\n  ggobj = p,\n  width_svg = 8,\n  height_svg = 8*0.618\n)\n\n\n\n\n\nThe tooltip now has the student Name and Class when hovering on the dots.\n\n\n3.1.3 Styling the tooltip\nThe tooltip can be styled using CSS as the rendering is done on the webpage, and no processing of style by ggplot2. This style is passed to the girafe() function.\nFor example, we can change the background to white, instead of the default black. We will also change the font to Arial.\n\ntooltip_css &lt;- \"background-color:white; #&lt;&lt;\nfont-style:bold; color:black; font-family: Arial\" #&lt;&lt;\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(              \n    aes(tooltip = ID),                   \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") +               \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(                                  \n  ggobj = p,                             \n  width_svg = 6,                         \n  height_svg = 6*0.618,\n  options = list(    #&lt;&lt;\n    opts_tooltip(    #&lt;&lt;\n      css = tooltip_css)) #&lt;&lt;\n)"
   },
   {
-    "objectID": "In-class_Exs/Ex4/In-class_Ex4.html#ggwithinstats",
-    "href": "In-class_Exs/Ex4/In-class_Ex4.html#ggwithinstats",
-    "title": "In-class Exercise 4: Visualizing Stats and Models",
-    "section": "3.2 ggwithinstats",
-    "text": "3.2 ggwithinstats\nWe need to pivot table long to have these columns: ID, SUBJECT, SCORE.\n\nexam_long &lt;-exam_data %&gt;% pivot_longer(\n  cols = ENGLISH:SCIENCE,\n  names_to = \"SUBJECT\",\n  values_to = \"SCORE\") %&gt;%\n  filter(CLASS == \"3A\")\n\n\nggwithinstats(\n  data = filter(exam_long, SUBJECT %in% c(\"MATHS\", \"SCIENCE\")),\n  x = SUBJECT,\n  y = SCORE,\n  type = \"np\"\n)"
+    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#hover",
+    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#hover",
+    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
+    "section": "3.2 Hover",
+    "text": "3.2 Hover\n\n3.2.1 Adding hover effect\nWe can add hover effect by adding data_id aesthetic to geom_dotplot_interactive().\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(           \n    aes(data_id = CLASS),             \n    stackgroups = TRUE,               \n    binwidth = 1,                        \n    method = \"histodot\") +               \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(                                  \n  ggobj = p,                             \n  width_svg = 6,                         \n  height_svg = 6*0.618                      \n)\n\n\n\n\n\nHovering on a dot show the other dots with the same value in CLASS. This is useful for highlight plot elements related to the data.\n\n\n3.2.2 Styling hover effect\nWe can also use CSS to style the hover effect. The styles are passed to the girafe() function.\nopts_hover - style of the hovered and related data\nopts_hover_inv - style of unrelated data\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(              \n    aes(data_id = CLASS),              \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") +               \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(                                  \n  ggobj = p,                             \n  width_svg = 6,                         \n  height_svg = 6*0.618,\n  options = list(                        \n    opts_hover(css = \"fill: blue;\"),  \n    opts_hover_inv(css = \"opacity:0.4;\") \n  )                                        \n)\n\n\n\n\n\n\n\n3.2.3 Combining tooltip and hover\nWe can also combine both tooltips and hover effect to highlight related data and provide guiding text on the tootltip.\nThis can be done by setting both tooltip and data_id aesthetics on geom_dotplot_interactive().\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(              \n    aes(tooltip = paste(\"Class:\", CLASS), \n        data_id = CLASS),              \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") +               \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(                                  \n  ggobj = p,                             \n  width_svg = 6,                         \n  height_svg = 6*0.618,\n  options = list(                        \n    opts_tooltip(css = \"background-color:white; font-style:bold; color:black; font-family: Arial\"),\n    opts_hover(css = \"fill: blue;\"),  \n    opts_hover_inv(css = \"opacity:0.4;\") \n  )                                        \n)\n\n\n\n\n\nWith this, the tooltip shows the class and highlights the other dots associated with the class."
   },
   {
-    "objectID": "In-class_Exs/Ex4/In-class_Ex4.html#ggscatterstats",
-    "href": "In-class_Exs/Ex4/In-class_Ex4.html#ggscatterstats",
-    "title": "In-class Exercise 4: Visualizing Stats and Models",
-    "section": "3.3 ggscatterstats",
-    "text": "3.3 ggscatterstats\nThe best fit line is controlled by smooth.line.args\n\nggscatterstats(\n  data = exam_data,\n  x = MATHS,\n  y = ENGLISH,\n  marginal = TRUE, # Show the histogram\n  label.var = ID,\n  label.expression = ENGLISH &gt; 90 & MATHS &gt; 90\n)"
+    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#onclick-effect",
+    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#onclick-effect",
+    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
+    "section": "3.3 onclick() effect",
+    "text": "3.3 onclick() effect\nThis provides functionality to run Javascript code when clicking on a plot element.\n\nexam_data$onclick &lt;- sprintf(\"window.open(\\\"%s%s\\\")\",\n\"https://www.moe.gov.sg/schoolfinder?journey=Primary%20school\",\nas.character(exam_data$ID))\n\np &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(              \n    aes(onclick = onclick),              \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") +               \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\ngirafe(                                  \n  ggobj = p,                             \n  width_svg = 6,                         \n  height_svg = 6*0.618)\n\n\n\n\n\nIn this example, clicking a dot opens MOE page of the student. This is triggered by the window.open() javascript.\n\n\n\n\n\n\nPreventing XSS attacks\n\n\n\nWhen running javascript functions, using data not generated by our system, it is important to escape the data for Javascript safety to prevent Cross-Site Scripting attacks.\nOne example is if CLASS has some values such as ;stealYoInfo();, it can potentially make users vulnerable. Even if there is no malicious intent, if some values have text that can affect Javascript parsing, the interactive plot may not work as expected.\nThis particular dataset and Singapore Open Data datasets are trusted so there is less concern for this happening. However, some caution is needed when using untrusted sources.\nI will do some tests at a later time to check if ggiraph is vulnerable to such attacks so that I can apply measures to prevent XSS."
   },
   {
-    "objectID": "In-class_Exs/Ex1/In-class_Ex1.html",
-    "href": "In-class_Exs/Ex1/In-class_Ex1.html",
-    "title": "In-class Exercise 1",
+    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#coordinating-multiple-views",
+    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#coordinating-multiple-views",
+    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
+    "section": "3.4 Coordinating multiple views",
+    "text": "3.4 Coordinating multiple views\nWe can pass the patchwork plot to girafe() to coordinate the interactions of the two plots.\n\np1 &lt;- ggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot_interactive(              \n    aes(data_id = ID),              \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") +  \n  coord_cartesian(xlim=c(0,100)) + \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\n\np2 &lt;- ggplot(data=exam_data, \n       aes(x = ENGLISH)) +\n  geom_dotplot_interactive(              \n    aes(data_id = ID),              \n    stackgroups = TRUE,                  \n    binwidth = 1,                        \n    method = \"histodot\") + \n  coord_cartesian(xlim=c(0,100)) + \n  scale_y_continuous(NULL,               \n                     breaks = NULL)\n\ngirafe(code = print(p1 + p2), \n       width_svg = 6,\n       height_svg = 3,\n       options = list(\n         opts_hover(css = \"fill: #202020;\"),\n         opts_hover_inv(css = \"opacity:0.2;\")\n         )\n       )\n\n\n\n\n\nIn the example above, hovering a dot in the Maths plot, highlights the corresponding dot in English.\nThis is useful for seeing how the student scored in both subjects."
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#creating-an-interactive-scatterplot",
+    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#creating-an-interactive-scatterplot",
+    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
+    "section": "4.1 Creating an interactive scatterplot",
+    "text": "4.1 Creating an interactive scatterplot\n\nplot_ly(data = exam_data, \n             x = ~MATHS, \n             y = ~ENGLISH)\n\n\n\n\n\nWith a few lines of code, it generated an interactive plot with tooltips and with varioous functions like zoom and pan."
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#adding-color-to-plotly-visualization",
+    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#adding-color-to-plotly-visualization",
+    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
+    "section": "4.2 Adding color to plotly visualization",
+    "text": "4.2 Adding color to plotly visualization\n\nplot_ly(data = exam_data, \n             x = ~MATHS, \n             y = ~ENGLISH,\n             color = ~RACE)\n\n\n\n\n\nAdding the color also added an interactive legend, and each race can clicked to hide and unhide dots from the plot."
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#creating-an-interactive-scatetrplot-using-ggplotly",
+    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#creating-an-interactive-scatetrplot-using-ggplotly",
+    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
+    "section": "4.3 Creating an interactive scatetrplot using ggplotly",
+    "text": "4.3 Creating an interactive scatetrplot using ggplotly\nWe can make an existing ggplot visualization interactive by passing the plot using ggplotly()\n\np &lt;- ggplot(data=exam_data, \n            aes(x = MATHS,\n                y = ENGLISH)) +\n  geom_point(size=1) +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100))\nggplotly(p)"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#coordinating-multiple-views-1",
+    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#coordinating-multiple-views-1",
+    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
+    "section": "4.4 Coordinating multiple views",
+    "text": "4.4 Coordinating multiple views\nCoordinating views is done by the following:\n\nhighlight_key() of plotly package is used as shared data.\ntwo scatterplots will be created by using ggplot2 functions.\nlastly, subplot() of plotly package is used to place them next to each other side-by-side. (similar to patchwork)\n\n\nd &lt;- highlight_key(exam_data)\np1 &lt;- ggplot(data=d, \n            aes(x = MATHS,\n                y = ENGLISH)) +\n  geom_point(size=1) +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100))\n\np2 &lt;- ggplot(data=d, \n            aes(x = MATHS,\n                y = SCIENCE)) +\n  geom_point(size=1) +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100))\nsubplot(ggplotly(p1),\n        ggplotly(p2))"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#interactive-data-table-dt-package",
+    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#interactive-data-table-dt-package",
+    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
+    "section": "5.1 Interactive Data Table: DT Package",
+    "text": "5.1 Interactive Data Table: DT Package\nIt is a wrapper of DataTables Javascript library. Data objects in R can be rendered as HTML tables using the JavaScript library ‘DataTables’ (typically via R Markdown or Shiny).\n\nDT::datatable(exam_data, class= \"compact\")\n\n\n\n\n\nThis provides interactive elements like pagination, search and sort with just 1 line of code!"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#rendering-plots-with-data-table",
+    "href": "Hands-on_Exs/Ex3A/Hands-on_Ex3A.html#rendering-plots-with-data-table",
+    "title": "Hands-on Exercise 3A: Programming Interactive Data Visualisation with R",
+    "section": "5.2 Rendering plots with data table",
+    "text": "5.2 Rendering plots with data table\n\nd &lt;- highlight_key(exam_data) \np &lt;- ggplot(d, \n            aes(ENGLISH, \n                MATHS)) + \n  geom_point(size=1) +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100))\n\ngg &lt;- highlight(ggplotly(p),        \n                \"plotly_selected\")  \n\ncrosstalk::bscols(gg,               \n                  DT::datatable(d), \n                  widths = 5)        \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nThe scatterplot is rendered beside datatable."
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html",
+    "href": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html",
+    "title": "Hands-on Exercise 4C: Building Funnel Plot with R",
     "section": "",
-    "text": "pacman::p_load(tidyverse)\n\nUsing read_csv() imports as tibble data frame\n\nrealis &lt;- read_csv(\"data/realis2019.csv\")\n\nUsing read.csv() will import as data.frame.\n\nrealis.csv &lt;- read.csv(\"data/realis2019.csv\")"
+    "text": "This hands-on exercise covers Chapter 12: Funnel Plots for Fair Comparisons.\nI learned about the following:\n\ngenerating funnel plots"
   },
   {
-    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html",
-    "href": "In-class_Exs/Ex2/In-class_Ex2.html",
-    "title": "In-class Exercise 2: Visualizing distribution",
-    "section": "",
-    "text": "From exercise published on https://r4va.netlify.app/chap09\nI learned the following:\n\nDifferent ways to visualize distribution\nRidgeline plot using ggridges\nRaincloud plot using ggdists"
-  },
-  {
-    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#loading-the-r-packages",
-    "href": "In-class_Exs/Ex2/In-class_Ex2.html#loading-the-r-packages",
-    "title": "In-class Exercise 2: Visualizing distribution",
-    "section": "2.1 Loading the R packages",
-    "text": "2.1 Loading the R packages\n\npacman::p_load(tidyverse, ggdist, ggthemes, ggridges, colorspace)"
-  },
-  {
-    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#importing-the-data",
-    "href": "In-class_Exs/Ex2/In-class_Ex2.html#importing-the-data",
-    "title": "In-class Exercise 2: Visualizing distribution",
-    "section": "2.2 Importing the data",
-    "text": "2.2 Importing the data\n\nexam_df &lt;- read_csv(\"data/Exam_data.csv\")"
-  },
-  {
-    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#histogram",
-    "href": "In-class_Exs/Ex2/In-class_Ex2.html#histogram",
-    "title": "In-class Exercise 2: Visualizing distribution",
-    "section": "3.1 Histogram",
-    "text": "3.1 Histogram\n\nggplot(exam_df, aes(x=ENGLISH)) +\n  geom_histogram(color = \"#1696d2\",\n               adjust = 0.65,\n               alpha = 0.6)"
-  },
-  {
-    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#probability-density-diagram",
-    "href": "In-class_Exs/Ex2/In-class_Ex2.html#probability-density-diagram",
-    "title": "In-class Exercise 2: Visualizing distribution",
-    "section": "3.2 Probability Density Diagram",
-    "text": "3.2 Probability Density Diagram\nIt uses geom_density() from ggdist package.\n\nggplot(exam_df, aes(x=ENGLISH)) +\n  geom_density(color = \"#1696d2\",\n               adjust = 0.65,\n               alpha = 0.6,)"
-  },
-  {
-    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#alternative-design",
-    "href": "In-class_Exs/Ex2/In-class_Ex2.html#alternative-design",
-    "title": "In-class Exercise 2: Visualizing distribution",
-    "section": "3.3 Alternative design",
-    "text": "3.3 Alternative design\n\nmedian_eng &lt;- median(exam_df$ENGLISH)\nmean_eng &lt;- mean(exam_df$ENGLISH)\nstd_eng &lt;- sd(exam_df$ENGLISH)\n\nggplot(exam_df, aes(x=ENGLISH)) +\n  geom_density(color = \"#1696d2\",\n               adjust = 0.65,\n               alpha = 0.6,) +\n  stat_function(\n    fun=dnorm,\n    args = list(mean=mean_eng, sd = std_eng),\n    col = \"grey30\",\n    size = 0.8)+\n    geom_vline(aes(xintercept=mean_eng), color = \"#4d5887\", linewidth = 0.6, linetype = \"dashed\")+\n  annotate(geom = \"text\",\n           x = mean_eng - 10,\n           y = 0.04,\n           label = paste0(\"Mean ENGLISH:\", round(mean_eng), 2),\n           color = \"#4d5887\") +\n  geom_vline(aes(xintercept=median_eng), color = \"#4d5887\", linewidth = 0.6) +\n  annotate(geom = \"text\",\n           x = median_eng + 10,\n           y = 0.04,\n           label = paste0(\"Median ENGLISH:\", round(median_eng), 2),\n           color = \"#4d5887\")"
-  },
-  {
-    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#plotting-ridgeline-graph-ggridges-method",
-    "href": "In-class_Exs/Ex2/In-class_Ex2.html#plotting-ridgeline-graph-ggridges-method",
-    "title": "In-class Exercise 2: Visualizing distribution",
-    "section": "4.1 Plotting ridgeline graph: ggridges method",
-    "text": "4.1 Plotting ridgeline graph: ggridges method\nggridges package provides two main geom to plot gridgeline plots, they are: geom_ridgeline() and geom_density_ridges().\ngeom_ridgeline() plots the graph using the height values from the data directly. It is useful when the height values refer to a column directly.\nFor this particular dataset, it is more appropriate to use geom_density_ridges() as we need to plot the distribution of students’ English score. If we had tallied and aggregated the number of students who scores within score ranges, geom_ridgeline() might be appropriate but it isn’t the case.\n\n\nShow ggplot2 code\nggplot(exam_df, \n       aes(x = ENGLISH, \n           y = CLASS)) +\n  geom_density_ridges(\n    scale = 3,\n    rel_min_height = 0.01,\n    bandwidth = 3.4,\n    fill = lighten(\"#7097BB\", .3),\n    color = \"white\"\n  ) +\n  scale_x_continuous(\n    name = \"English grades\",\n    expand = c(0, 0)\n    ) +\n  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +\n  theme_ridges()"
-  },
-  {
-    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#varying-colors-along-the-x-axis",
-    "href": "In-class_Exs/Ex2/In-class_Ex2.html#varying-colors-along-the-x-axis",
-    "title": "In-class Exercise 2: Visualizing distribution",
-    "section": "4.2 Varying colors along the x-axis",
-    "text": "4.2 Varying colors along the x-axis\nSometimes we would like to have the area under a ridgeline not filled with a single solid color but rather with colors that vary in some form along the x axis. This effect can be achieved by using either geom_ridgeline_gradient() or geom_density_ridges_gradient(). Both geoms work just like geom_ridgeline() and geom_density_ridges(), except that they allow for varying fill colors. However, they do not allow for alpha transparency in the fill. For technical reasons, we can have changing fill colors or transparency but not both.\nIf we need emphasize the actual values with color gradient, using colors is appropriate. However, It may not be necessary when there are fewer ridge graphs, since the farthest graph is still relatively close to the axis.\nHowever, in the plot below, it can be more easily seen that 3I scored lowest, while 3A scored the highest among the different classes. Hence, in this case, colors are really valuable.\n\n\nShow ggplot2 code\nggplot(exam_df, \n       aes(x = ENGLISH, \n           y = CLASS,\n           fill = after_stat(x))) + # changed from stat() as it is deprecated\n  geom_density_ridges_gradient(\n    scale = 3,\n    rel_min_height = 0.01) +\n  scale_fill_viridis_c(name = \"Temp. [F]\",\n                       option = \"C\") +\n  scale_x_continuous(\n    name = \"English grades\",\n    expand = c(0, 0)\n  ) +\n  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +\n  theme_ridges()"
-  },
-  {
-    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#mapping-the-probabilities-directly-into-color",
-    "href": "In-class_Exs/Ex2/In-class_Ex2.html#mapping-the-probabilities-directly-into-color",
-    "title": "In-class Exercise 2: Visualizing distribution",
-    "section": "4.3 Mapping the probabilities directly into color",
-    "text": "4.3 Mapping the probabilities directly into color\nBeside providing additional geom objects to support the need to plot ridgeline plot, ggridges package also provides a stat function called stat_density_ridges() that replaces stat_density() of ggplot2.\nFigure below is plotted by mapping the probabilities calculated by using stat(ecdf) which represent the empirical cumulative density function for the distribution of English score.\n\n\n\n\n\n\nWe are using the probabilities from stat(ecdf) in the fill aesthetic of the plot so the probabilities affect the color fill.\n\n\n\n\n\nShow ggplot2 code\nggplot(exam_df,\n       aes(x = ENGLISH, \n           y = CLASS, \n           fill = 0.5 - abs(0.5-stat(ecdf)))) +\n  stat_density_ridges(geom = \"density_ridges_gradient\", \n                      calc_ecdf = TRUE) +\n  scale_fill_viridis_c(name = \"Tail probability\",\n                       direction = -1) +\n  theme_ridges()"
-  },
-  {
-    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#ridgeline-plots-with-quantile-lines",
-    "href": "In-class_Exs/Ex2/In-class_Ex2.html#ridgeline-plots-with-quantile-lines",
-    "title": "In-class Exercise 2: Visualizing distribution",
-    "section": "4.4 Ridgeline plots with quantile lines",
-    "text": "4.4 Ridgeline plots with quantile lines\nBy using geom_density_ridges_gradient(), we can colour the ridgeline plot by quantile, via the calculated stat(quantile) aesthetic as shown in the figure below.\n\n\nShow ggplot2 code\nggplot(exam_df,\n       aes(x = ENGLISH, \n           y = CLASS, \n           fill = factor(stat(quantile))\n           )) +\n  stat_density_ridges(\n    geom = \"density_ridges_gradient\",\n    calc_ecdf = TRUE, \n    quantiles = 4,\n    quantile_lines = TRUE) +\n  scale_fill_viridis_d(name = \"Quartiles\") +\n  theme_ridges()\n\n\n\n\n\n\n\n\n\nInstead of using number to define the quantiles, we can also specify quantiles by cut points such as 2.5% and 97.5% tails to colour the ridgeline plot as shown in the figure below.\n\n\nShow ggplot2 code\nggplot(exam_df,\n       aes(x = ENGLISH, \n           y = CLASS, \n           fill = factor(stat(quantile))\n           )) +\n  stat_density_ridges(\n    geom = \"density_ridges_gradient\",\n    calc_ecdf = TRUE, \n    quantiles = c(0.025, 0.975)\n    ) +\n  scale_fill_manual(\n    name = \"Probability\",\n    values = c(\"#FF0000A0\", \"#A0A0A0A0\", \"#0000FFA0\"),\n    labels = c(\"(0, 0.025]\", \"(0.025, 0.975]\", \"(0.975, 1]\")\n  ) +\n  theme_ridges()"
-  },
-  {
-    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#plotting-a-half-eye-plot",
-    "href": "In-class_Exs/Ex2/In-class_Ex2.html#plotting-a-half-eye-plot",
-    "title": "In-class Exercise 2: Visualizing distribution",
-    "section": "5.1 Plotting a Half-eye plot",
-    "text": "5.1 Plotting a Half-eye plot\nWe will plot a Half-Eye graph by using stat_halfeye() of ggdist package.\nIt contains a half-density and slab interval graph.\n\nWith slab intervalWithout slab interval\n\n\nThe slab interval is similar to a box plot and it shows the relevant quantiles of the data.\n\n\nShow ggplot2 code\nggplot(exam_df, \n       aes(x = RACE, \n           y = ENGLISH)) +\n  stat_halfeye(adjust = 0.5,\n               justification = -0.2)\n\n\n\n\n\n\n\n\n\n\n\nSetting .width = 0, point_colour = NA will remove the slab interval. Slab interval may be useful for some use cases but rendering a box plot or removing it together may be more useful for visualization.\n\n\nShow ggplot2 code\nggplot(exam_df, \n       aes(x = RACE, \n           y = ENGLISH)) +\n  stat_halfeye(adjust = 0.5,\n               justification = -0.2,\n               .width = 0,\n               point_colour = NA)"
-  },
-  {
-    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#adding-a-boxplot",
-    "href": "In-class_Exs/Ex2/In-class_Ex2.html#adding-a-boxplot",
-    "title": "In-class Exercise 2: Visualizing distribution",
-    "section": "5.2 Adding a boxplot",
-    "text": "5.2 Adding a boxplot\nWe can replace the slab interval with a narrow boxplot. It provides more aesthetic presentation of the distribution and fills the gap between the half-eye plot and the gridlines.\n\n\nShow ggplot2 code\nggplot(exam_df, \n       aes(x = RACE, \n           y = ENGLISH)) +\n  stat_halfeye(adjust = 0.5,\n               justification = -0.2,\n               .width = 0,\n               point_colour = NA) +\n  geom_boxplot(width = .20,\n               outlier.shape = NA)"
-  },
-  {
-    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#adding-volume-information",
-    "href": "In-class_Exs/Ex2/In-class_Ex2.html#adding-volume-information",
-    "title": "In-class Exercise 2: Visualizing distribution",
-    "section": "5.3 Adding Volume information",
-    "text": "5.3 Adding Volume information\nThe distribution plot so far gives information on the relative distribution. However, it is hard to know the absolute volume within each bin. We can use stat_dots() of ggdist package to generate this.\nWe will plot it on the same side as the half-eye plot.\n\n\nShow ggplot2 code\nggplot(exam_df, \n       aes(x = RACE, \n           y = ENGLISH)) +\n  stat_halfeye(adjust = 0.5,\n               justification = -0.2,\n               .width = 0,\n               point_colour = NA) +\n  geom_boxplot(width = .20,\n               outlier.shape = NA) +\n  stat_dots(side = \"left\", \n            justification = 1.2, \n            binwidth = .5,\n            dotsize = 2)\n\n\n\n\n\n\n\n\n\nBy adding the volume dots, we can see that the Others plot actually has less observations that the other Race values, even though the curve looks taller. It reduces misinterpretation of the data."
-  },
-  {
-    "objectID": "In-class_Exs/Ex2/In-class_Ex2.html#finishing-touches",
-    "href": "In-class_Exs/Ex2/In-class_Ex2.html#finishing-touches",
-    "title": "In-class Exercise 2: Visualizing distribution",
-    "section": "5.4 Finishing touches",
-    "text": "5.4 Finishing touches\nLastly, we can flip the coordinates and add a theme to make it more presentable.\n\nggplot(exam_df, \n       aes(x = RACE, \n           y = ENGLISH)) +\n  stat_halfeye(adjust = 0.5,\n               justification = -0.2,\n               .width = 0,\n               point_colour = NA) +\n  geom_boxplot(width = .20,\n               outlier.shape = NA) +\n  stat_dots(side = \"left\", \n            justification = 1.2, \n            binwidth = .5,\n            dotsize = 1.5) +\n  coord_flip() +\n  theme_economist()"
-  },
-  {
-    "objectID": "Hands-on_Exs/Ex1/Hands-on_Ex1.html",
-    "href": "Hands-on_Exs/Ex1/Hands-on_Ex1.html",
-    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics: ggplot2 methods",
-    "section": "",
-    "text": "This hands-on exercise covers Chapter 1: A Layered Grammar of Graphics: ggplot2 methods.\nI learned about the following:\n\nUseful functions and components in ggplot2 .\nGrammar of Graphics to guide how data is visualized"
-  },
-  {
-    "objectID": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#loading-the-required-libraries",
-    "href": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#loading-the-required-libraries",
-    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics: ggplot2 methods",
-    "section": "Loading the required libraries",
-    "text": "Loading the required libraries\n\n\n\n\n\n\nMark this chunk for setup so it ensures loading of required libraries when another code chunk is run\n\n\n\n\npacman::p_load(tidyverse)"
-  },
-  {
-    "objectID": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#loading-the-data",
-    "href": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#loading-the-data",
-    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics: ggplot2 methods",
-    "section": "Loading the data",
-    "text": "Loading the data\nWe first need to download the provided data set from eLearn and put it under the data folder.\n\n\n\n\n\n\nFile structure\n\n\n\n\n\n\n\n\n\nNext, read the data by using read_csv() from readr package.\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")\nglimpse(exam_data)\n\nRows: 322\nColumns: 7\n$ ID      &lt;chr&gt; \"Student321\", \"Student305\", \"Student289\", \"Student227\", \"Stude…\n$ CLASS   &lt;chr&gt; \"3I\", \"3I\", \"3H\", \"3F\", \"3I\", \"3I\", \"3I\", \"3I\", \"3I\", \"3H\", \"3…\n$ GENDER  &lt;chr&gt; \"Male\", \"Female\", \"Male\", \"Male\", \"Male\", \"Female\", \"Male\", \"M…\n$ RACE    &lt;chr&gt; \"Malay\", \"Malay\", \"Chinese\", \"Chinese\", \"Malay\", \"Malay\", \"Chi…\n$ ENGLISH &lt;dbl&gt; 21, 24, 26, 27, 27, 31, 31, 31, 33, 34, 34, 36, 36, 36, 37, 38…\n$ MATHS   &lt;dbl&gt; 9, 22, 16, 77, 11, 16, 21, 18, 19, 49, 39, 35, 23, 36, 49, 30,…\n$ SCIENCE &lt;dbl&gt; 15, 16, 16, 31, 25, 16, 25, 27, 15, 37, 42, 22, 32, 36, 35, 45…"
-  },
-  {
-    "objectID": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#data",
-    "href": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#data",
-    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics: ggplot2 methods",
-    "section": "Data",
-    "text": "Data\nThe data layer contains the dataset to be visualized.\n\nggplot(data=exam_data)\n\n\n\n\n\n\n\n\nThis generated an empty plot as no visual elements have been added to ggplot2 call."
-  },
-  {
-    "objectID": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#aesthetic-mappings",
-    "href": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#aesthetic-mappings",
-    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics: ggplot2 methods",
-    "section": "Aesthetic Mappings",
-    "text": "Aesthetic Mappings\nThe aesthetic mappings take attributes of the data and and use them to influence visual characteristics, such as position, colour, size, shape, or transparency. Each visual characteristic can thus encode an aspect of the data and be used to convey information.\nAll aesthetics of a plot are specified in the aes() function call.\n\nggplot(data=exam_data, \n       aes(x= MATHS))\n\n\n\n\n\n\n\n\nThis maps the MATHS column of exam_data to the x-axis of the plot. The axis range is based on the range of this dataset.\n\nmin(exam_data[\"MATHS\"])\n\n[1] 9\n\n\n\nmax(exam_data[\"MATHS\"])\n\n[1] 99"
-  },
-  {
-    "objectID": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#geometrics",
-    "href": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#geometrics",
-    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics: ggplot2 methods",
-    "section": "Geometrics",
-    "text": "Geometrics\n\nTypes\nGeometric objects are the actual marks we put on a plot. Examples include:\n\ngeom_point for drawing individual points (e.g., a scatter plot)\ngeom_line for drawing lines (e.g., for a line charts)\ngeom_smooth for drawing smoothed lines (e.g., for simple trends or approximations)\ngeom_bar for drawing bars (e.g., for bar charts)\ngeom_histogram for drawing binned values (e.g. a histogram)\ngeom_polygon for drawing arbitrary shapes\ngeom_map for drawing polygons in the shape of a map! (You can access the data to use for these maps by using the map_data() function).\n\nA plot can have multiple geometrics. Other available geometrics can be found in https://ggplot2.tidyverse.org/reference/#section-layer-geoms.\n\n\ngeom_bar()\ngeom_bar() plots a bar chart.\n\nggplot(data=exam_data, \n       aes(x=RACE)) +\n  geom_bar()\n\n\n\n\n\n\n\n\n\n\ngeom_dotplot()\ngeom_dotplot() is appropriate for binned data.\n\nggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot(dotsize = 0.5)\n\n\n\n\n\n\n\n\nVertical scale is misleading so let’s just remove it.\n\n\n\n\n\n\nNote\n\n\n\n\nscale_y_continuous() is used to turn off the y-axis, and\nbinwidth argument is used to change the binwidth to 2.5.\n\n\n\n\nggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_dotplot(binwidth=2.5,         \n               dotsize = 0.5) +      \n  scale_y_continuous(NULL,           \n                     breaks = NULL)  \n\n\n\n\n\n\n\n\n\n\ngeom_histogram()\ngeom_histogram() is for generating a histogram. (default bin = 30)\n\nggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_histogram()\n\n\n\n\n\n\n\n\nLet’s change the histogram bin and color.\n\nggplot(data=exam_data, \n       aes(x= MATHS)) +\n  geom_histogram(bins=20,            \n                 color=\"black\",      \n                 fill=\"light blue\")  \n\n\n\n\n\n\n\n\n\n\nChanging geometry by using aes()\nIn this example, we partition the data (e.g. Female vs Male) and color each bar corresponding to the partition differently.\n\nggplot(data=exam_data, \n       aes(x= MATHS, \n           fill = GENDER)) +\n  geom_histogram(bins=20, \n                 color=\"grey30\")\n\n\n\n\n\n\n\n\n\n\ngeom_density()\ngeom-density() computes and plots kernel density estimate, which is a smoothed version of the histogram.\nThis is appropriate for continuous data.\n\nggplot(data=exam_data, \n       aes(x = MATHS)) +\n  geom_density()           \n\n\n\n\n\n\n\n\nIt can be used with partitioned data as well.\n\nggplot(data=exam_data, \n       aes(x = MATHS, \n           colour = GENDER)) +\n  geom_density()\n\n\n\n\n\n\n\n\n\n\ngeom_boxplot()\ngeom_boxplot() displays continuous value list. It visualises five summary statistics (the median, two hinges and two whiskers), and all “outlying” points individually.\nIt is appropriate for visualizing the distribution of a dataset.\n\nggplot(data=exam_data, \n       aes(y = MATHS,       \n           x= GENDER)) +    \n  geom_boxplot()            \n\n\n\n\n\n\n\n\nNotches are used in box plots to help visually assess whether the medians of distributions differ. If the notches do not overlap, this is evidence that the medians are different.\nNotches can be used by supplying notches=true.\n\nggplot(data=exam_data, \n       aes(y = MATHS, \n           x= GENDER)) +\n  geom_boxplot(notch=TRUE)\n\n\n\n\n\n\n\n\n\n\ngeom_violin()\ngeom_violin is designed for creating violin plot. Violin plots are a way of comparing multiple data distributions. With ordinary density curves, it is difficult to compare more than just a few distributions because the lines visually interfere with each other. With a violin plot, it’s easier to compare several distributions since they’re placed side by side.\n\nggplot(data=exam_data, \n       aes(y = MATHS, \n           x= GENDER)) +\n  geom_violin()\n\n\n\n\n\n\n\n\n\n\ngeom_point()\ngeom_point() is especially useful for creating scatterplot.\nThe plot below shows the plot of Maths and English grades.\n\nggplot(data=exam_data, \n       aes(x= MATHS, \n           y=ENGLISH)) +\n  geom_point()            \n\n\n\n\n\n\n\n\n\n\nCombining geom objects\nMultiple geom objects can be combined in a single plot like below, combining a boxplot and scatterplot.\n\nggplot(data=exam_data, \n       aes(y = MATHS, \n           x= GENDER)) +\n  geom_boxplot() +                    \n  geom_point(position=\"jitter\", \n             size = 0.5)"
-  },
-  {
-    "objectID": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#statistics",
-    "href": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#statistics",
-    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics: ggplot2 methods",
-    "section": "Statistics",
-    "text": "Statistics\nThe Statistics functions statistically transform data, usually as some form of summary. For example:\n\nfrequency of values of a variable (bar graph)\n\na mean\na confidence limit\n\nThere are two ways to use these functions:\n\nadd a stat_() function and override the default geom, or\nadd a geom_() function and override the default stat.\n\n\n\nAdding mean to the boxplot\nThe boxplot show summary of the dataset based on quantiles. Hence, we can see the median but not the mean.\n\nggplot(data=exam_data, \n       aes(y = MATHS, x= GENDER)) +\n  geom_boxplot()\n\n\n\n\n\n\n\n\nWe can add the mean by using the stat_summary() function.\n\nggplot(data=exam_data, \n       aes(y = MATHS, x= GENDER)) +\n  geom_boxplot() +\n  stat_summary(geom = \"point\",       \n               fun=\"mean\",         \n               colour =\"red\",        \n               size=4)               \n\n\n\n\n\n\n\n\nThis adds a red dot corresponding to the mean to the boxplot.\n\n\nGenerating the stat using the geom_() functions\nAlternatively, the result above can also be generated by using geom_point() with stat parameter.\n\nggplot(data=exam_data, \n       aes(y = MATHS, x= GENDER)) +\n  geom_boxplot() +\n  geom_point(stat=\"summary\",        \n             fun=\"mean\",           \n             colour =\"red\",          \n             size=4)          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\nImportant\n\n\n\nUsing fun.y generated the warning below:\nWarning: The `fun.y` argument of `stat_summary()` is deprecated as of ggplot2 3.3.0.\nPlease use the `fun` argument instead.\nHence, I replace fun.y with just fun.\n\n\n\n\nGenerating best fit curve\nBest fit curve can be generated by using geom_smooth(). We can add this to the English vs Maths scatterplot previously generated.\n\nggplot(data=exam_data, \n       aes(x= MATHS, y=ENGLISH)) +\n  geom_point() +\n  geom_smooth(linewidth=0.5, color=\"red\")\n\n\n\n\n\n\n\n\nWe can also generate a best fit line by specifying method=lm instead of the default loess.\n\nggplot(data=exam_data, \n       aes(x= MATHS, y=ENGLISH)) +\n  geom_point() +\n  geom_smooth(method=\"lm\", linewidth=0.5, color=\"red\")"
-  },
-  {
-    "objectID": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#facets",
-    "href": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#facets",
-    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics: ggplot2 methods",
-    "section": "Facets",
-    "text": "Facets\nFacetting generates small multiples (sometimes also called trellis plot), each displaying a different subset of the data. They are an alternative to aesthetics for displaying additional discrete variables. ggplot2 supports two types of factes, namely: facet_grid() and facet_wrap.\n\nfacet_wrap()\nfacet_wrap wraps a 1d sequence of panels into 2d. This is generally a better use of screen space than facet_grid because most displays are roughly rectangular.\nThe code chunk below generates multiple histograms for Maths grades for each class.\n\nggplot(data=exam_data, \n       aes(x= MATHS)) +\n  geom_histogram(bins=20) +\n    facet_wrap(~ CLASS)\n\n\n\n\n\n\n\n\n\n\nfacet_grid()\nfacet_grid() forms a matrix of panels defined by row and column facetting variables. It is most useful when you have two discrete variables, and all combinations of the variables exist in the data.\nThe code chunk below visualizes the same data above but using facet_grid().\n\nggplot(data=exam_data, \n       aes(x= MATHS)) +\n  geom_histogram(bins=20) +\n    facet_grid(~ CLASS)"
-  },
-  {
-    "objectID": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#coordinates",
-    "href": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#coordinates",
-    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics: ggplot2 methods",
-    "section": "Coordinates",
-    "text": "Coordinates\nThe Coordinates functions map the position of objects onto the plane of the plot. There are a number of different possible coordinate systems to use, they are:\n\ncoord_cartesian(): the default cartesian coordinate systems, where you specify x and y values (e.g. allows you to zoom in or out).\ncoord_flip(): a cartesian system with the x and y flipped.\ncoord_fixed(): a cartesian system with a “fixed” aspect ratio (e.g. 1.78 for a “widescreen” plot).\ncoord_quickmap():\n\n\nFlipping coordinates\nBy the default, the bar chart of ggplot2 is in vertical form.\n\nggplot(data=exam_data, \n       aes(x=RACE)) +\n  geom_bar()\n\n\n\n\n\n\n\n\nWe can transform the vertical to horizontal bars by using coord_flip().\n\nggplot(data=exam_data, \n       aes(x=RACE)) +\n  geom_bar() +\n  coord_flip()\n\n\n\n\n\n\n\n\n\n\nChanging axis range\nThe scatterplot below may be misleading as the axis range are different.\n\nggplot(data=exam_data, \n       aes(x= MATHS, y=ENGLISH)) +\n  geom_point() +\n  geom_smooth(method=lm, linewidth=0.5)\n\n\n\n\n\n\n\n\nThis is because by default, the axis range was generated based on the min and max values in the dataset.\nWe can apply context and set axis ranges based on the real life min and max values (0 and 100, respectively).\n\nggplot(data=exam_data, \n       aes(x= MATHS, y=ENGLISH)) +\n  geom_point() +\n  geom_smooth(method=lm, \n              linewidth=0.5) +  \n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100))"
-  },
-  {
-    "objectID": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#themes",
-    "href": "Hands-on_Exs/Ex1/Hands-on_Ex1.html#themes",
-    "title": "Hands-on Exercise 1: A Layered Grammar of Graphics: ggplot2 methods",
-    "section": "Themes",
-    "text": "Themes\nThemes control elements of the graph not related to the data. For example:\n\nbackground colour\nsize of fonts\ngridlines\ncolour of labels\n\nBuilt-in themes include: - theme_gray() (default) - theme_bw() - theme_classic()\nA list of theme can be found at this link. Each theme element can be conceived of as either a line (e.g. x-axis), a rectangle (e.g. graph background), or text (e.g. axis title).\nApplying the built-in themes is as simple as applying the theme_* functions.\n\nggplot(data=exam_data,\n       aes(x=RACE)) +\n  geom_bar() +\n  coord_flip() +\n  theme_linedraw()"
-  },
-  {
-    "objectID": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html",
-    "href": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html",
-    "title": "Hands-on Exercise 4B: Visualizing Uncertainty",
-    "section": "",
-    "text": "This hands-on exercise covers Chapter 11: Visual Uncertainty.\nI learned about the following:\n\nplotting uncertainty through error bars\ncreating hypothetical outcome plots (HOPs) by using ungeviz package"
-  },
-  {
-    "objectID": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#loading-the-required-packages",
-    "href": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#loading-the-required-packages",
-    "title": "Hands-on Exercise 4B: Visualizing Uncertainty",
+    "objectID": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#loading-the-required-packages",
+    "href": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#loading-the-required-packages",
+    "title": "Hands-on Exercise 4C: Building Funnel Plot with R",
     "section": "2.1 Loading the required packages",
-    "text": "2.1 Loading the required packages\nFor this exercise we will use the following R packages:\n\ntidyverse, a family of R packages for data science process,\nplotly for creating interactive plot,\ngganimate for creating animation plot,\ngifski for gganimate to generate gif animations\nDT for displaying interactive html table,\ncrosstalk for for implementing cross-widget interactions (currently, linked brushing and filtering), and\nggdist for visualising distribution and uncertainty.\nungeviz for visualizing uncertainty\nknitr for rendering a simple table\n\n\n\n\n\n\n\nI needed to install devtools first by Tools &gt; Install Packages.\nAdded the following libraries from the ones of the chapter as they are also necessary to be install individually:\n\ngifski\nknitr\n\n\n\n\n\npacman::p_load(tidyverse, plotly, gifski, gganimate, DT, crosstalk, ggdist, knitr)\ndevtools::install_github(\"wilkelab/ungeviz\")\nlibrary(ungeviz)"
+    "text": "2.1 Loading the required packages\nFor this exercise we will use the following R packages:\n\nreadr for importing csv into R.\nFunnelPlotR for creating funnel plot.\nggplot2 for creating funnel plot manually.\nknitr for building static html table.\nplotly for creating interactive funnel plot.\n\n\npacman::p_load(tidyverse, FunnelPlotR, plotly, knitr)"
   },
   {
-    "objectID": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#loading-the-data",
-    "href": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#loading-the-data",
-    "title": "Hands-on Exercise 4B: Visualizing Uncertainty",
+    "objectID": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#loading-the-data",
+    "href": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#loading-the-data",
+    "title": "Hands-on Exercise 4C: Building Funnel Plot with R",
     "section": "2.2 Loading the data",
-    "text": "2.2 Loading the data\nWe will use the same exam_data dataset from Hands-on Ex 1 and load it into the RStudio environment using read_csv().\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")\nglimpse(exam_data)\n\nRows: 322\nColumns: 7\n$ ID      &lt;chr&gt; \"Student321\", \"Student305\", \"Student289\", \"Student227\", \"Stude…\n$ CLASS   &lt;chr&gt; \"3I\", \"3I\", \"3H\", \"3F\", \"3I\", \"3I\", \"3I\", \"3I\", \"3I\", \"3H\", \"3…\n$ GENDER  &lt;chr&gt; \"Male\", \"Female\", \"Male\", \"Male\", \"Male\", \"Female\", \"Male\", \"M…\n$ RACE    &lt;chr&gt; \"Malay\", \"Malay\", \"Chinese\", \"Chinese\", \"Malay\", \"Malay\", \"Chi…\n$ ENGLISH &lt;dbl&gt; 21, 24, 26, 27, 27, 31, 31, 31, 33, 34, 34, 36, 36, 36, 37, 38…\n$ MATHS   &lt;dbl&gt; 9, 22, 16, 77, 11, 16, 21, 18, 19, 49, 39, 35, 23, 36, 49, 30,…\n$ SCIENCE &lt;dbl&gt; 15, 16, 16, 31, 25, 16, 25, 27, 15, 37, 42, 22, 32, 36, 35, 45…\n\n\nThere are a total of seven attributes in the exam_data tibble data frame. Four of them are categorical data type and the other three are in continuous data type.\n\nThe categorical attributes are: ID, CLASS, GENDER and RACE.\nThe continuous attributes are: MATHS, ENGLISH and SCIENCE."
+    "text": "2.2 Loading the data\nIn this section, COVID-19_DKI_Jakarta will be used. The data was downloaded from Open Data Covid-19 Provinsi DKI Jakarta portal. For this hands-on exercise, we are going to compare the cumulative COVID-19 cases and death by sub-district (i.e. kelurahan) as at 31st July 2021, DKI Jakarta.\nThe code chunk below imports the data into R and save it into a tibble data frame object called covid19.\n\ncovid19 &lt;- read_csv(\"data/COVID-19_DKI_Jakarta.csv\") %&gt;%\n  mutate_if(is.character, as.factor)\n\nkable(head(covid19, 10))\n\n\n\n\n\n\n\n\n\n\n\n\n\nSub-district ID\nCity\nDistrict\nSub-district\nPositive\nRecovered\nDeath\n\n\n\n\n3172051003\nJAKARTA UTARA\nPADEMANGAN\nANCOL\n1776\n1691\n26\n\n\n3173041007\nJAKARTA BARAT\nTAMBORA\nANGKE\n1783\n1720\n29\n\n\n3175041005\nJAKARTA TIMUR\nKRAMAT JATI\nBALE KAMBANG\n2049\n1964\n31\n\n\n3175031003\nJAKARTA TIMUR\nJATINEGARA\nBALI MESTER\n827\n797\n13\n\n\n3175101006\nJAKARTA TIMUR\nCIPAYUNG\nBAMBU APUS\n2866\n2792\n27\n\n\n3174031002\nJAKARTA SELATAN\nMAMPANG PRAPATAN\nBANGKA\n1828\n1757\n26\n\n\n3175051002\nJAKARTA TIMUR\nPASAR REBO\nBARU\n2541\n2433\n37\n\n\n3175041004\nJAKARTA TIMUR\nKRAMAT JATI\nBATU AMPAR\n3608\n3445\n68\n\n\n3171071002\nJAKARTA PUSAT\nTANAH ABANG\nBENDUNGAN HILIR\n2012\n1937\n38\n\n\n3175031002\nJAKARTA TIMUR\nJATINEGARA\nBIDARA CINA\n2900\n2773\n52"
   },
   {
-    "objectID": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#plotting-standard-error-bars-of-point-estimates",
-    "href": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#plotting-standard-error-bars-of-point-estimates",
-    "title": "Hands-on Exercise 4B: Visualizing Uncertainty",
-    "section": "3.1 Plotting standard error bars of point estimates",
-    "text": "3.1 Plotting standard error bars of point estimates\nNow we are ready to plot the standard error bars of mean maths score by race as shown below.\n\n\nShow the code\nggplot(my_sum) +\n  geom_errorbar(\n    aes(x=RACE, \n        ymin=mean-se, \n        ymax=mean+se), \n    width=0.2, \n    colour=\"black\", \n    alpha=0.9, \n    size=0.5) +\n  geom_point(aes\n           (x=RACE, \n            y=mean), \n           stat=\"identity\", \n           color=\"red\",\n           size = 1.5,\n           alpha=1) +\n  ggtitle(\"Standard error of mean maths score by rac\")"
+    "objectID": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#basic-plot",
+    "href": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#basic-plot",
+    "title": "Hands-on Exercise 4C: Building Funnel Plot with R",
+    "section": "3.1 Basic Plot",
+    "text": "3.1 Basic Plot\nThe code chunk below plots a funnel plot.\n\nfunnel_plot(\n  .data = covid19,\n  numerator = Positive,\n  denominator = Death,\n  group = `Sub-district`\n)\n\n\n\n\n\n\n\n\nA funnel plot object with 267 points of which 0 are outliers. \nPlot is adjusted for overdispersion. \n\n\nThings to learn from the code chunk above.\n\ngroup in this function is different from the scatterplot. Here, it defines the level of the points to be plotted i.e. Sub-district, District or City. If Cityc is chosen, there are only six data points.\nBy default, data_typeargument is “SR”.\nlimit: Plot limits, accepted values are: 95 or 99, corresponding to 95% or 99.8% quantiles of the distribution."
   },
   {
-    "objectID": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#plotting-confidence-interval-of-point-estimates",
-    "href": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#plotting-confidence-interval-of-point-estimates",
-    "title": "Hands-on Exercise 4B: Visualizing Uncertainty",
-    "section": "3.2 Plotting confidence interval of point estimates",
-    "text": "3.2 Plotting confidence interval of point estimates\nInstead of plotting the standard error bar of point estimates, we can also plot the confidence intervals of mean maths score by race.\n\n\nShow the code\nggplot(my_sum) +\n  geom_errorbar(\n    aes(x=reorder(RACE, -mean), \n        ymin=mean-1.96*se, \n        ymax=mean+1.96*se), \n    width=0.2, \n    colour=\"black\", \n    alpha=0.9, \n    size=0.5) +\n  geom_point(aes\n           (x=RACE, \n            y=mean), \n           stat=\"identity\", \n           color=\"red\",\n           size = 1.5,\n           alpha=1) +\n  labs(x = \"Maths score\",\n       title = \"95% confidence interval of mean maths score by race\")"
+    "objectID": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#makeover-1",
+    "href": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#makeover-1",
+    "title": "Hands-on Exercise 4C: Building Funnel Plot with R",
+    "section": "3.2 Makeover 1",
+    "text": "3.2 Makeover 1\nFrom the plot above, the values are really low so we will adjust the range of y-axis, along with changing the data_type from the default “SR” (indirectly standardised ratios) to “PR” (proportions).\n\nfunnel_plot(\n  .data = covid19,\n  numerator = Death,\n  denominator = Positive,\n  group = `Sub-district`,\n  data_type = \"PR\",\n  x_range = c(0, 6500),\n  y_range = c(0, 0.05)\n)"
   },
   {
-    "objectID": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#visualizing-the-uncertainty-of-point-estimates-with-interactive-error-bars",
-    "href": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#visualizing-the-uncertainty-of-point-estimates-with-interactive-error-bars",
-    "title": "Hands-on Exercise 4B: Visualizing Uncertainty",
-    "section": "3.3 Visualizing the uncertainty of point estimates with interactive error bars",
-    "text": "3.3 Visualizing the uncertainty of point estimates with interactive error bars\nWe will now plot interactive error bars for the 99% confidence interval of mean maths score by race as shown in the figure below.\n\n\nShow the code\nshared_df = SharedData$new(my_sum)\n\nbscols(widths = c(4,8),\n       ggplotly((ggplot(shared_df) +\n                   geom_errorbar(aes(\n                     x=reorder(RACE, -mean),\n                     ymin=mean-2.58*se, \n                     ymax=mean+2.58*se), \n                     width=0.2, \n                     colour=\"black\", \n                     alpha=0.9, \n                     size=0.5) +\n                   geom_point(aes(\n                     x=RACE, \n                     y=mean, \n                     text = paste(\"Race:\", `RACE`, \n                                  \"&lt;br&gt;N:\", `n`,\n                                  \"&lt;br&gt;Avg. Scores:\", round(mean, digits = 2),\n                                  \"&lt;br&gt;95% CI:[\", \n                                  round((mean-2.58*se), digits = 2), \",\",\n                                  round((mean+2.58*se), digits = 2),\"]\")),\n                     stat=\"identity\", \n                     color=\"red\", \n                     size = 1.5, \n                     alpha=1) + \n                   xlab(\"Race\") + \n                   ylab(\"Average Scores\") + \n                   theme_minimal() + \n                   theme(axis.text.x = element_text(\n                     angle = 45, vjust = 0.5, hjust=1)) +\n                   ggtitle(\"99% Confidence interval of average /&lt;br&gt;maths scores by race\")), \n                tooltip = \"text\"), \n       DT::datatable(shared_df, \n                     rownames = FALSE, \n                     class=\"compact\", \n                     width=\"100%\", \n                     options = list(pageLength = 10,\n                                    scrollX=T), \n                     colnames = c(\"No. of pupils\", \n                                  \"Avg Scores\",\n                                  \"Std Dev\",\n                                  \"Std Error\")) %&gt;%\n         formatRound(columns=c('mean', 'sd', 'se'),\n                     digits=2))"
+    "objectID": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#makeover-2",
+    "href": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#makeover-2",
+    "title": "Hands-on Exercise 4C: Building Funnel Plot with R",
+    "section": "3.3 Makeover 2",
+    "text": "3.3 Makeover 2\n\nfunnel_plot(\n  .data = covid19,\n  numerator = Death,\n  denominator = Positive,\n  group = `Sub-district`,\n  data_type = \"PR\",   \n  xrange = c(0, 6500),  \n  yrange = c(0, 0.05),\n  label = NA,\n  title = \"Cumulative COVID-19 Fatality Rate by Cumulative Total Number of COVID-19 Positive Cases\", #&lt;&lt;           \n  x_label = \"Cumulative COVID-19 Positive Cases\", #&lt;&lt;\n  y_label = \"Cumulative Fatality Rate\"  #&lt;&lt;\n)\n\n\n\n\n\n\n\n\nA funnel plot object with 267 points of which 7 are outliers. \nPlot is adjusted for overdispersion. \n\n\nThings to learn from the code chunk above.\n\nlabel = NA argument is to remove the default label outliers feature.\ntitle argument is used to add plot title.\nx_label and y_label arguments are used to add/edit x-axis and y-axis titles."
   },
   {
-    "objectID": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#using-stat_pointinterval",
-    "href": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#using-stat_pointinterval",
-    "title": "Hands-on Exercise 4B: Visualizing Uncertainty",
-    "section": "4.1 Using stat_pointinterval()",
-    "text": "4.1 Using stat_pointinterval()\nWe will build a visual for displaying distribution of maths scores by race.\n\nexam_data %&gt;%\n  ggplot(aes(x = RACE, \n             y = MATHS)) +\n  stat_pointinterval() +\n  labs(\n    title = \"Visualising confidence intervals of mean math score\",\n    subtitle = \"Mean Point + Multiple-interval plot\")\n\n\n\n\n\n\n\n\nstat_pointinterval() can also be called with extra arguments\n\nexam_data %&gt;%\n  ggplot(aes(x = RACE, y = MATHS)) +\n  stat_pointinterval(.width = 0.95,\n  .point = median,\n  .interval = qi) +\n  labs(\n    title = \"Visualising confidence intervals of median math score\",\n    subtitle = \"Median Point + Multiple-interval plot\")"
+    "objectID": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#computing-the-basic-derived-fields",
+    "href": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#computing-the-basic-derived-fields",
+    "title": "Hands-on Exercise 4C: Building Funnel Plot with R",
+    "section": "4.1 Computing the basic derived fields",
+    "text": "4.1 Computing the basic derived fields\nTo plot the funnel plot from scratch, we need to derive cumulative death rate and standard error of cumulative death rate.\n\ndf &lt;- covid19 %&gt;%\n  mutate(rate = Death / Positive) %&gt;%\n  mutate(rate.se = sqrt((rate*(1-rate)) / (Positive))) %&gt;%\n  filter(rate &gt; 0)\n\n\n\n\n\n\n\nIn this code, we supply the numerator and denominator in rate corresponding to the ones supplies in funnel_plot().\n\n\n\nNext, the fit.mean is computed by using the code chunk below.\n\nfit.mean &lt;- weighted.mean(df$rate, 1/df$rate.se^2)"
   },
   {
-    "objectID": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#using-stat_pointinterval-makeover",
-    "href": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#using-stat_pointinterval-makeover",
-    "title": "Hands-on Exercise 4B: Visualizing Uncertainty",
-    "section": "4.2 Using stat_pointinterval() (makeover)",
-    "text": "4.2 Using stat_pointinterval() (makeover)\nThe previous plot shows the 95% confidence interval. This plot below will show the 95% (thick line) to 99% (thin line) confidence interval.\n\n\n\n\n\n\nThe default for .width seems to be .width = c(0.66, 0.95) from the docs.\n\n\n\n\nexam_data %&gt;%\n  ggplot(aes(x = RACE, y = MATHS)) +\n  stat_pointinterval(.width = c(0.95, 0.99),\n  .point = median,\n  .interval = qi) +\n  labs(\n    title = \"Visualising confidence intervals of median math score\",\n    subtitle = \"Median Point + Multiple-interval plot\")"
+    "objectID": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#calculate-lower-and-upper-limits-for-95-and-99.9-ci",
+    "href": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#calculate-lower-and-upper-limits-for-95-and-99.9-ci",
+    "title": "Hands-on Exercise 4C: Building Funnel Plot with R",
+    "section": "4.2 Calculate lower and upper limits for 95% and 99.9% CI",
+    "text": "4.2 Calculate lower and upper limits for 95% and 99.9% CI\nThe code chunk below is used to compute the lower and upper limits for 95% confidence interval.\n\nnumber.seq &lt;- seq(1, max(df$Positive), 1)\nnumber.ll95 &lt;- fit.mean - 1.96 * sqrt((fit.mean*(1-fit.mean)) / (number.seq)) \nnumber.ul95 &lt;- fit.mean + 1.96 * sqrt((fit.mean*(1-fit.mean)) / (number.seq)) \nnumber.ll999 &lt;- fit.mean - 3.29 * sqrt((fit.mean*(1-fit.mean)) / (number.seq)) \nnumber.ul999 &lt;- fit.mean + 3.29 * sqrt((fit.mean*(1-fit.mean)) / (number.seq)) \ndfCI &lt;- data.frame(number.ll95, number.ul95, number.ll999, \n                   number.ul999, number.seq, fit.mean)"
   },
   {
-    "objectID": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#using-stat_gradientinterval",
-    "href": "Hands-on_Exs/Ex4B/Hands-on_Ex4B.html#using-stat_gradientinterval",
-    "title": "Hands-on Exercise 4B: Visualizing Uncertainty",
-    "section": "4.3 Using stat_gradientinterval()",
-    "text": "4.3 Using stat_gradientinterval()\nIn the code chunk below, stat_gradientinterval() of ggdist is used to build a visual for displaying distribution of maths scores by race.\n\nexam_data %&gt;%\n  ggplot(aes(x = RACE, \n             y = MATHS)) +\n  stat_gradientinterval(   \n    fill = \"skyblue\",      \n    show.legend = TRUE     \n  ) +                        \n  labs(\n    title = \"Visualising confidence intervals of mean math score\",\n    subtitle = \"Gradient + interval plot\")\n\n\n\n\n\n\n\n\nThis plots gradients based on distribution. The darker color, the more observations with that value."
+    "objectID": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#plotting-a-static-funnel-plot",
+    "href": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#plotting-a-static-funnel-plot",
+    "title": "Hands-on Exercise 4C: Building Funnel Plot with R",
+    "section": "4.3 Plotting a static funnel plot",
+    "text": "4.3 Plotting a static funnel plot\n\n\nShow the code\np &lt;- ggplot(df, aes(x = Positive, y = rate)) +\n  geom_point(aes(label=`Sub-district`), \n             alpha=0.4) +\n  geom_line(data = dfCI, \n            aes(x = number.seq, \n                y = number.ll95), \n            size = 0.4, \n            colour = \"grey40\", \n            linetype = \"dashed\") +\n  geom_line(data = dfCI, \n            aes(x = number.seq, \n                y = number.ul95), \n            size = 0.4, \n            colour = \"grey40\", \n            linetype = \"dashed\") +\n  geom_line(data = dfCI, \n            aes(x = number.seq, \n                y = number.ll999), \n            size = 0.4, \n            colour = \"grey40\") +\n  geom_line(data = dfCI, \n            aes(x = number.seq, \n                y = number.ul999), \n            size = 0.4, \n            colour = \"grey40\") +\n  geom_hline(data = dfCI, \n             aes(yintercept = fit.mean), \n             size = 0.4, \n             colour = \"grey40\") +\n  coord_cartesian(ylim=c(0,0.05)) +\n  annotate(\"text\", x = 1, y = -0.13, label = \"95%\", size = 3, colour = \"grey40\") + \n  annotate(\"text\", x = 4.5, y = -0.18, label = \"99%\", size = 3, colour = \"grey40\") + \n  ggtitle(\"Cumulative Fatality Rate by Cumulative Number of COVID-19 Cases\") +\n  xlab(\"Cumulative Number of COVID-19 Cases\") + \n  ylab(\"Cumulative Fatality Rate\") +\n  theme_light() +\n  theme(plot.title = element_text(size=12),\n        legend.position = c(0.91,0.85), \n        legend.title = element_text(size=7),\n        legend.text = element_text(size=7),\n        legend.background = element_rect(colour = \"grey60\", linetype = \"dotted\"),\n        legend.key.height = unit(0.3, \"cm\"))\np"
   },
   {
-    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html",
-    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html",
-    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
+    "objectID": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#interactive-plot-with-plotly",
+    "href": "Hands-on_Exs/Ex4C/Hands-on_Ex4C.html#interactive-plot-with-plotly",
+    "title": "Hands-on Exercise 4C: Building Funnel Plot with R",
+    "section": "4.4 Interactive plot with plotly",
+    "text": "4.4 Interactive plot with plotly\nThe funnel plot created using ggplot2 functions can be made interactive with ggplotly() of plotly r package.\n\nfp_ggplotly &lt;- ggplotly(p,\n  tooltip = c(\"label\", \n              \"x\", \n              \"y\"))\nfp_ggplotly"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex5/Hands-on_Ex5.html",
+    "href": "Hands-on_Exs/Ex5/Hands-on_Ex5.html",
+    "title": "Hands-on Exercise 5: Visualizing and Analyzing Text Data",
     "section": "",
-    "text": "This hands-on exercise covers Chapter 2: Beyond ggplot Fundamentals.\nI learned about the following:\n\nPackages to extend ggplot2\nImporting custom fonts\nComposing figures using multiple graphs"
+    "text": "This hands-on exercise covers Chapter 29: Visualising and Analysing Text Data with R: tidytext methods.\nI learned about the following:\n\nunderstand tidytext framework for processing, analysing and visualising text data,\nwrite function for importing multiple files into R,\ncombine multiple files into a single data frame,\nclean and wrangle text data by using tidyverse approach,\nvisualize words with Word Cloud,\ncompute term frequency–inverse document frequency (TF-IDF) using tidytext method, and\nvisualizing texts and terms relationship."
   },
   {
-    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#loading-the-required-libraries",
-    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#loading-the-required-libraries",
-    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
-    "section": "Loading the required libraries",
-    "text": "Loading the required libraries\nIn Hands-on Ex 1, we only used tidyverse and ggplot2. In this exercise, 4 other R packages will be used:\n\nggrepel: an R package provides geoms for ggplot2 to repel overlapping text labels.\nggthemes: an R package provides some extra themes, geoms, and scales for ‘ggplot2’.\nhrbrthemes: an R package provides typography-centric themes and theme components for ggplot2.\npatchwork: an R package for preparing composite figure created using ggplot2.\n\n\npacman::p_load(ggrepel, patchwork, \n               ggthemes, hrbrthemes,\n               tidyverse)"
+    "objectID": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#loading-the-required-packages",
+    "href": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#loading-the-required-packages",
+    "title": "Hands-on Exercise 5: Visualizing and Analyzing Text Data",
+    "section": "2.1 Loading the required packages",
+    "text": "2.1 Loading the required packages\nFor this exercise we will use the following R packages:\n\ntidytext, tidyverse (mainly readr, purrr, stringr, ggplot2)\nwidyr,\nwordcloud and ggwordcloud,\ntextplot (required igraph, tidygraph and ggraph, )\nDT,\nlubridate and hms\n\n\npacman::p_load(tidytext, widyr, wordcloud, DT, ggwordcloud, textplot, lubridate, hms, tidyverse, tidygraph, ggraph, igraph)"
   },
   {
-    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#loading-the-data",
-    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#loading-the-data",
-    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
-    "section": "Loading the data",
-    "text": "Loading the data\nWe will use the same exam_data dataset from Hands-on Ex 1 and load it into the RStudio environment using read_csv().\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")\nglimpse(exam_data)\n\nRows: 322\nColumns: 7\n$ ID      &lt;chr&gt; \"Student321\", \"Student305\", \"Student289\", \"Student227\", \"Stude…\n$ CLASS   &lt;chr&gt; \"3I\", \"3I\", \"3H\", \"3F\", \"3I\", \"3I\", \"3I\", \"3I\", \"3I\", \"3H\", \"3…\n$ GENDER  &lt;chr&gt; \"Male\", \"Female\", \"Male\", \"Male\", \"Male\", \"Female\", \"Male\", \"M…\n$ RACE    &lt;chr&gt; \"Malay\", \"Malay\", \"Chinese\", \"Chinese\", \"Malay\", \"Malay\", \"Chi…\n$ ENGLISH &lt;dbl&gt; 21, 24, 26, 27, 27, 31, 31, 31, 33, 34, 34, 36, 36, 36, 37, 38…\n$ MATHS   &lt;dbl&gt; 9, 22, 16, 77, 11, 16, 21, 18, 19, 49, 39, 35, 23, 36, 49, 30,…\n$ SCIENCE &lt;dbl&gt; 15, 16, 16, 31, 25, 16, 25, 27, 15, 37, 42, 22, 32, 36, 35, 45…\n\n\nThere are a total of seven attributes in the exam_data tibble data frame. Four of them are categorical data type and the other three are in continuous data type.\n\nThe categorical attributes are: ID, CLASS, GENDER and RACE.\nThe continuous attributes are: MATHS, ENGLISH and SCIENCE."
+    "objectID": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#importing-multiple-text-files-from-multiple-folders",
+    "href": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#importing-multiple-text-files-from-multiple-folders",
+    "title": "Hands-on Exercise 5: Visualizing and Analyzing Text Data",
+    "section": "2.2 Importing Multiple Text Files from Multiple Folders",
+    "text": "2.2 Importing Multiple Text Files from Multiple Folders\n\n2.2.1 Creating a folder list\n\nnews20 &lt;- \"data/20news/\"\n\n\n\n2.2.2 Define a function to read all files from a folder into a data frame\n\nread_folder &lt;- function(infolder) {\n  tibble(file = dir(infolder, \n                    full.names = TRUE)) %&gt;%\n    mutate(text = map(file, \n                      read_lines)) %&gt;%\n    transmute(id = basename(file), \n              text) %&gt;%\n    unnest(text)\n}"
   },
   {
-    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#working-with-ggreprel",
-    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#working-with-ggreprel",
-    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
-    "section": "Working with ggreprel",
-    "text": "Working with ggreprel\nggrepel is an extension of ggplot2 package which provides geoms for ggplot2 to repel overlapping text like below.\nWe simply replace geom_text() by geom_text_repel() and geom_label() by geom_label_repel.\n\n\nShow the code\nggplot(data=exam_data, \n       aes(x= MATHS, \n           y=ENGLISH)) +\n  geom_point() +\n  geom_smooth(method=lm, \n              linewidth=0.5) +  \n  geom_label_repel(aes(label = ID), \n             fontface=\"bold\") +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100)) +\n  ggtitle(\"English scores versus Maths scores for Primary 3\")"
-  },
-  {
-    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#working-with-ggtheme-package",
-    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#working-with-ggtheme-package",
-    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
-    "section": "Working with ggtheme package",
-    "text": "Working with ggtheme package\nggthemes provides ‘ggplot2’ themes that replicate the look of plots by Edward Tufte, Stephen Few, Fivethirtyeight, The Economist, ‘Stata’, ‘Excel’, and The Wall Street Journal, among others.\nSome of the themes provided by the package are show below:\n\nCalcThe EconomistThe Economist (white)ExcelExcel (new)FivethirtyeightSolarizedStataThe Wall Street Journal\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_calc()\n\n\n\n\n\n\n\n\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_economist()\n\n\n\n\n\n\n\n\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_economist_white()\n\n\n\n\n\n\n\n\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_excel()\n\n\n\n\n\n\n\n\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_excel_new()\n\n\n\n\n\n\n\n\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_fivethirtyeight()\n\n\n\n\n\n\n\n\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_solarized()\n\n\n\n\n\n\n\n\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_stata()\n\n\n\n\n\n\n\n\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_wsj()"
-  },
-  {
-    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#working-with-hbrthemes-package",
-    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#working-with-hbrthemes-package",
-    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
-    "section": "Working with hbrthemes package",
-    "text": "Working with hbrthemes package\nhrbrthemes package provides a base theme that focuses on typographic elements, including where various labels are placed as well as the fonts that are used.\n\n\n\n\n\n\nImporting required fonts\n\n\n\n\n\nSome of the themes use custom fonts. To install these fonts, the corresponding import command must be run first, e.g.\n\nimport_econ_sans()\n\nThis will show where there fonts are located.\nNext, import the font in the location to your system.\n\nMac: https://support.apple.com/en-sg/guide/font-book/fntbk1000/mac\nWindows: https://support.microsoft.com/en-us/office/add-a-font-b7c5f17c-4426-4b53-967f-455339c564c1\nLinux: https://linuxiac.com/how-to-install-fonts-on-linux\n\nIn future exercises, if these themes will be used, these steps must be added to the setup code chunk.\n\n\n\nSome of the themes provided by the package are show below:\n\nft_rcipsumipsum_esipsum_interipsum_gs\n\n\n\n\n\n\n\n\nNote\n\n\n\nImport Roboto Condensed font first:\n\nimport_roboto_condensed()\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_ft_rc()\n\n\n\n\n\n\n\n\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_ipsum()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nThis requires the Econ Sans font to be installed and imported first:\n\nimport_econ_sans()\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_ipsum_es()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nImport Inter font first:\n\nimport_inter()\n\nAfter installing the font, run:\n\nextrafont::font_import()\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_ipsum_inter()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nThis requires the Goldman Sans Condensed font to be installed and imported first:\n\nimport_goldman_sans()\n\n\n\n\n\nShow the code\nggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  ggtitle(\"Distribution of Maths scores\") +\n  theme_ipsum_gs()"
-  },
-  {
-    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#base-graphs",
-    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#base-graphs",
-    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
-    "section": "Base Graphs",
-    "text": "Base Graphs\n\nDistribution of Maths scoresDistribution of English scoresEnglish vs Maths scores for Primary 3\n\n\n\n\nShow the code\np1 &lt;- ggplot(data=exam_data, \n             aes(x = MATHS)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") + \n  coord_cartesian(xlim=c(0,100)) +\n  ggtitle(\"Distribution of Maths scores\")\np1\n\n\n\n\n\n\n\n\n\n\n\n\n\nShow the code\np2 &lt;- ggplot(data=exam_data, \n             aes(x = ENGLISH)) +\n  geom_histogram(bins=20, \n                 boundary = 100,\n                 color=\"grey25\", \n                 fill=\"grey90\") +\n  coord_cartesian(xlim=c(0,100)) +\n  ggtitle(\"Distribution of English scores\")\np2\n\n\n\n\n\n\n\n\n\n\n\n\n\nShow the code\np3 &lt;- ggplot(data=exam_data, \n             aes(x= MATHS, \n                 y=ENGLISH)) +\n  geom_point() +\n  geom_smooth(method=lm, \n              size=0.5) +  \n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100)) +\n  ggtitle(\"English vs Maths scores (Primary 3)\")\np3"
-  },
-  {
-    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#creating-composite-graphics-pathwork-methods",
-    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#creating-composite-graphics-pathwork-methods",
-    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
-    "section": "Creating Composite Graphics: pathwork methods",
-    "text": "Creating Composite Graphics: pathwork methods\nThere are several ggplot2 extension’s functions support the needs to prepare composite figure by combining several graphs such as grid.arrange() of gridExtra package and plot_grid() of cowplot package. In this section, I am going to shared with you an ggplot2 extension called patchwork which is specially designed for combining separate ggplot2 graphs into a single figure.\nPatchwork package has a very simple syntax where we can create layouts super easily. Here’s the general syntax that combines:\n\nTwo-Column Layout using the Plus Sign +.\nParenthesis () to create a subplot group.\nTwo-Row Layout using the Division Sign /"
-  },
-  {
-    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#combining-two-ggplot2-graphs-using",
-    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#combining-two-ggplot2-graphs-using",
-    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
-    "section": "Combining two ggplot2 graphs using ‘+’",
-    "text": "Combining two ggplot2 graphs using ‘+’\nUsing + is the simplest way to combine multiple graphs. This will show them side by side\n\np1 + p2"
-  },
-  {
-    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#combining-three-ggplot2-graphs-using-pathwork",
-    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#combining-three-ggplot2-graphs-using-pathwork",
-    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
-    "section": "Combining three ggplot2 graphs using pathwork",
-    "text": "Combining three ggplot2 graphs using pathwork\nAside from +, patchwork provides other operators we can use to compose plots:\n\n“/” operator to stack two ggplot2 graphs,\n“|” operator to place the plots beside each other,\n“()” operator the define the sequence of the plotting.\n\nFor example, if we want to stack the two bar graphs, and show the scatterplot to the right, we can do:\n\n(p1 / p2) | p3"
-  },
-  {
-    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#tagging-composed-graphs",
-    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#tagging-composed-graphs",
-    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
-    "section": "Tagging composed graphs",
-    "text": "Tagging composed graphs\npatchwork provides auto-tagging capabilities so the individual graphs can more easily be referred in text.\n\n((p1 / p2) | p3) +\n  plot_annotation(tag_levels = '1')\n\n\n\n\n\n\n\n\nFor example, we can refer to the Distributions of Maths scores graph as Graph 1, corresponding to the annotation provided."
-  },
-  {
-    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#creating-figure-with-insert",
-    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#creating-figure-with-insert",
-    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
-    "section": "Creating figure with insert",
-    "text": "Creating figure with insert\nBeside providing functions to place plots next to each other based on the provided layout. With inset_element() of patchwork, we can place one or several plots or graphic elements freely on top or below another plot.\n\np3 + inset_element(p2, \n                   left = 0.02, \n                   bottom = 0.7, \n                   right = 0.5, \n                   top = 1)\n\n\n\n\n\n\n\n\nThis is useful for providing supplementary details to the main graph."
-  },
-  {
-    "objectID": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#applying-themes-to-the-composite-figure",
-    "href": "Hands-on_Exs/Ex2/Hands-on_Ex2.html#applying-themes-to-the-composite-figure",
-    "title": "Hands-on Exercise 2: Beyond ggplot Fundamentals",
-    "section": "Applying themes to the composite figure",
-    "text": "Applying themes to the composite figure\nWe can apply the theme by using & theme_() to the patchwork result.\n\nThe Economist (ggtheme)Ipsum_es (hrbrtheme)\n\n\n\npatchwork &lt;- (p1 / p2) | p3\npatchwork & theme_economist()\n\n\n\n\n\n\n\n\n\n\n\npatchwork &lt;- (p1 / p2) | p3\npatchwork & theme_ipsum_es()"
+    "objectID": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#importing-multiple-text-files-from-multiple-folders-1",
+    "href": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#importing-multiple-text-files-from-multiple-folders-1",
+    "title": "Hands-on Exercise 5: Visualizing and Analyzing Text Data",
+    "section": "2.3 Importing Multiple Text Files from Multiple Folders",
+    "text": "2.3 Importing Multiple Text Files from Multiple Folders\n\n2.3.1 Reading in all the messages from the 20news folder\n\nraw_text &lt;- tibble(folder = \n                     dir(news20, \n                         full.names = TRUE)) %&gt;%\n  mutate(folder_out = map(folder, \n                          read_folder)) %&gt;%\n  unnest(cols = c(folder_out)) %&gt;%\n  transmute(newsgroup = basename(folder), \n            id, text)\nwrite_rds(raw_text, \"data/rds/news20.rds\")"
   },
   {
     "objectID": "index.html",
