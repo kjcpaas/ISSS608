@@ -809,14 +809,14 @@
     "href": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#loading-the-required-packages",
     "title": "Hands-on Exercise 5: Visualizing and Analyzing Text Data",
     "section": "2.1 Loading the required packages",
-    "text": "2.1 Loading the required packages\nFor this exercise we will use the following R packages:\n\ntidytext, tidyverse (mainly readr, purrr, stringr, ggplot2)\nwidyr,\nwordcloud and ggwordcloud,\ntextplot (required igraph, tidygraph and ggraph, )\nDT,\nlubridate and hms\n\n\npacman::p_load(tidytext, widyr, wordcloud, DT, ggwordcloud, textplot, lubridate, hms, tidyverse, tidygraph, ggraph, igraph)"
+    "text": "2.1 Loading the required packages\nFor this exercise we will use the following R packages:\n\ntidytext, tidyverse (mainly readr, purrr, stringr, ggplot2)\nwidyr,\nwordcloud and ggwordcloud,\ntextplot (required igraph, tidygraph and ggraph, )\nDT,\nlubridate and hms\n\n\npacman::p_load(tidytext, widyr, wordcloud, DT, ggwordcloud, textplot, lubridate, hms, tidyverse, tidygraph, ggraph, igraph)\n\n# Set seed\nset.seed(1234)"
   },
   {
     "objectID": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#importing-multiple-text-files-from-multiple-folders",
     "href": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#importing-multiple-text-files-from-multiple-folders",
     "title": "Hands-on Exercise 5: Visualizing and Analyzing Text Data",
     "section": "2.2 Importing Multiple Text Files from Multiple Folders",
-    "text": "2.2 Importing Multiple Text Files from Multiple Folders\n\n2.2.1 Creating a folder list\n\nnews20 &lt;- \"data/20news/\"\n\n\n\n2.2.2 Define a function to read all files from a folder into a data frame\n\nread_folder &lt;- function(infolder) {\n  tibble(file = dir(infolder, \n                    full.names = TRUE)) %&gt;%\n    mutate(text = map(file, \n                      read_lines)) %&gt;%\n    transmute(id = basename(file), \n              text) %&gt;%\n    unnest(text)\n}"
+    "text": "2.2 Importing Multiple Text Files from Multiple Folders\n\n2.2.1 Creating a folder list\n\nnews20 &lt;- \"data/20news\"\n\n\n\n2.2.2 Define a function to read all files from a folder into a data frame\n\nread_folder &lt;- function(infolder) {\n  tibble(file = dir(infolder, \n                    full.names = TRUE)) %&gt;%\n    mutate(text = map(file, \n                      read_lines)) %&gt;%\n    transmute(id = basename(file), \n              text) %&gt;%\n    unnest(text)\n}"
   },
   {
     "objectID": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#importing-multiple-text-files-from-multiple-folders-1",
@@ -824,6 +824,125 @@
     "title": "Hands-on Exercise 5: Visualizing and Analyzing Text Data",
     "section": "2.3 Importing Multiple Text Files from Multiple Folders",
     "text": "2.3 Importing Multiple Text Files from Multiple Folders\n\n2.3.1 Reading in all the messages from the 20news folder\n\nraw_text &lt;- tibble(folder = \n                     dir(news20, \n                         full.names = TRUE)) %&gt;%\n  mutate(folder_out = map(folder, \n                          read_folder)) %&gt;%\n  unnest(cols = c(folder_out)) %&gt;%\n  transmute(newsgroup = basename(folder), \n            id, text)\nwrite_rds(raw_text, \"data/rds/news20.rds\")"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#removing-header-and-automated-email-signitures",
+    "href": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#removing-header-and-automated-email-signitures",
+    "title": "Hands-on Exercise 5: Visualizing and Analyzing Text Data",
+    "section": "4.1 Removing header and automated email signitures",
+    "text": "4.1 Removing header and automated email signitures\nEach message has some structure and extra text that we don’t want to include in our analysis. For example, every message has a header, containing field such as “from:” or “in_reply_to:” that describe the message. Some also have automated email signatures, which occur after a line like “–”.\n\ncleaned_text &lt;- raw_text %&gt;%\n  group_by(newsgroup, id) %&gt;%\n  filter(cumsum(text == \"\") &gt; 0,\n         cumsum(str_detect(\n           text, \"^--\")) == 0) %&gt;%\n  ungroup()\n\n\n\n\n\n\n\nThis code chunk removes the non-message texts from the raw texts."
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#removing-lines-with-nested-text-representing-quotes-from-other-users",
+    "href": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#removing-lines-with-nested-text-representing-quotes-from-other-users",
+    "title": "Hands-on Exercise 5: Visualizing and Analyzing Text Data",
+    "section": "4.2 Removing lines with nested text representing quotes from other users",
+    "text": "4.2 Removing lines with nested text representing quotes from other users\n\ncleaned_text &lt;- cleaned_text %&gt;%\n  filter(str_detect(text, \"^[^&gt;]+[A-Za-z\\\\d]\")\n         | text == \"\",\n         !str_detect(text, \n                     \"writes(:|\\\\.\\\\.\\\\.)$\"),\n         !str_detect(text, \n                     \"^In article &lt;\")\n  )\n\n\n\n\n\n\n\nThis removed quotes from other users so they are not double counted/analyzed."
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#text-data-processing",
+    "href": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#text-data-processing",
+    "title": "Hands-on Exercise 5: Visualizing and Analyzing Text Data",
+    "section": "4.3 Text Data Processing",
+    "text": "4.3 Text Data Processing\nIn this code chunk below, unnest_tokens() of tidytext package is used to split the dataset into tokens, while stop_words is used to remove stop-words.\n\nusenet_words &lt;- cleaned_text %&gt;%\n  unnest_tokens(word, text) %&gt;%\n  filter(str_detect(word, \"[a-z']$\"),\n         !word %in% stop_words$word)\n\nNow that we’ve removed the headers, signatures, and formatting, we can start exploring common words. For starters, we could find the most common words in the entire dataset, or within particular newsgroups.\n\nusenet_words %&gt;%\n  count(word, sort = TRUE) %&gt;% datatable()\n\n\n\n\n\nInstead of counting individual word, we can also count words within by newsgroup by using the code chunk below.\n\nwords_by_newsgroup &lt;- usenet_words %&gt;%\n  count(newsgroup, word, sort = TRUE) %&gt;%\n  ungroup()\nwords_by_newsgroup %&gt;% datatable()"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#visualising-words-in-newsgroups-using-wordcloud-package",
+    "href": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#visualising-words-in-newsgroups-using-wordcloud-package",
+    "title": "Hands-on Exercise 5: Visualizing and Analyzing Text Data",
+    "section": "4.4 Visualising Words in newsgroups using wordcloud package",
+    "text": "4.4 Visualising Words in newsgroups using wordcloud package\nWe can also add colors. For convenience, we can use palettes from brewer.\n\nwordcloud(words_by_newsgroup$word,\n          words_by_newsgroup$n,\n          max.words = 300,\n          colors = brewer.pal(9,\"Dark2\"))\n\n\n\n\n\n\n\n\nA DT table can be used to complement the visual discovery. We specify filter to add text filter per column.\n\ndatatable(words_by_newsgroup, filter = \"top\")"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#visualising-words-in-newsgroups-using-ggwordcloud-package",
+    "href": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#visualising-words-in-newsgroups-using-ggwordcloud-package",
+    "title": "Hands-on Exercise 5: Visualizing and Analyzing Text Data",
+    "section": "4.5 Visualising Words in newsgroups using ggwordcloud package",
+    "text": "4.5 Visualising Words in newsgroups using ggwordcloud package\nThis can be used along with ggplot2. In the code below, we render facets for each newsgroup to visualize the words per news group.\nNote: Specified n &gt; 8 so wordcloud renders faster and texts do not overlap.\n\nwords_by_newsgroup %&gt;%\n  filter(n &gt; 8) %&gt;%\nggplot(aes(label = word,\n           size = n)) +\n  geom_text_wordcloud() +\n  theme_minimal() +\n  facet_wrap(~newsgroup)"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#computing-tf-idf-within-newsgroups",
+    "href": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#computing-tf-idf-within-newsgroups",
+    "title": "Hands-on Exercise 5: Visualizing and Analyzing Text Data",
+    "section": "5.1 Computing tf-idf within newsgroups",
+    "text": "5.1 Computing tf-idf within newsgroups\nThe code chunk below uses bind_tf_idf() of tidytext to compute and bind the term frequency, inverse document frequency and ti-idf of a tidy text dataset to the dataset.\n\ntf_idf &lt;- words_by_newsgroup %&gt;%\n  bind_tf_idf(word, newsgroup, n) %&gt;%\n  arrange(desc(tf_idf))"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#visualising-tf-idf-as-interactive-table",
+    "href": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#visualising-tf-idf-as-interactive-table",
+    "title": "Hands-on Exercise 5: Visualizing and Analyzing Text Data",
+    "section": "5.2 Visualising tf-idf as interactive table",
+    "text": "5.2 Visualising tf-idf as interactive table\nTable below is an interactive table created by using datatable().\nWe can also use formatRound() to format columns, according to the docs. We can also use formatStyle() to add some styling.\n\ndatatable(tf_idf, filter = \"top\") %&gt;%\n  formatRound(c(\"tf\", \"idf\", \"tf_idf\"), 3) %&gt;%\n  formatStyle(0, \n              target = 'row', \n              lineHeight='25%')"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#visualising-tf-idf-within-newsgroups",
+    "href": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#visualising-tf-idf-within-newsgroups",
+    "title": "Hands-on Exercise 5: Visualizing and Analyzing Text Data",
+    "section": "5.3 Visualising tf-idf within newsgroups",
+    "text": "5.3 Visualising tf-idf within newsgroups\nFacet bar charts technique is used to visualise the tf-idf values of science related newsgroup.\n\ntf_idf %&gt;%\n  filter(str_detect(newsgroup, \"^sci\\\\.\")) %&gt;%\n  group_by(newsgroup) %&gt;%\n  slice_max(tf_idf, \n            n = 12) %&gt;%\n  ungroup() %&gt;%\n  mutate(word = reorder(word, \n                        tf_idf)) %&gt;%\n  ggplot(aes(tf_idf, \n             word, \n             fill = newsgroup)) +\n  geom_col(show.legend = FALSE) +\n  facet_wrap(~ newsgroup, \n             scales = \"free\") +\n  labs(x = \"tf-idf\", \n       y = NULL)"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#counting-and-correlating-pairs-of-words-with-the-widyr-package",
+    "href": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#counting-and-correlating-pairs-of-words-with-the-widyr-package",
+    "title": "Hands-on Exercise 5: Visualizing and Analyzing Text Data",
+    "section": "6.1 Counting and correlating pairs of words with the widyr package",
+    "text": "6.1 Counting and correlating pairs of words with the widyr package\n\nTo count the number of times that two words appear within the same document, or to see how correlated they are.\nMost operations for finding pairwise counts or correlations need to turn the data into a wide matrix first.\nwidyr package first ‘casts’ a tidy dataset into a wide matrix, performs an operation such as a correlation on it, then re-tidies the result.\n\n\nIn this code chunk below, pairwise_cor() of widyr package is used to compute the correlation between newsgroup based on the common words found.\n\nnewsgroup_cors &lt;- words_by_newsgroup %&gt;%\n  pairwise_cor(newsgroup, \n               word, \n               n, \n               sort = TRUE)"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#visualising-correlation-as-a-network",
+    "href": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#visualising-correlation-as-a-network",
+    "title": "Hands-on Exercise 5: Visualizing and Analyzing Text Data",
+    "section": "6.2 Visualising correlation as a network",
+    "text": "6.2 Visualising correlation as a network\nNow, we can visualise the relationship between newgroups in network graph as shown below.\n\nnewsgroup_cors %&gt;%\n  filter(correlation &gt; .025) %&gt;%\n  graph_from_data_frame() %&gt;%\n  ggraph(layout = \"fr\") +\n  geom_edge_link(aes(alpha = correlation, \n                     width = correlation)) +\n  geom_node_point(size = 6, \n                  color = \"lightblue\") +\n  geom_node_text(aes(label = name),\n                 color = \"red\",\n                 repel = TRUE) +\n  theme_void()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nResult differs from the original chapter as we are using seed 1234 instead of 2017."
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#bigram",
+    "href": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#bigram",
+    "title": "Hands-on Exercise 5: Visualizing and Analyzing Text Data",
+    "section": "6.3 Bigram",
+    "text": "6.3 Bigram\nIn this code chunk below, a bigram data frame is created by using unnest_tokens() of tidytext.\n\nbigrams &lt;- cleaned_text %&gt;%\n  unnest_tokens(bigram, \n                text, \n                token = \"ngrams\", \n                n = 2)\nbigrams\n\n# A tibble: 28,824 × 3\n   newsgroup   id    bigram    \n   &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;     \n 1 alt.atheism 54256 &lt;NA&gt;      \n 2 alt.atheism 54256 &lt;NA&gt;      \n 3 alt.atheism 54256 as i      \n 4 alt.atheism 54256 i don't   \n 5 alt.atheism 54256 don't know\n 6 alt.atheism 54256 know this \n 7 alt.atheism 54256 this book \n 8 alt.atheism 54256 book i    \n 9 alt.atheism 54256 i will    \n10 alt.atheism 54256 will use  \n# ℹ 28,814 more rows"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#counting-bigrams",
+    "href": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#counting-bigrams",
+    "title": "Hands-on Exercise 5: Visualizing and Analyzing Text Data",
+    "section": "6.4 Counting bigrams",
+    "text": "6.4 Counting bigrams\nThe code chunk is used to count and sort the bigram data frame ascendingly.\n\nbigrams_count &lt;- bigrams %&gt;%\n  filter(bigram != 'NA') %&gt;%\n  count(bigram, sort = TRUE)\nbigrams_count\n\n# A tibble: 19,885 × 2\n   bigram       n\n   &lt;chr&gt;    &lt;int&gt;\n 1 of the     169\n 2 in the     113\n 3 to the      74\n 4 to be       59\n 5 for the     52\n 6 i have      48\n 7 that the    47\n 8 if you      40\n 9 on the      39\n10 it is       38\n# ℹ 19,875 more rows"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#cleaning-bigram",
+    "href": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#cleaning-bigram",
+    "title": "Hands-on Exercise 5: Visualizing and Analyzing Text Data",
+    "section": "6.5 Cleaning bigram",
+    "text": "6.5 Cleaning bigram\nThe code chunk below is used to seperate the bigram into two words.\n\nbigrams_separated &lt;- bigrams %&gt;%\n  filter(bigram != 'NA') %&gt;%\n  separate(bigram, c(\"word1\", \"word2\"), \n           sep = \" \")\n\nbigrams_filtered &lt;- bigrams_separated %&gt;%\n  filter(!word1 %in% stop_words$word) %&gt;%\n  filter(!word2 %in% stop_words$word)\n\nbigrams_filtered\n\n# A tibble: 4,604 × 4\n   newsgroup   id    word1        word2        \n   &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;        &lt;chr&gt;        \n 1 alt.atheism 54256 defines      god          \n 2 alt.atheism 54256 term         preclues     \n 3 alt.atheism 54256 science      ideas        \n 4 alt.atheism 54256 ideas        drawn        \n 5 alt.atheism 54256 supernatural precludes    \n 6 alt.atheism 54256 scientific   assertions   \n 7 alt.atheism 54256 religious    dogma        \n 8 alt.atheism 54256 religion     involves     \n 9 alt.atheism 54256 involves     circumventing\n10 alt.atheism 54256 gain         absolute     \n# ℹ 4,594 more rows"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#counting-the-bigram-again",
+    "href": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#counting-the-bigram-again",
+    "title": "Hands-on Exercise 5: Visualizing and Analyzing Text Data",
+    "section": "6.6 Counting the bigram again",
+    "text": "6.6 Counting the bigram again\nAfter filtering out the bigrams with stop words, we will do a recount of the bigrams.\n\nbigram_counts &lt;- bigrams_filtered %&gt;% \n  count(word1, word2, sort = TRUE)"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#create-a-network-graph-from-bigram-data-frame",
+    "href": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#create-a-network-graph-from-bigram-data-frame",
+    "title": "Hands-on Exercise 5: Visualizing and Analyzing Text Data",
+    "section": "6.7 Create a network graph from bigram data frame",
+    "text": "6.7 Create a network graph from bigram data frame\nIn the code chunk below, a network graph is created by using graph_from_data_frame() of igraph package.\n\nbigram_graph &lt;- bigram_counts %&gt;%\n  filter(n &gt; 3) %&gt;%\n  graph_from_data_frame()\nbigram_graph\n\nIGRAPH ffd2c94 DN-- 40 24 -- \n+ attr: name (v/c), n (e/n)\n+ edges from ffd2c94 (vertex names):\n [1] 1          -&gt;2           1          -&gt;3           static     -&gt;void       \n [4] time       -&gt;pad         1          -&gt;4           infield    -&gt;fly        \n [7] mat        -&gt;28          vv         -&gt;vv          1          -&gt;5          \n[10] cock       -&gt;crow        noticeshell-&gt;widget      27         -&gt;1993       \n[13] 3          -&gt;4           child      -&gt;molestation cock       -&gt;crew       \n[16] gun        -&gt;violence    heat       -&gt;sink        homosexual -&gt;male       \n[19] homosexual -&gt;women       include    -&gt;xol         mary       -&gt;magdalene  \n[22] read       -&gt;write       rev        -&gt;20          tt         -&gt;ee"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#visualizing-a-network-of-bigrams-with-ggraph",
+    "href": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#visualizing-a-network-of-bigrams-with-ggraph",
+    "title": "Hands-on Exercise 5: Visualizing and Analyzing Text Data",
+    "section": "6.8 Visualizing a network of bigrams with ggraph",
+    "text": "6.8 Visualizing a network of bigrams with ggraph\nIn this code chunk below, ggraph package is used to plot the bigram.\n\nggraph(bigram_graph, layout = \"fr\") +\n  geom_edge_link() +\n  geom_node_point() +\n  geom_node_text(aes(label = name), \n                 vjust = 1, \n                 hjust = 1)"
+  },
+  {
+    "objectID": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#revised-version",
+    "href": "Hands-on_Exs/Ex5/Hands-on_Ex5.html#revised-version",
+    "title": "Hands-on Exercise 5: Visualizing and Analyzing Text Data",
+    "section": "6.9 Revised version",
+    "text": "6.9 Revised version\nWe can improve the visualization by adding some color and some directional arrows.\n\na &lt;- grid::arrow(type = \"closed\", \n                 length = unit(.15,\n                               \"inches\"))\n\nggraph(bigram_graph, \n       layout = \"fr\") +\n  geom_edge_link(aes(edge_alpha = n), \n                 show.legend = FALSE,\n                 arrow = a, \n                 end_cap = circle(.02,\n                                  'inches')) +\n  geom_node_point(color = \"lightblue\", \n                  size = 2) +\n  geom_node_text(aes(label = name), \n                 vjust = 1, \n                 hjust = 1) +\n  theme_void()"
   },
   {
     "objectID": "index.html",
