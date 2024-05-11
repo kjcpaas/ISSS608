@@ -31,6 +31,8 @@ website:
             href: In-class_Exs/Ex2/In-class_Ex2.qmd
           - text: "4: Visualizing Uncertainty"
             href: In-class_Exs/Ex4/In-class_Ex4.qmd
+          - text: "5: Visualising and Analysing Text Data"
+            href: In-class_Exs/Ex5/In-class_Ex5.qmd
       - text: Take-home Exercises
         menu:
           - text: "1: Singapore Private Residential Property Market for 2024 Q1"

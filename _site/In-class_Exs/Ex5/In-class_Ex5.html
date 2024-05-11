@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.553">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Kristine Joy Paas">
+<meta name="dcterms.date" content="2024-05-11">
+
+<title>ISSS608 - In-class Exercise 5: Visualizing and Analyzing Text Data</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link href="../../site_libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
+<script src="../../site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<link href="../../site_libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet">
+<script src="../../site_libs/datatables-binding-0.33/datatables.js"></script>
+<script src="../../site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<link href="../../site_libs/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
+<link href="../../site_libs/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet">
+<script src="../../site_libs/dt-core-1.13.6/js/jquery.dataTables.min.js"></script>
+<link href="../../site_libs/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet">
+<script src="../../site_libs/crosstalk-1.2.1/js/crosstalk.min.js"></script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">ISSS608</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-hands-on-exercises" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Hands-on Exercises</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-hands-on-exercises">    
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Exs/Ex1/Hands-on_Ex1.html">
+ <span class="dropdown-text">1: A Layered Grammar of Graphics: ggplot2 methods</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Exs/Ex2/Hands-on_Ex2.html">
+ <span class="dropdown-text">2: Beyond ggplot Fundamentals</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Exs/Ex3A/Hands-on_Ex3A.html">
+ <span class="dropdown-text">3A: Programming Interactive Data Visualisation with R</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Exs/Ex3B/Hands-on_Ex3B.html">
+ <span class="dropdown-text">3B: Programming Animated Statistical Graphics with R</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Exs/Ex4A/Hands-on_Ex4A.html">
+ <span class="dropdown-text">4A: Visualizing Statistical Analysis</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Exs/Ex4B/Hands-on_Ex4B.html">
+ <span class="dropdown-text">4B: Visualizing Uncertainty</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Exs/Ex4C/Hands-on_Ex4C.html">
+ <span class="dropdown-text">4C: Building Funnel Plot with R</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Exs/Ex5/Hands-on_Ex5.html">
+ <span class="dropdown-text">5: Visualising and Analysing Text Data</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-in-class-exercises" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">In-class Exercises</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-in-class-exercises">    
+        <li>
+    <a class="dropdown-item" href="../../In-class_Exs/Ex1/In-class_Ex1.html">
+ <span class="dropdown-text">1: Introduction to Visual Analytics</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Exs/Ex2/In-class_Ex2.html">
+ <span class="dropdown-text">2: Visualizing Distribution</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Exs/Ex4/In-class_Ex4.html">
+ <span class="dropdown-text">4: Visualizing Uncertainty</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Exs/Ex5/In-class_Ex5.html">
+ <span class="dropdown-text">5: Visualising and Analysing Text Data</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-take-home-exercises" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Take-home Exercises</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-take-home-exercises">    
+        <li>
+    <a class="dropdown-item" href="../../Take-home_Exs/Ex1/Take-home_Ex1.html">
+ <span class="dropdown-text">1: Singapore Private Residential Property Market for 2024 Q1</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Take-home_Exs/Ex2/Take-home_Ex2.html">
+ <span class="dropdown-text">2: DataVis Makeover</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">1 Overview</a></li>
+  <li><a href="#getting-started" id="toc-getting-started" class="nav-link" data-scroll-target="#getting-started">2 Getting Started</a>
+  <ul class="collapse">
+  <li><a href="#loading-the-required-packages" id="toc-loading-the-required-packages" class="nav-link" data-scroll-target="#loading-the-required-packages">2.1 Loading the required packages</a></li>
+  <li><a href="#loading-the-data" id="toc-loading-the-data" class="nav-link" data-scroll-target="#loading-the-data">2.2 Loading the data</a></li>
+  </ul></li>
+  <li><a href="#tokenizing-text-data" id="toc-tokenizing-text-data" class="nav-link" data-scroll-target="#tokenizing-text-data">3 Tokenizing text data</a>
+  <ul class="collapse">
+  <li><a href="#sorting-data-by-frequency" id="toc-sorting-data-by-frequency" class="nav-link" data-scroll-target="#sorting-data-by-frequency">3.1 Sorting data by frequency</a></li>
+  <li><a href="#extracting-company-and-news-source-information" id="toc-extracting-company-and-news-source-information" class="nav-link" data-scroll-target="#extracting-company-and-news-source-information">3.2 Extracting company and news source information</a></li>
+  </ul></li>
+  <li><a href="#working-with-json-files" id="toc-working-with-json-files" class="nav-link" data-scroll-target="#working-with-json-files">4 Working with json files</a></li>
+  <li><a href="#reflections" id="toc-reflections" class="nav-link" data-scroll-target="#reflections">5 Reflections</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">In-class Exercise 5: Visualizing and Analyzing Text Data</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Kristine Joy Paas </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">May 11, 2024</p>
+    </div>
+  </div>
+  
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">May 11, 2024</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="overview" class="level1">
+<h1>1 Overview</h1>
+<p>We will visualize and analyze text data</p>
+</section>
+<section id="getting-started" class="level1">
+<h1>2 Getting Started</h1>
+<section id="loading-the-required-packages" class="level2">
+<h2 class="anchored" data-anchor-id="loading-the-required-packages">2.1 Loading the required packages</h2>
+<ul>
+<li><p>readtext - Import and handling for plain and formatted text</p></li>
+<li><p>quanteda - Quantitative text data analysis</p></li>
+<li><p>tidytext - facilitates use of text to other tidy formats</p></li>
+<li><p>jsonlite - for processing json files</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(tidyverse, readtext, quanteda, tidytext, jsonlite, DT)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="loading-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="loading-the-data">2.2 Loading the data</h2>
+<p>Using <code>readtext</code> reads all files and add the contents in tibble dataframe.</p>
+<p>We use the <code>articles/</code> and <code>mc1.json</code> data from <a href="https://vast-challenge.github.io/2024/MC1.html">VAST Challenge</a>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>text_data <span class="ot">=</span> <span class="fu">readtext</span>(<span class="st">"data/articles/*"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(text_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 338
+Columns: 2
+$ doc_id &lt;chr&gt; "Alvarez PLC__0__0__Haacklee Herald.txt", "Alvarez PLC__0__0__L…
+$ text   &lt;chr&gt; "Marine Sanctuary Aid Boosts Alvarez PLC's Sustainable Fishing …</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="tokenizing-text-data" class="level1">
+<h1>3 Tokenizing text data</h1>
+<p>This will extract the words/token from the text data</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>usenet_words <span class="ot">&lt;-</span> text_data <span class="sc">%&gt;%</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(word, text) <span class="sc">%&gt;%</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_detect</span>(word, <span class="st">"[a-z']$"</span>),</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>         <span class="sc">!</span>word <span class="sc">%in%</span> stop_words<span class="sc">$</span>word)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(usenet_words)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 50,147
+Columns: 2
+$ doc_id &lt;chr&gt; "Alvarez PLC__0__0__Haacklee Herald.txt", "Alvarez PLC__0__0__H…
+$ word   &lt;chr&gt; "marine", "sanctuary", "aid", "boosts", "alvarez", "plc's", "su…</code></pre>
+</div>
+</div>
+<section id="sorting-data-by-frequency" class="level2">
+<h2 class="anchored" data-anchor-id="sorting-data-by-frequency">3.1 Sorting data by frequency</h2>
+<p>We can sort the words by frequency by using <code>count</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>usenet_words <span class="sc">%&gt;%</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(word, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>readtext object consisting of 3261 documents and 0 docvars.
+# A data frame: 3,261 × 3
+  word             n text     
+  &lt;chr&gt;        &lt;int&gt; &lt;chr&gt;    
+1 fishing       2177 "\"\"..."
+2 sustainable   1525 "\"\"..."
+3 company       1036 "\"\"..."
+4 practices      838 "\"\"..."
+5 industry       715 "\"\"..."
+6 transactions   696 "\"\"..."
+# ℹ 3,255 more rows</code></pre>
+</div>
+</div>
+<p>The 3 most common words from the text sources are <code>fishing</code>, <code>sustainable</code>, and <code>company</code>.</p>
+</section>
+<section id="extracting-company-and-news-source-information" class="level2">
+<h2 class="anchored" data-anchor-id="extracting-company-and-news-source-information">3.2 Extracting company and news source information</h2>
+<p>The file name seems to be in the format <code>CompanyName__0__Publisher</code>. We can extract company name and publisher.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>text_data_split <span class="ot">&lt;-</span> text_data <span class="sc">%&gt;%</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate_wider_delim</span>(<span class="st">"doc_id"</span>,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">delim =</span> <span class="st">"__0__"</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">names =</span> <span class="fu">c</span>(<span class="st">"X"</span>, <span class="st">"Y"</span>),</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">too_few =</span> <span class="st">"align_end"</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(text_data_split)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 338
+Columns: 3
+$ X    &lt;chr&gt; "Alvarez PLC", "Alvarez PLC", "Alvarez PLC", "Alvarez PLC", "Alva…
+$ Y    &lt;chr&gt; "0__Haacklee Herald.txt", "0__Lomark Daily.txt", "0__The News Buo…
+$ text &lt;chr&gt; "Marine Sanctuary Aid Boosts Alvarez PLC's Sustainable Fishing Ef…</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The code above hardcodes <code>0</code> in the delimiter but it can be any number. As a result, some are not parsed as expected, e.g.</p>
+<table class="table">
+<tbody>
+<tr class="odd">
+<td>NA</td>
+<td>Cervantes-Kramer__1__1__Haacklee&nbsp;Herald.txt</td>
+<td>C</td>
+</tr>
+</tbody>
+</table>
+<p>Looking at the data a second time, we can determine that the delimiter should be something like <code>__&lt;num&gt;__&lt;num&gt;__</code>.</p>
+</div>
+</div>
+<p>We can make adjustments to the code to use <code>regex</code> to use regular expression with <code>\d+</code> token to match any number. We will also change “X” and “Y” to “Company” and “Publisher”, respectively so we can more easily understand what the data represents.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>text_data_company_publisher <span class="ot">&lt;-</span> text_data <span class="sc">%&gt;%</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate_wider_delim</span>(<span class="st">"doc_id"</span>,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">delim =</span> <span class="fu">regex</span>(<span class="st">"__</span><span class="sc">\\</span><span class="st">d+__</span><span class="sc">\\</span><span class="st">d+__"</span>),</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">names =</span> <span class="fu">c</span>(<span class="st">"Company"</span>, <span class="st">"Publisher"</span>),</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">too_few =</span> <span class="st">"align_end"</span>)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="fu">datatable</span>(text_data_company_publisher[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-13217ca664dd71de50ec" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-13217ca664dd71de50ec">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59","60","61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77","78","79","80","81","82","83","84","85","86","87","88","89","90","91","92","93","94","95","96","97","98","99","100","101","102","103","104","105","106","107","108","109","110","111","112","113","114","115","116","117","118","119","120","121","122","123","124","125","126","127","128","129","130","131","132","133","134","135","136","137","138","139","140","141","142","143","144","145","146","147","148","149","150","151","152","153","154","155","156","157","158","159","160","161","162","163","164","165","166","167","168","169","170","171","172","173","174","175","176","177","178","179","180","181","182","183","184","185","186","187","188","189","190","191","192","193","194","195","196","197","198","199","200","201","202","203","204","205","206","207","208","209","210","211","212","213","214","215","216","217","218","219","220","221","222","223","224","225","226","227","228","229","230","231","232","233","234","235","236","237","238","239","240","241","242","243","244","245","246","247","248","249","250","251","252","253","254","255","256","257","258","259","260","261","262","263","264","265","266","267","268","269","270","271","272","273","274","275","276","277","278","279","280","281","282","283","284","285","286","287","288","289","290","291","292","293","294","295","296","297","298","299","300","301","302","303","304","305","306","307","308","309","310","311","312","313","314","315","316","317","318","319","320","321","322","323","324","325","326","327","328","329","330","331","332","333","334","335","336","337","338"],["Alvarez PLC","Alvarez PLC","Alvarez PLC","Alvarez PLC","Alvarez PLC","Alvarez PLC","Anderson, Brown and Green","Anderson, Brown and Green","Anderson, Brown and Green","Anderson, Brown and Green","Anderson, Brown and Green","Anderson, Brown and Green","Arellano Group","Arellano Group","Arellano Group","Barnes and Sons","Barnes and Sons","Barnes and Sons","Barnett Ltd","Barnett Ltd","Barnett Ltd","Barnett Ltd","Barnett Ltd","Bell, Reynolds and Forbes","Bell, Reynolds and Forbes","Bell, Reynolds and Forbes","Bell, Reynolds and Forbes","Bell, Reynolds and Forbes","Bell, Reynolds and Forbes","Bishop-Hernandez","Bishop-Hernandez","Bishop-Hernandez","Blackwell, Clark and Lam","Blackwell, Clark and Lam","Blackwell, Clark and Lam","Blackwell, Clark and Lam","Blackwell, Clark and Lam","Blackwell, Clark and Lam","Bowers Group","Bowers Group","Bowers Group","Brown, Clarke and Martinez","Brown, Clarke and Martinez","Brown, Clarke and Martinez","Brown, Clarke and Martinez","Brown, Clarke and Martinez","Brown, Clarke and Martinez","Burns Inc","Burns Inc","Burns Inc","Burns Inc","Burns Inc","Burns Inc","Cain, Simpson and Hernandez","Cain, Simpson and Hernandez","Cain, Simpson and Hernandez","Castillo-Elliott","Castillo-Elliott","Castillo-Elliott","Castillo-Elliott","Castillo-Elliott","Castillo-Elliott","Cervantes-Kramer","Cervantes-Kramer","Cervantes-Kramer","Cervantes-Kramer","Cervantes-Kramer","Cervantes-Kramer","Cervantes-Kramer","Cervantes-Kramer","Cervantes-Kramer","Cervantes-Kramer","Cervantes-Kramer","Cervantes-Kramer","Cisneros-Meyer","Cisneros-Meyer","Cisneros-Meyer","Clark-Leon","Clark-Leon","Clark-Leon","Clark-Leon","Clark-Leon","Clarke, Scott and Sloan","Clarke, Scott and Sloan","Clarke, Scott and Sloan","Clements, Allen and Sullivan","Clements, Allen and Sullivan","Clements, Allen and Sullivan","Clements, Allen and Sullivan","Collins, Johnson and Lloyd","Collins, Johnson and Lloyd","Collins, Johnson and Lloyd","Cook PLC","Cook PLC","Cook PLC","Cooper, Holland and Nelson","Cooper, Holland and Nelson","Cooper, Holland and Nelson","Craig Ltd","Craig Ltd","Craig Ltd","Craig Ltd","Craig Ltd","Craig Ltd","Cuevas PLC","Cuevas PLC","Cuevas PLC","Davis-Boyd","Davis-Boyd","Davis-Boyd","Evans-Pearson","Evans-Pearson","Evans-Pearson","Evans-Pearson","Evans-Pearson","Evans-Pearson","Flores Ltd","Flores Ltd","Flores Ltd","Franco-Stuart","Franco-Stuart","Franco-Stuart","Franco-Stuart","Franco-Stuart","Franco-Stuart","Frank Group","Frank Group","Frank Group","Frey Inc","Frey Inc","Frey Inc","Frey Inc","Frey Inc","Frey Inc","Glover, Moran and Johnson","Glover, Moran and Johnson","Glover, Moran and Johnson","Greer-Holder","Greer-Holder","Greer-Holder","Harper Inc","Harper Inc","Harper Inc","Harrell-Walters","Harrell-Walters","Harrell-Walters","Harrell-Walters","Harrell-Walters","Harrell-Walters","Harrington Inc","Harrington Inc","Harrington Inc","Harrington Inc","Harrington Inc","Harrington Inc","Henderson, Hall and Lutz","Henderson, Hall and Lutz","Henderson, Hall and Lutz","Henderson, Hall and Lutz","Henderson, Hall and Lutz","Henderson, Hall and Lutz","Hernandez-Rojas","Hernandez-Rojas","Hernandez-Rojas","Hines-Douglas","Hines-Douglas","Hines-Douglas","Horn and Sons","Horn and Sons","Horn and Sons","Hughes-Clark","Hughes-Clark","Hughes-Clark","Hughes-Clark","Hughes-Clark","Hughes-Clark","Jackson Inc","Jackson Inc","Jackson Inc","Jones Group","Jones Group","Jones Group","Jones Group","Jones Group","Jones Group","Jones Group","Jones Group","Jones Group","Jones Group","Jones Group","Jones Group","Jones, Davis and Grant","Jones, Davis and Grant","Jones, Davis and Grant","Kelly-Smith","Kelly-Smith","Kelly-Smith","Klein LLC","Klein LLC","Klein LLC","Lutz-Fleming","Lutz-Fleming","Lutz-Fleming","Mann, Myers and Rivera","Mann, Myers and Rivera","Mann, Myers and Rivera","Martin LLC","Martin LLC","Martin LLC","Martinez-Le","Martinez-Le","Martinez-Le","Mcgee and Sons","Mcgee and Sons","Mcgee and Sons","Mcgee and Sons","Mcgee and Sons","Mcgee and Sons","Mclaughlin-Chandler","Mclaughlin-Chandler","Mclaughlin-Chandler","Montoya Group","Montoya Group","Montoya Group","Moore-Simon","Moore-Simon","Moore-Simon","Murphy, Marshall and Pope","Murphy, Marshall and Pope","Murphy, Marshall and Pope","Murray, Friedman and Wall","Murray, Friedman and Wall","Murray, Friedman and Wall","Murray, Friedman and Wall","Namorna Transit Ltd","NyanzaRiver Worldwide AS","Oka Seafood Shipping Ges.m.b.H.","Olsen Group","Olsen Group","Olsen Group","Phelps, Brown and Wallace","Phelps, Brown and Wallace","Phelps, Brown and Wallace","Phillips-Newton","Phillips-Newton","Phillips-Newton","PregolyaDredge Logistics Incorporated","Ramos-Shelton","Ramos-Shelton","Ramos-Shelton","Rasmussen, Nelson and King","Rasmussen, Nelson and King","Rasmussen, Nelson and King","Rasmussen, Nelson and King","Rasmussen, Nelson and King","Rasmussen, Nelson and King","Rasmussen, Nelson and King","Rasmussen, Nelson and King","Rhodes-Thompson","Rhodes-Thompson","Rhodes-Thompson","Rhodes-Thompson","Rivas-Stevens","Rivas-Stevens","Rivas-Stevens","Rosario-Melendez","Rosario-Melendez","Rosario-Melendez","Roth, Logan and Moreno","Roth, Logan and Moreno","Roth, Logan and Moreno","Sanchez-Moreno","Sanchez-Moreno","Sanchez-Moreno","Sanchez-Moreno","Sanchez-Moreno","Sanchez-Moreno","Serrano-Cruz","Serrano-Cruz","Serrano-Cruz","Smith-Hull","Smith-Hull","Smith-Hull","Solis-Lopez","Solis-Lopez","Solis-Lopez","Solis-Lopez","Solis-Lopez","Solis-Lopez","Spencer, Richards and Wilson","Spencer, Richards and Wilson","Spencer, Richards and Wilson","Taylor, Prince and Sherman","Taylor, Prince and Sherman","Taylor, Prince and Sherman","Taylor, Prince and Sherman","Taylor, Prince and Sherman","Thomas-Weaver","Thomas-Weaver","Thomas-Weaver","Thompson-Padilla","Thompson-Padilla","Thompson-Padilla","Turner-Green","Turner-Green","Turner-Green","Underwood Inc","Underwood Inc","Underwood Inc","V. Miesel Shipping","Valdez, Dalton and Cook","Valdez, Dalton and Cook","Valdez, Dalton and Cook","Vargas-Jensen","Vargas-Jensen","Vargas-Jensen","Vasquez, Chaney and Martinez","Vasquez, Chaney and Martinez","Vasquez, Chaney and Martinez","Walker, Erickson and Blake","Walker, Erickson and Blake","Walker, Erickson and Blake","Watson-Gray","Watson-Gray","Watson-Gray","Watson-Gray","Watson-Gray","Watson-Gray","Wilcox-Nelson","Wilcox-Nelson","Wilcox-Nelson","Wilcox-Nelson","Wu-Hart","Wu-Hart","Wu-Hart","York-Castillo","York-Castillo","York-Castillo"],["Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald_Police.txt","Haacklee Herald.txt","Lomark Daily_Police.txt","Lomark Daily.txt","The News Buoy_Police.txt","The News Buoy.txt","Haacklee Herald_Police.txt","Haacklee Herald.txt","Lomark Daily_Police.txt","Lomark Daily.txt","The News Buoy_Police.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald_Police.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","The News Buoy.txt","The News Buoy.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald_Police.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald_Police.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald_Police.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt","Haacklee Herald.txt","Lomark Daily.txt","The News Buoy.txt"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Company<\/th>\n      <th>Publisher<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"Company","targets":1},{"name":"Publisher","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+</section>
+<section id="working-with-json-files" class="level1">
+<h1>4 Working with json files</h1>
+<p>We can use <code>fromJSON</code> to read json file</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>mc1_data <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(<span class="st">"data/mc1.json"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="reflections" class="level1">
+<h1>5 Reflections</h1>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

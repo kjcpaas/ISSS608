@@ -1,0 +1,111 @@
+---
+title: "In-class Exercise 5: Visualizing and Analyzing Text Data"
+author: "Kristine Joy Paas"
+date: "11 May 2024"
+date-modified: "last-modified"
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+  freeze: true
+---
+
+# 1 Overview
+
+We will visualize and analyze text data
+
+# 2 Getting Started
+
+## 2.1 Loading the required packages
+
+-   readtext - Import and handling for plain and formatted text
+
+-   quanteda - Quantitative text data analysis
+
+-   tidytext - facilitates use of text to other tidy formats
+
+-   jsonlite - for processing json files
+
+```{r}
+#| label: setup
+pacman::p_load(tidyverse, readtext, quanteda, tidytext, jsonlite, DT)
+```
+
+## 2.2 Loading the data
+
+Using `readtext` reads all files and add the contents in tibble dataframe.
+
+We use the `articles/` and `mc1.json` data from [VAST Challenge](https://vast-challenge.github.io/2024/MC1.html).
+
+```{r}
+text_data = readtext("data/articles/*")
+glimpse(text_data)
+```
+
+# 3 Tokenizing text data
+
+This will extract the words/token from the text data
+
+```{r}
+usenet_words <- text_data %>%
+  unnest_tokens(word, text) %>%
+  filter(str_detect(word, "[a-z']$"),
+         !word %in% stop_words$word)
+glimpse(usenet_words)
+```
+
+## 3.1 Sorting data by frequency
+
+We can sort the words by frequency by using `count`.
+
+```{r}
+usenet_words %>%
+  count(word, sort = TRUE)
+```
+
+The 3 most common words from the text sources are `fishing`, `sustainable`, and `company`.
+
+## 3.2 Extracting company and news source information
+
+The file name seems to be in the format `CompanyName__0__Publisher`. We can extract company name and publisher.
+
+```{r}
+text_data_split <- text_data %>%
+  separate_wider_delim("doc_id",
+                       delim = "__0__",
+                       names = c("X", "Y"),
+                       too_few = "align_end")
+glimpse(text_data_split)
+```
+
+::: callout-tip
+The code above hardcodes `0` in the delimiter but it can be any number. As a result, some are not parsed as expected, e.g.
+
+|     |                                                   |     |
+|-----|---------------------------------------------------|-----|
+| NA  | Cervantes-Kramer\_\_1\_\_1\_\_Haacklee Herald.txt | C   |
+
+Looking at the data a second time, we can determine that the delimiter should be something like `__<num>__<num>__`.
+:::
+
+We can make adjustments to the code to use `regex` to use regular expression with `\d+` token to match any number. We will also change "X" and "Y" to "Company" and "Publisher", respectively so we can more easily understand what the data represents.
+
+```{r}
+text_data_company_publisher <- text_data %>%
+  separate_wider_delim("doc_id",
+                       delim = regex("__\\d+__\\d+__"),
+                       names = c("Company", "Publisher"),
+                       too_few = "align_end")
+datatable(text_data_company_publisher[1:2])
+```
+
+# 4 Working with json files
+
+We can use `fromJSON` to read json file
+
+```{r}
+mc1_data <- fromJSON("data/mc1.json")
+```
+
+# 5 Reflections
