@@ -23,6 +23,8 @@ website:
             href: Hands-on_Exs/Ex4C/Hands-on_Ex4C.qmd
           - text: "5: Visualising and Analysing Text Data"
             href: Hands-on_Exs/Ex5/Hands-on_Ex5.qmd
+          - text: "6: Visualising and Analysing Network Data"
+            href: Hands-on_Exs/Ex6/Hands-on_Ex6.qmd
       - text: In-class Exercises
         menu:
           - text: "1: Introduction to Visual Analytics"
