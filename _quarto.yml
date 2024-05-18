@@ -35,6 +35,10 @@ website:
             href: In-class_Exs/Ex4/In-class_Ex4.qmd
           - text: "5: Visualising and Analysing Text Data"
             href: In-class_Exs/Ex5/In-class_Ex5.qmd
+          - text: "6A: Visualising and Analysing Text Data (Part 2)"
+            href: In-class_Exs/Ex6A/In-class_Ex6A.qmd
+          - text: "6B: Visualising and Analysing Network Data"
+            href: In-class_Exs/Ex6B/In-class_Ex6B.qmd
       - text: Take-home Exercises
         menu:
           - text: "1: Singapore Private Residential Property Market for 2024 Q1"

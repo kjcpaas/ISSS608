@@ -497,7 +497,7 @@ GAStech_graph %>%
   theme_graph()
 ```
 
-# 8 Building interactive network graph with visNetwork 
+# 8 Building interactive network graph with visNetwork
 
 ## 8.1 Data preparation
 

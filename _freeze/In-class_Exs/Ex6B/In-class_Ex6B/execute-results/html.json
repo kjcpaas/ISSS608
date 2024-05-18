@@ -1,0 +1,17 @@
+{
+  "hash": "0fe4c97d1ab858578eafb13e040fd11e",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"In-class Exercise 6A: Visualising and Analysing Network Data\"\nauthor: \"Kristine Joy Paas\"\ndate: \"18 May 2024\"\ndate-modified: \"last-modified\"\nformat: html\nexecute: \n  echo: true\n  eval: true\n  warning: false\n  freeze: true\n---\n\n\n# 1 Overview\n\nWe will visualize and analyze text data using King James Bible\n\nref: <https://kgjerde.github.io/corporaexplorer/articles/bible.html>\n\n# 2 Getting Started\n\n## 2.1 Loading the required packages\n\n\n::: {.cell}\n\n```{.r .cell-code}\npacman::p_load(jsonlite, tidygraph, ggraph, visNetwork, graphlayouts, ggforce, skimr, tidytext, tidyverse)\n```\n:::\n\n\n## 2.2 Loading the data\n\n\n::: {.cell}\n\n```{.r .cell-code}\nmc3_data <- fromJSON(\"data/MC3.json\")\n```\n:::\n\n::: {.cell}\n\n```{.r .cell-code}\nclass(mc3_data)\n```\n\n::: {.cell-output .cell-output-stdout}\n\n```\n[1] \"list\"\n```\n\n\n:::\n:::\n\n\n# 3 Extracting network elements\n\n## 3.1 Extracting edges\n\n\n::: {.cell}\n\n```{.r .cell-code}\nmc3_edges <-\n  as_tibble(mc3_data$links) %>%\n  distinct() %>%\n  mutate(\n    source = as.character(source),\n    target=as.character(target),\n    type = as.character(type)\n  ) %>%\n  group_by(source, target, type) %>%\n  summarize(weights = n()) %>%\n  filter(source!=target) %>%\n  ungroup()\n```\n:::\n\n\n## 3.2 Extracting nodes\n\n\n::: {.cell}\n\n```{.r .cell-code}\nmc3_nodes <- as_tibble(mc3_data$nodes) %>%\n  mutate(\n    country = as.character(country),\n    id = as.character(id),\n    product_services = as.character(product_services),\n    revenue_omu = as.numeric(as.character(revenue_omu)),\n    type = as.character(type)\n  ) %>%\n  select(id, country, type, revenue_omu, product_services)\n```\n:::\n\n::: {.cell}\n\n```{.r .cell-code}\nid1 <- mc3_edges %>%\n  select(source) %>%\n  rename(id = source)\nid2 <- mc3_edges %>%\n  select(target) %>%\n  rename(id = target)\nmc3_nodes1 <- rbind(id1, id2) %>%\n  distinct() %>%\n  left_join(mc3_nodes,\n            unmatched = \"drop\")\n```\n:::\n\n::: {.cell}\n\n```{.r .cell-code}\nmc3_graph <- tbl_graph(nodes = mc3_nodes1,\n                       edges = mc3_edges,\n                       directed = FALSE) %>%\n  mutate(\n    betweenness_centrality = centrality_betweenness(),\n    close_centrality = centrality_closeness()\n  )\n```\n:::\n\n\n::: {.callout-important appearance=\"simple\"}\nWe calculated edge weights. However, since centrality calculations are undirected, the weights are not relevant.\n\nIt only matters if the nodes are connected or not.\n:::\n\n\n::: {.cell}\n\n```{.r .cell-code}\nmc3_graph %>%\n  filter(betweenness_centrality >= 300000) %>%\n  ggraph(layout = \"fr\") +\n  geom_edge_link(aes(alpha = 0.5)) +\n  geom_node_point(aes(\n    size = betweenness_centrality,\n    color = \"lightblue\",\n    alpha = 0.5\n  )) +\n  scale_size_continuous(range=c(1,10))+\n  theme_graph()\n```\n\n::: {.cell-output-display}\n![](In-class_Ex6B_files/figure-html/unnamed-chunk-8-1.png){width=672}\n:::\n:::\n",
+    "supporting": [
+      "In-class_Ex6B_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}
