@@ -45,6 +45,8 @@ website:
             href: Take-home_Exs/Ex1/Take-home_Ex1.qmd
           - text: "2: DataVis Makeover"
             href: Take-home_Exs/Ex2/Take-home_Ex2.qmd
+          - text: "3: VAST Challenge 2024 Mini-Challenge 3"
+            href: Take-home_Exs/Ex3/Take-home_Ex3.qmd
     right:
       - href: index.qmd
         text: Home
