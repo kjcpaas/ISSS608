@@ -25,6 +25,8 @@ website:
             href: Hands-on_Exs/Ex5/Hands-on_Ex5.qmd
           - text: "6: Visualising and Analysing Network Data"
             href: Hands-on_Exs/Ex6/Hands-on_Ex6.qmd
+          - text: "7: Visualising and Analysing Time-Oriented Data"
+            href: Hands-on_Exs/Ex7/Hands-on_Ex7.qmd
       - text: In-class Exercises
         menu:
           - text: "1: Introduction to Visual Analytics"
@@ -45,7 +47,7 @@ website:
             href: Take-home_Exs/Ex1/Take-home_Ex1.qmd
           - text: "2: DataVis Makeover"
             href: Take-home_Exs/Ex2/Take-home_Ex2.qmd
-          - text: "3: VAST Challenge 2024 Mini-Challenge 3"
+          - text: "3: [WIP]VAST Challenge 2024 Mini-Challenge 3"
             href: Take-home_Exs/Ex3/Take-home_Ex3.qmd
     right:
       - href: index.qmd
