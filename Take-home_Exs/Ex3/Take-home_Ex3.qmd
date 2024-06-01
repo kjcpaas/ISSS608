@@ -17,7 +17,7 @@ execute:
 
 ```{r}
 #| label: setup
-pacman::p_load(jsonlite, tidyverse, ggraph, tidygraph, visNetwork, patchwork, ggtext, knitr)
+pacman::p_load(jsonlite, tidyverse, ggraph, tidygraph, visNetwork, patchwork, ggtext, knitr, igraph)
 ```
 
 ```{r}
@@ -52,8 +52,8 @@ mc3_nodes %>% head(n = 10) %>% kable()
 ```{r}
 mc3_edges <- as_tibble(mc3_data$links) %>%
   mutate(
-    source = as.character(source),
-    target = as.character(target),
+    from = as.character(source),
+    to = as.character(target),
     subtype = strsplit(type, ".", fixed = TRUE) %>% sapply(tail, n = 1),
     type = ifelse(
       grepl("Event.Owns", type),
@@ -61,9 +61,9 @@ mc3_edges <- as_tibble(mc3_data$links) %>%
       ifelse(grepl("Relationship", type), "Relationship", "Employment")
     )
   ) %>%
-  select(source, target, type, subtype) %>%
+  select(from, to, type, subtype) %>%
   distinct() %>%
-  filter(source != target)
+  filter(from != to)
 
 mc3_edges %>% head(n = 10) %>% kable()
 ```
@@ -78,8 +78,8 @@ mc3_edges %>% head(n = 10) %>% kable()
 
 ```{r}
 ssfec_edges <- mc3_edges %>%
-  filter(source == "SouthSeafood Express Corp" |
-           target == "SouthSeafood Express Corp")
+  filter(from == "SouthSeafood Express Corp" |
+           to == "SouthSeafood Express Corp")
 ssfec_edges %>% kable()
 ```
 
@@ -87,8 +87,8 @@ ssfec_edges %>% kable()
 
 ```{r}
 ssfec_nodes <- mc3_nodes %>%
-  filter(id %in% ssfec_edges$source |
-           id %in% ssfec_edges$target) %>%
+  filter(id %in% ssfec_edges$from |
+           id %in% ssfec_edges$to) %>%
   mutate(
     focus = (id == "SouthSeafood Express Corp")
   )
@@ -143,6 +143,19 @@ ggraph(ssfec_graph, layout = "linear", circular = TRUE) +
     plot.title = element_text(face = "bold", size = rel(1.4)),
     plot.subtitle = element_markdown(color = "grey50")
   )
+```
+
+### Distance-based
+
+```{r}
+graph <- graph_from_data_frame(mc3_edges, vertices = mc3_nodes)
+```
+
+```{r}
+ssfec_node = which(V(graph)$name == "SouthSeafood Express Corp")
+dists <- distances(graph, v = ssfec_node) %>%
+  as.data.frame() %>%
+  pivot_longer(cols = mc3_nodes$id, names_to = "name", values_to = "distance")
 ```
 
 # References
