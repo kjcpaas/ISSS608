@@ -1,0 +1,15 @@
+{
+  "hash": "a127360a11fea1ae1d3ec61503ffb3a8",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"In-class Exercise 7: Visualising and Analysing Time-Oriented Data\"\nauthor: \"Kristine Joy Paas\"\ndate: \"1 June 2024\"\ndate-modified: \"last-modified\"\nformat: html\nexecute: \n  echo: true\n  eval: true\n  warning: false\n  freeze: true\n---\n\n\n# 1 Overview\n\n# 2 Getting Started\n\n## 2.1 Loading the required packages\n\n\n::: {.cell}\n\n```{.r .cell-code}\npacman::p_load(scales,\n               viridis,\n               lubridate,\n               ggthemes,\n               gridExtra,\n               readxl,\n               knitr,\n               data.table,\n               tidyverse,\n               CGPfunctions)\n```\n:::\n\n\n# \n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

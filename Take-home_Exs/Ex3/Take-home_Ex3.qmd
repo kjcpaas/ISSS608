@@ -11,104 +11,294 @@ execute:
   freeze: true
 ---
 
-# Setup
+# 1 Overview
 
-## Loading Packages
+# 2 Setup
+
+## 2.1 Loading Packages
 
 ```{r}
 #| label: setup
-pacman::p_load(jsonlite, tidyverse, ggraph, tidygraph, visNetwork, patchwork, ggtext, knitr, igraph)
+pacman::p_load(
+  jsonlite,
+  tidyverse,
+  ggraph,
+  tidygraph,
+  visNetwork,
+  patchwork,
+  ggtext,
+  knitr,
+  igraph,
+  ggiraph
+)
 ```
+
+We will also set some values to have consistency throughout all graphs. This is also so that we don't have to search and replace all instances of these
 
 ```{r}
-#| echo: false
-font_family = "Roboto Condensed"
+FONT_FAMILY = "Roboto Condensed"
 ```
 
-## Loading Data
+## 2.2 Loading Data
 
 ```{r}
 mc3_data <- fromJSON("data/mc3.json")
+glimpse(mc3_data)
 ```
 
-# Data Wrangling
+It contains graph data, where nodes can be accessed via `nodes` and edges via `links`. This dataset has a lot of columns but we will only filter the relevant data during wrangling..
 
-## Extracting Nodes
+# 3 Data Wrangling
+
+## 3.1 Extracting Graph Elements
+
+For simplicity, we will only extract the columns that are needed to do graph analysis. We will also *ignore* the time elements for now so we will not be including them in the analysis.
+
+::: panel-tabset
+### Nodes
+
+The nodes represent the entities in the network. They can be people or companies.
 
 ```{r}
-mc3_nodes <- as_tibble(mc3_data$nodes) %>%
+mc3_nodes_raw <- as_tibble(mc3_data$nodes)
+glimpse(mc3_nodes_raw)
+```
+
+We will only retain the following columns:
+
+-   `id` - to serve as the identifier for the node
+
+-   `type` - to differentiate people from companies in the graph.
+
+```{r}
+mc3_nodes_lite <- mc3_nodes_raw %>% select(id, type)
+```
+
+### Edges
+
+The edges represent the relationship between different nodes.
+
+```{r}
+mc3_edges_raw <- as_tibble(mc3_data$links)
+glimpse(mc3_edges_raw)
+```
+
+We will only retain the following columns:
+
+-   `source` - to identify the *actor* of the relationship, corresponds to `id` in nodes.
+
+-   `target` - to identify the *receiver* of the relationship, corresponds to `id` in nodes.
+
+-   `type` - to identify the type of the relationship
+
+```{r}
+mc3_edges_lite <- mc3_edges_raw %>% select(source, target, type)
+```
+:::
+
+## 3.2 Closer look at *type*
+
+Both the `nodes` and `edges` have `type` which contains the type of the nodes and edges. We will assign a `supertype` and a `subtype` from `type`.
+
+::: panel-tabset
+### Nodes
+
+```{r}
+(mc3_nodes_lite$type) %>% unique()
+```
+
+`supertype` - type of entity, either *Person* or *Organization*
+
+`subtype` - subcategory of *supertype*, e.g., *Company, FishingCompany, CEO*
+
+### Edges
+
+```{r}
+(mc3_edges_lite$type) %>% unique()
+```
+
+`supertype` - type of relationship, either *Ownership*, *Employment, Relationship.*
+
+`subtype` - subcategory of *supertype*, e.g., *Shareholdership, BeneficialOwnership, FamilyRelationship*
+:::
+
+## 3.3 Preparing the data
+
+With the considerations above, we will shape the data needed for our graph visualization.
+
+::: panel-tabset
+### Nodes
+
+For nodes, we will also assign a shape for visualization depending on *supertype.* For people, we will use 📐, while we use 🔴 for organizations.
+
+Lastly, we will assign numbers to each node as an alternative label to the ids (as they are long).
+
+```{r}
+PERSON_SHAPE = "triangle"
+ORGANIZATION_SHAPE = "circle"
+
+mc3_nodes_clean <- mc3_nodes_lite %>%
   mutate(
-    id = as.character(id),
+    supertype = strsplit(type, ".", fixed=TRUE) %>% sapply('[', 2),
+    # Get the last type as subtype. In the case of Entity.Person,
+    # both supertype and subtype are "Person".
     subtype = strsplit(type, ".", fixed=TRUE) %>% sapply(tail, n=1),
-    type = strsplit(type, ".", fixed=TRUE) %>% sapply('[', 2)
+    num = row_number(),
+    shape = ifelse(supertype == "Person", PERSON_SHAPE, ORGANIZATION_SHAPE)
   ) %>%
-  select(id, type, subtype)
+  select(id, num, supertype, subtype, shape)
 
-mc3_nodes %>% head(n = 10) %>% kable()
+kable(head(mc3_nodes_clean))
 ```
 
-## Extracting Edges
+Let's also check if `supertype`, `subtype`, and `shape` have been mapped correctly.
 
 ```{r}
-mc3_edges <- as_tibble(mc3_data$links) %>%
+mc3_nodes_clean %>%
+  group_by(supertype, subtype, shape) %>%
+  summarize(count = n()) %>%
+  arrange(-count) %>%
+  kable()
+```
+
+### Edges
+
+For `ggraph` to plot the edges correctly, we need to assigns weights to the edges. For simplicity, let us assign the number of edges with the same `source`, `target` and `type`.
+
+Lastly, we will change `source` and `target` to `from` and `to`, respectively for compatibility with network functions we will use.
+
+```{r}
+mc3_edges_clean <- mc3_edges_lite %>%
+  rename(from = source, to = target, ) %>%
   mutate(
-    from = as.character(source),
-    to = as.character(target),
-    subtype = strsplit(type, ".", fixed = TRUE) %>% sapply(tail, n = 1),
-    type = ifelse(
+    supertype = ifelse(
       grepl("Event.Owns", type),
       "Ownership",
       ifelse(grepl("Relationship", type), "Relationship", "Employment")
-    )
+    ),
+    subtype = strsplit(type, ".", fixed = TRUE) %>% sapply(tail, n = 1)
   ) %>%
-  select(from, to, type, subtype) %>%
-  distinct() %>%
-  filter(from != to)
+  filter(from != to) %>%
+  group_by(from, to, supertype, subtype) %>%
+  summarize(weight = n())
 
-mc3_edges %>% head(n = 10) %>% kable()
+kable(head(mc3_edges_clean))
 ```
 
-# Questions
-
-## Q4: Relations with SouthSeafood Express Corp
-
-### Direct Relations
-
-#### Edges
+Lastly, let's check if `type` has been mapped correctly to `supertype` and `subtype`.
 
 ```{r}
-ssfec_edges <- mc3_edges %>%
-  filter(from == "SouthSeafood Express Corp" |
-           to == "SouthSeafood Express Corp")
-ssfec_edges %>% kable()
+mc3_edges_clean %>%
+  group_by(supertype, subtype) %>%
+  summarize(count = n()) %>%
+  arrange(-count) %>%
+  kable()
+```
+:::
+
+## 3.4 Preparing the supernetwork
+
+We will prepare the supernetwork from the nodes and edges we prepared.
+
+```{r}
+supernetwork = tbl_graph(edges = mc3_edges_clean,
+                         nodes = mc3_nodes_clean,
+                         directed = TRUE)
 ```
 
-#### Nodes
+We call this a supernetwork as this is a collection of smaller, unconnected networks.
+
+# 4 Investigating *SouthSeafood Express Corp*
+
+From VAST Challenge 2024 [Mini-case 3](https://vast-challenge.github.io/2024/MC3.html):
+
+> Identify the network associated with SouthSeafood Express Corp and visualize how this network and competing businesses change as a result of their illegal fishing behavior. Which companies benefited from SouthSeafood Express Corp legal troubles? Are there other suspicious transactions that may be related to illegal fishing? Provide visual evidence for your conclusions.
+
+::: callout-tip
+## Solving the smaller problem first
+
+Although the question about *SouthSeafood Express Corp* is the last question, we will start with investigating its relationships so we can generalize to make inferences to the rest of the network, for Question 3.
+:::
+
+To do the investigation, our strategy is to start with the smallest network first to the biggest. We will be looking at:
+
+1.  Direct neighbors - They have the strongest influence on and can be influenced the most by *SouthSeafood Express Corp.*
+2.  Sphere of influence - Based on Nicholas A. Christakis and James H. Fowler's theory of [**Three Degrees of Influence**](https://www.strategy-business.com/article/10218), which states that that influence gradually dissipates and eventually cease to be notable beyond the **3rd degree of separation**.
+3.  Full connected network - We will look at the entire network containing the nodes that have paths to *SouthSeafood Express Corp.*
+
+In order to do this, we need to identify the *SouthSeafood Express Corp* node first.
 
 ```{r}
-ssfec_nodes <- mc3_nodes %>%
-  filter(id %in% ssfec_edges$from |
-           id %in% ssfec_edges$to) %>%
-  mutate(
-    focus = (id == "SouthSeafood Express Corp")
-  )
-ssfec_nodes %>% kable()
+ssfec_node <- which(V(supernetwork)$id == "SouthSeafood Express Corp")
 ```
 
-#### Graph
+We will use `ego()` and `induced_graph()` functions from `igraph` to generate the subnetworks related to this node.
+
+We will use the function below to get the subgraphs:
+
+::: {.callout-important collapse="true"}
+## RStudio breaks when defining functions
+
+Rstudio breaks as soon as I type `function(){}` in a code chunk.
+
+This results in not being able to save the file and not being able to run any code chunk. Hence, we will just copy the code below everytime while setting the variables.
+:::
+
+``` r
+par_graph = supernetwork # the graph to extract the subgraph from
+par_nodes = ssfec_node # reference node
+par_distance = 1 # distance from the reference node
+
+fvar_vertices <- ego(par_graph, nodes = par_nodes, order = par_distance)[[1]]
+fvar_igraph_subgraph <- induced_subgraph(par_graph, vids = fvar_vertices)
+fvar_nodes_df <- as_data_frame(fvar_igraph_subgraph, what = "vertices") %>% rename(id = name)
+fvar_edges_sf <- as_data_frame(fvar_igraph_subgraph, what = "edges")
+out_subgraph <- graph_from_data_frame(fvar_edges_sf, vertices=fvar_nodes_df, directed=TRUE)
+```
+
+## 4.1 Direct Neighbors
+
+### 4.1.1 Extracting the subgraph
+
+We will first extract the direct neighbors for *SouthSeafood Express Corp.*
 
 ```{r}
-ssfec_graph <- tbl_graph(nodes = ssfec_nodes, edges = ssfec_edges, directed = TRUE)
+par_graph = supernetwork
+par_nodes = ssfec_node
+par_distance = 1
 ```
 
 ```{r}
-ggraph(ssfec_graph, layout = "linear", circular = TRUE) +
-  
+#| code-fold: true
+#| code-summary: 'Show function code'
+
+fvar_vertices <- ego(par_graph, nodes = par_nodes, order = par_distance)[[1]]
+fvar_igraph_subgraph <- induced_subgraph(par_graph, vids = fvar_vertices)
+fvar_nodes_df <- as_data_frame(fvar_igraph_subgraph, what = "vertices")
+fvar_edges_sf <- as_data_frame(fvar_igraph_subgraph, what = "edges")
+out_subgraph <- tbl_graph(nodes = fvar_nodes_df, edges=fvar_edges_sf, directed=TRUE)
+```
+
+We will also add focus on the *SouthSeafood Express Corp* node to emphasize it.
+
+```{r}
+ssfec_direct_neighbors <- out_subgraph %>%
+  mutate(focus = (id == "SouthSeafood Express Corp"))
+```
+
+### 4.1.2 Plotting the graph
+
+Finally, we can plot the graph of *SouthSeafood Express Corp* direct neighbors.
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show ggraph code'
+ggraph(ssfec_direct_neighbors, layout = "linear", circular = TRUE) +
   # Render nodes
-  geom_node_point(aes(color = focus), show.legend = FALSE, size = 30) +
+  geom_node_point(aes(color = focus, shape = shape), show.legend = FALSE, size = 30) +
   geom_node_text(
     aes(label = str_wrap(id, width = -1)),
-    family = font_family,
+    family = FONT_FAMILY,
     size = 3,
     color = "white"
   ) +
@@ -124,7 +314,7 @@ ggraph(ssfec_graph, layout = "linear", circular = TRUE) +
     # Format labels
     angle_calc = "along",
     label_dodge = unit(0.04, "npc"),
-    family = font_family,
+    family = FONT_FAMILY,
     show.legend = FALSE
   ) +
   
@@ -136,28 +326,118 @@ ggraph(ssfec_graph, layout = "linear", circular = TRUE) +
   
   # Style graph
   unset_graph_style() +
-  theme_graph(base_family = font_family, plot_margin = margin(0)) +
-  plot_annotation(title = "SouthSeafood Express Corp's Direct Network", subtitle = "Two other fishing companies, <span style='color:blue;'>**AguaLeska Transit N.V.**</span> and <span style='color:blue;'>**Tainamarine Fishing Co**</span> hold shares in<br />SouthSeafood Express Corp.") &
+  theme_graph(base_family = FONT_FAMILY, plot_margin = margin(0)) +
+  plot_annotation(
+    title = "SouthSeafood Express Corp's Shareholders",
+    subtitle = "Two other fishing companies, <span style='color:blue;'>**AguaLeska Transit N.V.**</span> and <span style='color:blue;'>**Tainamarine Fishing Co**</span> hold shares in<br />SouthSeafood Express Corp. They are posed to benefit the most from the company's illegal fishing activities.") &
   theme(
-    text = element_text(family = font_family),
+    text = element_text(family = FONT_FAMILY),
     plot.title = element_text(face = "bold", size = rel(1.4)),
     plot.subtitle = element_markdown(color = "grey50")
   )
 ```
 
-### Distance-based
+::: callout-tip
+#### Insights
+
+As shareholders, **AguaLeska Transit N.V.** and **Tainamarine Fishing Co** have big influence on where the resources of *SouthSeafood Express Corp* go.
+
+In this case, most of it will most likely opposite of the arrow direction, i.e. benefitting the shareholders.
+:::
+
+## 4.2 Sphere of influence
+
+### 4.2.1 Extracting the subgraph
+
+We will first extract the direct neighbors for *SouthSeafood Express Corp.* We will use `distance=3`, based on [**Three Degrees of Influence**](https://www.strategy-business.com/article/10218).
 
 ```{r}
-graph <- graph_from_data_frame(mc3_edges, vertices = mc3_nodes)
+par_graph = supernetwork
+par_nodes = ssfec_node
+par_distance = 3
 ```
 
 ```{r}
-ssfec_node = which(V(graph)$name == "SouthSeafood Express Corp")
-dists <- distances(graph, v = ssfec_node) %>%
-  as.data.frame() %>%
-  pivot_longer(cols = mc3_nodes$id, names_to = "name", values_to = "distance")
+#| code-fold: true
+#| code-summary: 'Show function code'
+
+fvar_vertices <- ego(par_graph, nodes = par_nodes, order = par_distance)[[1]]
+fvar_igraph_subgraph <- induced_subgraph(par_graph, vids = fvar_vertices)
+fvar_nodes_df <- as_data_frame(fvar_igraph_subgraph, what = "vertices")
+fvar_edges_sf <- as_data_frame(fvar_igraph_subgraph, what = "edges")
+out_subgraph <- tbl_graph(nodes = fvar_nodes_df, edges=fvar_edges_sf, directed=TRUE)
 ```
 
-# References
+We will also add focus on the *SouthSeafood Express Corp* node to emphasize it.
 
-<https://blogs.cornell.edu/info2040/2015/10/19/three-degrees-of-influence-how-far-can-you-reach-people/>
+```{r}
+ssfec_sphere_of_influence <- out_subgraph %>%
+  mutate(focus = (id == "SouthSeafood Express Corp"))
+```
+
+### 4.2.2 Plotting the graph
+
+Finally, we can plot the graph of *SouthSeafood Express Corp's* sphere of influence.
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show ggraph code'
+set.seed(911)
+ggraph(ssfec_sphere_of_influence, layout = "nicely") +
+  geom_node_point(aes(color = focus, shape = shape),
+                  size = 7.5,
+                  show.legend = FALSE) +
+  geom_node_text(
+    aes(label = num),
+    family = FONT_FAMILY,
+    size = 2,
+    color = 'white'
+  ) +
+  geom_edge_link(
+    aes(label = subtype),
+    arrow = arrow(type = "closed", length = unit(0.01, "npc")),
+    end_cap = circle(4, "mm"),
+    start_cap = circle(4, "mm"),
+    angle_calc = "along",
+    label_dodge = unit(0.02, "npc"),
+    label_size = 2,
+    family = FONT_FAMILY
+  ) +
+  scale_color_manual(values = c("blue", "gold3")) +
+  scale_alpha_continuous(range = c(1, 0.7)) +
+  
+  # Style graph
+  unset_graph_style() +
+  theme_graph(base_family = FONT_FAMILY, plot_margin = margin(0)) +
+  plot_annotation(title = "SouthSeafood Express Corp's Sphere of Influence",
+                  subtitle = "Entities with 3 degrees of separation from SouthSeafood Express Corp",
+                  caption = "*check tables below for the names*") &
+  theme(
+    text = element_text(family = FONT_FAMILY),
+    plot.title = element_text(face = "bold", size = rel(1.4)),
+    plot.subtitle = element_markdown(color = "grey50"),
+    plot.caption = element_markdown(color = "grey50")
+  
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show code'
+ssfec_sphere_of_influence %>% 
+  activate(nodes) %>%
+  arrange(num) %>%
+  select(num, id, supertype, subtype) %>%
+  kable()
+```
+
+::: callout-tip
+#### Insights
+
+The network map is comprised mostly of *Shareholderships* and *BenificialOwnerships.*
+
+*SouthSeafood Express Corp's (60464)* shareholders, **AguaLeska Transit N.V. (60429)** and **Tainamarine Fishing Co (60468)** have other shareholders.
+
+**StichtingMarine Shipping Company (60466)** holds shares of these companies (through other companies). **SavanetaCreek Solutions NV (60461)**, a Logistics Company holds shareholdership on this Fishing Company as well.
+
+Furthermore, **Liam Conti (60477)** and **Fintan Park (60479)** are the beneficial owners of these companies so they have the final decision-making power. Lastly, as Liam Conti's family member, **Nadia Conti (60478)** may also benefit from Liam's ownership of companies.
+:::
