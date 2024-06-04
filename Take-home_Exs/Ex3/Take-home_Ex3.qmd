@@ -210,6 +210,12 @@ supernetwork = tbl_graph(edges = mc3_edges_clean,
 
 We call this a supernetwork as this is a collection of smaller, unconnected networks.
 
+```{r}
+#| echo: false
+# Clean up environment
+rm(mc3_edges_lite, mc3_nodes_clean)
+```
+
 # 4 Investigating *SouthSeafood Express Corp*
 
 From VAST Challenge 2024 [Mini-case 3](https://vast-challenge.github.io/2024/MC3.html):
@@ -646,13 +652,13 @@ Take note that the models are **subjective** and we can adjust the values accord
 
 **Current**: Shareholder -\> Company, weight: 1
 
-**Proposed**: Shareholder \<- Company, weight: 1
+**Proposed**: Shareholder \<- Company, weight: 2
 
 **Rationale**: Although shareholders in a company may not necessarily benefit from the resources of a company (the Benificial Owner does), they are important decision makers in the company so they have some form of control over the company resources.
 
 ##### BeneficialOwnership
 
-**Current**: BeneficialOwner -\> Company, weight: 2
+**Current**: BeneficialOwner -\> Company, weight: 1
 
 **Proposed**: BeneficialOwner \<- Company, weight: 3
 
@@ -677,16 +683,169 @@ Take note that the models are **subjective** and we can adjust the values accord
 
 #### 4.3.3.2 Generating resource flow
 
-Based on the considerations above, we will generate edges representing the resource flow from the edges dataframes. We will define a function for this.
+Based on the considerations above, we will generate edges representing the resource flow from the edges dataframes. We will define functions for this.
+
+::: panel-tabset
+##### Convert edges
 
 ```{r}
-#| file: convert_to_resource_flow.R
+#| file: convert_edges_to_resource_flow.R
 ```
 
 ```{r, include = FALSE}
 #| echo: false
-convert_to_resource_flow <- source("convert_to_resource_flow.R", local = knitr::knit_global())$value
+convert_edges_to_resource_flow <- source("convert_edges_to_resource_flow.R", local = knitr::knit_global())$value
 ```
+
+##### Convert graph
+
+```{r}
+#| file: convert_graph_to_resource_flow.R
+```
+
+```{r, include = FALSE}
+#| echo: false
+convert_graph_to_resource_flow <- source("convert_graph_to_resource_flow.R", local = knitr::knit_global())$value
+```
+:::
+
+#### 4.3.3.3 Plotting the resource graph
+
+```{r}
+ssfec_influence_resource <- convert_graph_to_resource_flow(ssfec_influential_init_centralities)
+```
+
+::: panel-tabset
+##### Resource Graph
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show ggraph code'
+set.seed(911)
+g <- ggraph(ssfec_influence_resource, layout = "nicely") +
+  geom_point_interactive(
+    aes(
+      x = x, y = y, data_id = id,
+      tooltip = paste0(id, " (", num, ")"),
+      color = focus, shape = shape
+    ),
+    size = 7.5,
+    show.legend = FALSE
+    )+
+  geom_node_text(
+    aes(label = num),
+    family = FONT_FAMILY,
+    size = 2,
+    color = 'white'
+  ) +
+  geom_edge_link(
+    aes(label = subtype),
+    arrow = arrow(type = "closed", length = unit(0.01, "npc")),
+    end_cap = circle(4, "mm"),
+    start_cap = circle(4, "mm"),
+    angle_calc = "along",
+    label_dodge = unit(0.02, "npc"),
+    label_size = 2,
+    family = FONT_FAMILY
+  ) +
+  scale_color_manual(values = c(MUTED_COLOR, PRIMARY_COLOR)) +
+  
+  # Style graph
+  unset_graph_style() +
+  theme_graph(base_family = FONT_FAMILY, plot_margin = margin(0)) +
+  plot_annotation(title = "SouthSeafood Express Corp's Sphere of Influence",
+                  subtitle = "Entities with 3 degrees of separation from SouthSeafood Express Corp",
+                  caption = "*Hover on the nodes to see their names*") &
+  theme(
+    text = element_text(family = FONT_FAMILY),
+    plot.title = element_text(face = "bold", size = rel(1.2)),
+    plot.subtitle = element_markdown(color = "grey50", size = rel(0.9)),
+    plot.caption = element_markdown(color = "grey50", size = rel(0.75))
+  )
+
+# Add interactive elements
+tooltip_css = paste0(
+  "background-color:black;color:white;font-family:",
+  FONT_FAMILY,
+  ";padding:4px;"
+)
+
+girafe(                                  
+  ggobj = g,                             
+  width_svg = 6,                         
+  height_svg = 6*0.618,
+  options = list(
+    opts_tooltip(css = tooltip_css)
+  )
+)
+```
+
+##### Original Graph
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show ggraph code'
+set.seed(911)
+g <- ggraph(ssfec_influential_init_centralities, layout = "nicely") +
+  geom_point_interactive(
+    aes(
+      x = x, y = y, data_id = id,
+      tooltip = paste0(id, " (", num, ")"),
+      color = focus, shape = shape
+    ),
+    size = 7.5,
+    show.legend = FALSE
+    )+
+  geom_node_text(
+    aes(label = num),
+    family = FONT_FAMILY,
+    size = 2,
+    color = 'white'
+  ) +
+  geom_edge_link(
+    aes(label = subtype),
+    arrow = arrow(type = "closed", length = unit(0.01, "npc")),
+    end_cap = circle(4, "mm"),
+    start_cap = circle(4, "mm"),
+    angle_calc = "along",
+    label_dodge = unit(0.02, "npc"),
+    label_size = 2,
+    family = FONT_FAMILY
+  ) +
+  scale_color_manual(values = c(MUTED_COLOR, PRIMARY_COLOR)) +
+  
+  # Style graph
+  unset_graph_style() +
+  theme_graph(base_family = FONT_FAMILY, plot_margin = margin(0)) +
+  plot_annotation(title = "SouthSeafood Express Corp's Sphere of Influence",
+                  subtitle = "Entities with 3 degrees of separation from SouthSeafood Express Corp",
+                  caption = "*Hover on the nodes to see their names*") &
+  theme(
+    text = element_text(family = FONT_FAMILY),
+    plot.title = element_text(face = "bold", size = rel(1.2)),
+    plot.subtitle = element_markdown(color = "grey50", size = rel(0.9)),
+    plot.caption = element_markdown(color = "grey50", size = rel(0.75))
+  )
+
+# Add interactive elements
+tooltip_css = paste0(
+  "background-color:black;color:white;font-family:",
+  FONT_FAMILY,
+  ";padding:4px;"
+)
+
+girafe(                                  
+  ggobj = g,                             
+  width_svg = 6,                         
+  height_svg = 6*0.618,
+  options = list(
+    opts_tooltip(css = tooltip_css)
+  )
+)
+```
+:::
+
+The resource graph now represents the flow of resource, which can help us trace who benefits from a node's activities. We can now recompute the centralities and the resource flow.
 
 # References
 
