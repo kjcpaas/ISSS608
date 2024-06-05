@@ -13,6 +13,10 @@ execute:
 
 # 1 Overview
 
+-   MC3 intro
+
+-   Analyze power flow
+
 # 2 Setup
 
 ## 2.1 Loading Packages
@@ -39,6 +43,7 @@ We will also set some values to have consistency throughout all graphs. This is 
 FONT_FAMILY = "Roboto Condensed"
 PRIMARY_COLOR = "blue"
 MUTED_COLOR = "grey50"
+DEFAULT_SEED = 911 # For reproduceability
 ```
 
 ## 2.2 Loading Data
@@ -133,31 +138,38 @@ With the considerations above, we will shape the data needed for our graph visua
 
 For nodes, we will also assign a shape for visualization depending on *supertype.* For people, we will use 📐, while we use 🔴 for organizations.
 
-Lastly, we will assign numbers to each node as an alternative label to the ids (as they are long).
+Lastly, we will assign alias to each node as an alternative label to the names (as they are long). This will be generated using initials of the name.
 
 ```{r}
-PERSON_SHAPE = "triangle"
-ORGANIZATION_SHAPE = "circle"
+#| file: helpers/to_initials.R
+```
 
+```{r, include = FALSE}
+#| echo: false
+to_initials <- source("helpers/to_initials.R", local = knitr::knit_global())$value
+```
+
+```{r}
 mc3_nodes_clean <- mc3_nodes_lite %>%
   mutate(
+    name = id,
+    alias = sapply(name, to_initials),
     supertype = strsplit(type, ".", fixed=TRUE) %>% sapply('[', 2),
     # Get the last type as subtype. In the case of Entity.Person,
     # both supertype and subtype are "Person".
-    subtype = strsplit(type, ".", fixed=TRUE) %>% sapply(tail, n=1),
-    num = row_number(),
-    shape = ifelse(supertype == "Person", PERSON_SHAPE, ORGANIZATION_SHAPE)
+    subtype = strsplit(type, ".", fixed=TRUE) %>% sapply(tail, n=1)
+    # Names are long so will create alias from initials of name for display in graph
   ) %>%
-  select(id, num, supertype, subtype, shape)
+  select(name, alias, supertype, subtype)
 
 kable(head(mc3_nodes_clean))
 ```
 
-Let's also check if `supertype`, `subtype`, and `shape` have been mapped correctly.
+Let's also check if `supertype`, `subtype`, have been mapped correctly.
 
 ```{r}
 mc3_nodes_clean %>%
-  group_by(supertype, subtype, shape) %>%
+  group_by(supertype, subtype) %>%
   summarize(count = n()) %>%
   arrange(-count) %>%
   kable()
@@ -208,125 +220,95 @@ supernetwork = tbl_graph(edges = mc3_edges_clean,
                          directed = TRUE)
 ```
 
-We call this a supernetwork as this is a collection of smaller, unconnected networks.
+We call this a supernetwork as this covers the entire network of entities within the fishing business community.
 
 ```{r}
 #| echo: false
 # Clean up environment
-rm(mc3_edges_lite, mc3_nodes_clean)
+rm(mc3_data)
+rm(mc3_nodes_raw, mc3_nodes_lite, mc3_nodes_clean)
+rm(mc3_edges_raw, mc3_edges_lite, mc3_edges_clean)
+rm(to_initials)
 ```
 
-# 4 Investigating *SouthSeafood Express Corp*
+# 4 Extracting subnetworks
 
-From VAST Challenge 2024 [Mini-case 3](https://vast-challenge.github.io/2024/MC3.html):
+## 4.1 Extracting for ease of analysis
 
-> Identify the network associated with SouthSeafood Express Corp and visualize how this network and competing businesses change as a result of their illegal fishing behavior. Which companies benefited from SouthSeafood Express Corp legal troubles? Are there other suspicious transactions that may be related to illegal fishing? Provide visual evidence for your conclusions.
+As the `supernetwork` is very large, we will need to extract part of it to perform analysis effectively. To do this, we will need to extract subnetworks from this bigger network.
 
-::: callout-tip
-## Solving the smaller problem first
+::: panel-tabset
+### Explanation
 
-Although the question about *SouthSeafood Express Corp* is the last question, we will start with investigating its relationships so we can generalize to make inferences to the rest of the network, for Question 3.
-:::
+We will extract subnetworks based on distance from a given node. By default, we will get the network of all **connected nodes** to the reference node.
 
-To do the investigation, our strategy is to start with the smallest network first to the biggest. We will be looking at:
+We will use the following functions:
 
-1.  Direct neighbors - They have the strongest influence on and can be influenced the most by *SouthSeafood Express Corp.*
-2.  Sphere of influence - Based on Nicholas A. Christakis and James H. Fowler's theory of [**Three Degrees of Influence**](https://www.strategy-business.com/article/10218), which states that that influence gradually dissipates and eventually cease to be notable beyond the **3rd degree of separation**.
-3.  Full connected network - We will look at the entire network containing the nodes that have paths to *SouthSeafood Express Corp.*
+-   `ego()` from *igraph* to get a list of nodes within a given distance from the given node
 
-In order to do this, we need to identify the *SouthSeafood Express Corp* node first.
+-   `induced_subgraph()` to extract the subgraph containing only the nodes from the result of `ego()`. This will return an *igraph* type.
 
-```{r}
-ssfec_node <- which(V(supernetwork)$id == "SouthSeafood Express Corp")
-```
+-   `as_data_frame()` to extract the nodes and edges so we can generate a `tbl_graph` which is compatible to both *igraph* and *ggraph* functions.
 
-We will use `ego()` and `induced_graph()` functions from `igraph` to generate the subnetworks related to this node.
-
-We will use the function below to get the subgraphs:
-
-::: {.callout-important collapse="true"}
-## RStudio breaks when defining functions in Quarto doc
-
-Rstudio breaks as soon as I type `function(){}` in a code chunk in a Quarto document.
-
-This results in not being able to save the file and not being able to run any code chunk. Hence, the function is defined in a separate R file and included in this doc.
-:::
+### Function
 
 ```{r}
-#| file: extract_subgraph.R
+#| file: helpers/extract_subnetwork.R
 ```
 
 ```{r, include = FALSE}
 #| echo: false
-extract_subgraph <- source("extract_subgraph.R", local = knitr::knit_global())$value
+extract_subnetwork <- source("helpers/extract_subnetwork.R", local = knitr::knit_global())$value
 ```
+:::
 
-## 4.1 Direct Neighbors
+## 4.2 Plotting the subnetworks
 
-### 4.1.1 Extracting the subgraph
+To demonstrate what this function does, we will look at 3 subnetworks related to *SouthSeafood Express Corp.*
 
-We will first extract the direct neighbors for *SouthSeafood Express Corp*.
+1.  Direct neighbors - They have the strongest influence on and can be influenced the most by *SouthSeafood Express Corp.*
+2.  Sphere of influence - Based on Nicholas A. Christakis and James H. Fowler's theory of [**Three Degrees of Influence**](https://www.strategy-business.com/article/10218), which states that that influence gradually dissipates and eventually cease to be notable beyond the **3rd degree of separation**. This contains the nodes where *SouthSeafood Express Corp have* notable influence.
+3.  Connected network - We will look at the entire network containing the nodes that are connected to *SouthSeafood Express Corp* in any way.
 
-```{r}
-ssfec_direct_neighbors <- extract_subgraph(supernetwork, ssfec_node, distance = 1)
-```
-
-We will also add focus on the *SouthSeafood Express Corp* node to emphasize it in the plot.
-
-```{r}
-ssfec_direct_neighbors <- ssfec_direct_neighbors %>%
-  mutate(focus = (id == "SouthSeafood Express Corp"))
-```
-
-### 4.1.2 Plotting the graph
-
-Finally, we can plot the graph of *SouthSeafood Express Corp* direct neighbors.
+We will use `plot_fishing_relationships()` to plot the relationship graph of the network.
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Show ggraph code'
-ggraph(ssfec_direct_neighbors, layout = "linear", circular = TRUE) +
-  # Render nodes
-  geom_node_point(aes(color = focus, shape = shape), show.legend = FALSE, size = 30) +
-  geom_node_text(
-    aes(label = str_wrap(id, width = -1)),
-    family = FONT_FAMILY,
-    size = 3,
-    color = "white"
-  ) +
-  scale_color_manual(values = c(MUTED_COLOR, PRIMARY_COLOR)) +
-  
-  # Render edges
-  geom_edge_link(
-    aes(label = subtype),
-    # Control arrow
-    arrow = arrow(type = "closed", length = unit(0.025, "npc")),
-    end_cap = circle(12, "mm"),
-    start_cap = circle(12, "mm"),
-    # Format labels
-    angle_calc = "along",
-    label_dodge = unit(0.04, "npc"),
-    family = FONT_FAMILY,
-    show.legend = FALSE
-  ) +
-  
-  # Hack to reduce distance between nodes
-  # This is to not clip the nodes in the edge of the plot
-  # ref: https://stackoverflow.com/a/66991383
-  ylim(-1.3, 0.8) +
-  xlim(-1, 1) +
-  
-  # Style graph
-  unset_graph_style() +
-  theme_graph(base_family = FONT_FAMILY, plot_margin = margin(0)) +
-  plot_annotation(
-    title = "SouthSeafood Express Corp's Shareholders",
-    subtitle = "Two other fishing companies, <span style='color:blue;'>**AguaLeska Transit N.V.**</span> and <span style='color:blue;'>**Tainamarine Fishing Co**</span> hold shares in<br />SouthSeafood Express Corp. They are posed to benefit the most from the company's illegal fishing activities.") &
-  theme(
-    text = element_text(family = FONT_FAMILY),
-    plot.title = element_text(face = "bold", size = rel(1.2)),
-    plot.subtitle = element_markdown(color = "grey50", , size = rel(0.9))
-  )
+#| code-summary: 'Show the code for plot_fishing_relationships()'
+#| file: helpers/plot_fishing_relationships.R
+```
+
+```{r, include = FALSE}
+#| echo: false
+plot_fishing_relationships <- source("helpers/plot_fishing_relationships.R", local = knitr::knit_global())$value
+```
+
+::: {.callout-tip collapse="true" appearance="simple"}
+### Relationship Graph
+
+We call this the *Relationship Graph* as the provided graph shows the different relationships among the different entities.
+
+Later, we will tackle how to generate the *Power Graph* which will represent the power and flow of resources within the network.
+:::
+
+::: panel-tabset
+### Direct Neighbors
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+extract_subnetwork(
+  supernetwork,
+  node_name="SouthSeafood Express Corp",
+  distance=1
+) %>% plot_fishing_relationships(
+  layout = "linear",
+  circular = TRUE,
+  node_size = 12,
+  arrow_margin = 5.5,
+  title = "SouthSeafood Express Corp's Direct Neighbors",
+  subtitle = "Two other fishing companies, <span style='color:blue;'>**AguaLeska Transit N.V.**</span> and <span style='color:blue;'>**Tainamarine Fishing Co**</span> hold shares in<br />SouthSeafood Express Corp. They are posed to benefit the most from the company's illegal fishing activities."
+)
 ```
 
 ::: callout-tip
@@ -337,86 +319,18 @@ As shareholders, **AguaLeska Transit N.V.** and **Tainamarine Fishing Co** have 
 In this case, most of it will most likely opposite of the arrow direction, i.e. benefitting the shareholders.
 :::
 
-## 4.2 Sphere of influence
-
-### 4.2.1 Extracting the subgraph
-
-We will first extract the direct neighbors for *SouthSeafood Express Corp.* We will use `distance=3`, based on [**Three Degrees of Influence**](https://www.strategy-business.com/article/10218).
-
-```{r}
-ssfec_sphere_of_influence <- extract_subgraph(supernetwork, ssfec_node, distance = 3)
-```
-
-We will also add focus on the *SouthSeafood Express Corp* node to emphasize it.
-
-```{r}
-ssfec_sphere_of_influence <- ssfec_sphere_of_influence %>%
-  mutate(focus = (id == "SouthSeafood Express Corp"))
-```
-
-### 4.2.2 Plotting the graph
-
-Finally, we can plot the graph of *SouthSeafood Express Corp's* sphere of influence.
+### Sphere of Influence
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Show ggraph code'
-set.seed(911)
-g <- ggraph(ssfec_sphere_of_influence, layout = "nicely") +
-  geom_point_interactive(
-    aes(
-      x = x, y = y, data_id = id,
-      tooltip = paste0(id, " (", num, ")"),
-      color = focus, shape = shape
-    ),
-    size = 7.5,
-    show.legend = FALSE
-    )+
-  geom_node_text(
-    aes(label = num),
-    family = FONT_FAMILY,
-    size = 2,
-    color = 'white'
-  ) +
-  geom_edge_link(
-    aes(label = subtype),
-    arrow = arrow(type = "closed", length = unit(0.01, "npc")),
-    end_cap = circle(4, "mm"),
-    start_cap = circle(4, "mm"),
-    angle_calc = "along",
-    label_dodge = unit(0.02, "npc"),
-    label_size = 2,
-    family = FONT_FAMILY
-  ) +
-  scale_color_manual(values = c(MUTED_COLOR, PRIMARY_COLOR)) +
-  
-  # Style graph
-  unset_graph_style() +
-  theme_graph(base_family = FONT_FAMILY, plot_margin = margin(0)) +
-  plot_annotation(title = "SouthSeafood Express Corp's Sphere of Influence",
-                  subtitle = "Entities with 3 degrees of separation from SouthSeafood Express Corp",
-                  caption = "*Hover on the nodes to see their names*") &
-  theme(
-    text = element_text(family = FONT_FAMILY),
-    plot.title = element_text(face = "bold", size = rel(1.2)),
-    plot.subtitle = element_markdown(color = "grey50", size = rel(0.9)),
-    plot.caption = element_markdown(color = "grey50", size = rel(0.75))
-  )
-
-# Add interactive elements
-tooltip_css = paste0(
-  "background-color:black;color:white;font-family:",
-  FONT_FAMILY,
-  ";padding:4px;"
-)
-
-girafe(                                  
-  ggobj = g,                             
-  width_svg = 6,                         
-  height_svg = 6*0.618,
-  options = list(
-    opts_tooltip(css = tooltip_css)
-  )
+#| code-summary: 'Show the code'
+extract_subnetwork(
+  supernetwork,
+  node_name="SouthSeafood Express Corp",
+  distance=3
+) %>% plot_fishing_relationships(
+  title = "SouthSeafood Express Corp's Sphere of Influence",
+  subtitle = "Entities with 3 degrees of separation from **SouthSeafood Express Corp**. This is where the influence of the<br />company is noticeable."
 )
 ```
 
@@ -425,436 +339,199 @@ girafe(
 
 The network map is comprised mostly of *Shareholderships* and *BenificialOwnerships.*
 
-*SouthSeafood Express Corp's (60464)* shareholders, **AguaLeska Transit N.V. (60429)** and **Tainamarine Fishing Co (60468)** have other shareholders.
+*SouthSeafood Express Corp's* shareholders, **AguaLeska Transit N.V.** and **Tainamarine Fishing Co** have additional shareholders.
 
-**StichtingMarine Shipping Company (60466)** holds shares of these companies (through other companies). **SavanetaCreek Solutions NV (60461)**, a Logistics Company holds shareholdership on this Fishing Company as well. These 2 nodes **collect the resources** from the other companies they hold shares in, which their owners and shareholders ultimately benefit in.
+**StichtingMarine Shipping Company** holds shares in these companies (via other entities). **SavanetaCreek Solutions N.V.**, a Logistics Company, also holds a shareholdership in StichtingMarine Shipping Company. These two nodes serve as resource hubs, gathering resources from the companies in which they hold shares, ultimately benefiting their owners and shareholders.
 
-Furthermore, **Liam Conti (60477)** and **Fintan Park (60479)** are the beneficial owners of these companies so they have the final decision-making power and **benefit the most** from the resources in the network. Lastly, as Liam Conti's family member, **Nadia Conti (60478)** may also benefit from Liam's ownership of companies.
+Moreover, **Liam Conti** and **Fintan Park** are the beneficial owners of these companies, giving them final decision-making power and likely the greatest benefits from the network's resources. Additionally, as a family member of **Liam Conti**, **Nadia Conti** may also benefit from Liam's ownership of these companies.
 
-From our intuition, these 5 nodes are candidates to be the influential nodes in the network.
+Intuitively, these five nodes are likely candidates for the most influential entities within the network.
 :::
 
-## 4.3 Getting the best-fit centrality measure
-
-Next, we will get the best centrality metric that can match our intuition. To better see the fit, we will focus on the candidate influential nodes we have identified.
-
-```{r}
-ssfec_influential_candidates <- ssfec_sphere_of_influence %>%
-  mutate(focus = (id %in% c(
-    "StichtingMarine Shipping Company", # Collector of resources
-    "SavanetaCreek Solutions NV", # Collector of resources
-    "Liam Conti", # Beneficiary
-    "Nadia Conti", # Beneficiary
-    "Fintan Park" # Beneficiary
-  )))
-```
+### Connected Network
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Show ggraph code'
-set.seed(911)
-g <- ggraph(ssfec_influential_candidates, layout = "nicely") +
-  geom_point_interactive(
-    aes(
-      x = x, y = y, data_id = id,
-      tooltip = paste0(id, " (", num, ")"),
-      color = focus, shape = shape
-    ),
-    size = 7.5,
-    show.legend = FALSE
-    )+
-  geom_node_text(
-    aes(label = num),
-    family = FONT_FAMILY,
-    size = 2,
-    color = 'white'
-  ) +
-  geom_edge_link(
-    aes(label = subtype),
-    arrow = arrow(type = "closed", length = unit(0.01, "npc")),
-    end_cap = circle(4, "mm"),
-    start_cap = circle(4, "mm"),
-    angle_calc = "along",
-    label_dodge = unit(0.02, "npc"),
-    label_size = 2,
-    family = FONT_FAMILY
-  ) +
-  scale_color_manual(values = c(MUTED_COLOR, PRIMARY_COLOR)) +
-  
-  # Style graph
-  unset_graph_style() +
-  theme_graph(base_family = FONT_FAMILY, plot_margin = margin(0)) +
-  plot_annotation(title = "SouthSeafood Express Corp's Sphere of Influence",
-                  subtitle = "Highlighted are the candidates for influential nodes in the network",
-                  caption = "*Hover on the nodes to see their names*") &
-  theme(
-    text = element_text(family = FONT_FAMILY),
-    plot.title = element_text(face = "bold", size = rel(1.2)),
-    plot.subtitle = element_markdown(color = "grey50", size = rel(0.9)),
-    plot.caption = element_markdown(color = "grey50", size = rel(0.75))
-  )
-
-# Add interactive elements
-tooltip_css = paste0(
-  "background-color:black;color:white;font-family:",
-  FONT_FAMILY,
-  ";padding:4px;"
-)
-
-girafe(                                  
-  ggobj = g,                             
-  width_svg = 6,                         
-  height_svg = 6*0.618,
-  options = list(
-    opts_tooltip(css = tooltip_css)
-  )
+#| code-summary: 'Show the code'
+extract_subnetwork(
+  supernetwork,
+  node_name="SouthSeafood Express Corp"
+) %>% plot_fishing_relationships(
+  node_size = 5,
+  arrow_margin = 2,
+  title = "SouthSeafood Express Corp's Full Network",
+  subtitle = "This shows the full view of the network connected to SouthSeafood Express Corp in any way."
 )
 ```
 
-### 4.3.1 Candidate Centralities
+::: callout-tip
+#### Insights
 
-After reading on the different centralities, the potential candidates are [**eigenvector centrality**](https://vod.video.cornell.edu/media/32+-+Introduction+to+Eigenvalues+and+Eigenvectors+Session+32/1_fi5tfhbm/114208531) and HITS algorithm or [**hubs and authority centrality**](https://pi.math.cornell.edu/~mec/Winter2009/RalucaRemus/Lecture4/lecture4.html)**.**
+With this sheer number of nodes, it is hard to infer any relationships aside from general estimate of how many of each entity and the type of relationships present in the system.
 
-::: panel-tabset
-#### Eigenvector
+We should consider using other tools that provide more interactivity, like `visNetwork`.
 
-The principle of eigenvector centrality is *the more important your neighbors are, the more important you are.*
-
-As seen in the graph, the candidate nodes are close to each other and therefore are neighbors to important nodes.
-
-#### Hubs and Authorities
-
-Authorities are where the nodes that other nodes point to, while hubs are nodes that point towards authorities.
-
-This seems to be the **most fit** for our context. However, we have to reverse the arrows for most cases as the resource flow is opposite the majority of the arrows we have, i.e. company benefits the shareholders and owners.
+Later on, we will explore different centralities to help infer which entities are most influential in the network.
+:::
 :::
 
-### 4.3.2 Initial look at centralities
+# 5 Generating Power Graph
 
-In the graphs below, the bigger the node, the higher their centrality score. The bigger the node is, the more important they are.
+To figure out who are the most influential or greatest beneficiaries within the network, we have to look at the power dynamics in each relationship.
 
-#### 4.3.2.1 Hub and Authority
+## 5.1 Direction
 
-We will not look at this for now as we will look at it in the context of resource flow.
+As we want to investigate the flow of power and resources, the direction will be from the **less powerful to more powerful** entity.
 
-#### 4.3.2.2 Eigenvector
+## 5.2 Weights
 
-Let us first calculate the centrality scores.
+For the purpose of our analysis, we will score each relationship flow according to the following:
+
+-   Benefits from the resources: 1 (+1 if they are the owner of a company)
+
+-   A decision-maker on where resources go: 2 (+1 if they are the ultimate decision maker)
+
+-   Influential on the other person: 1 (only if target is a person)
+
+We will use the total as the weights for each edge. Lastly, we will rename the relationship to prevent confusion in case of direction reversal.
+
+## 5.3 Score table
+
++-------------------------+--------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------+
+|                         | BeneficialOwner                                                                                                          | Shareholdership                                                                                                                               | WorksFor                                                                         | FamilyRelationship                                                                                        |
++=========================+==========================================================================================================================+===============================================================================================================================================+==================================================================================+===========================================================================================================+
+| Current **From**        | Owner                                                                                                                    | Shareholder                                                                                                                                   | Employee                                                                         | Person 1                                                                                                  |
++-------------------------+--------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------+
+| Current **To**          | Company                                                                                                                  | Company                                                                                                                                       | Employer                                                                         | Person 2                                                                                                  |
++-------------------------+--------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------+
+| New **From\             | Company                                                                                                                  | Company                                                                                                                                       | Employee                                                                         | Person 2 (additional)                                                                                     |
+| **(Lower power)         |                                                                                                                          |                                                                                                                                               |                                                                                  |                                                                                                           |
++-------------------------+--------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------+
+| New **To\               | Owner                                                                                                                    | Shareholder                                                                                                                                   | Employer                                                                         | Person 2                                                                                                  |
+| **(Higher power)        |                                                                                                                          |                                                                                                                                               |                                                                                  |                                                                                                           |
+|                         |                                                                                                                          |                                                                                                                                               |                                                                                  | (additional)                                                                                              |
++-------------------------+--------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------+
+| New **subtype**         | OwnedBy                                                                                                                  | HasShareholder                                                                                                                                | WorksFor                                                                         | FamilyRelationship                                                                                        |
++-------------------------+--------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------+
+| Beneficiary             | 1 + 1                                                                                                                    | 1                                                                                                                                             | 0                                                                                | 1                                                                                                         |
++-------------------------+--------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------+
+| Decision-maker          | 2 + 1                                                                                                                    | 2                                                                                                                                             | 1                                                                                | 0                                                                                                         |
++-------------------------+--------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------+
+| Influential (on person) | 0                                                                                                                        | 0                                                                                                                                             | 1                                                                                | 1                                                                                                         |
++-------------------------+--------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------+
+| **Total**               | **5**                                                                                                                    | **3**                                                                                                                                         | **2**                                                                            | **2**                                                                                                     |
++-------------------------+--------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------+
+| Rationale               | Beneficial owners benefit from the resources of the company.                                                             | Shareholders may receive proceeds from the profits of the company.                                                                            | Employees are contractually obligated to act in the interests of their employer. | Assuming that family members have a healthy relationship, they share resources and confide in each other. |
+|                         |                                                                                                                          |                                                                                                                                               |                                                                                  |                                                                                                           |
+|                         | While BeneficialOwners may or may not be Shareholders in the same company, they hold the ultimate decision-making power. | They have some decision-making power within the company. However, it is the Beneficial Owner that ultimately gets the final say in decisions. | Employers also decide what their employees do.                                   | Due to this, they have power over each other.                                                             |
++-------------------------+--------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------+
+
+::: {.callout-important appearance="simple"}
+These scores are subjective and based on general assumptions. We also lack the information to model the power dynamics accurately.
+:::
+
+## 5.4 Converting relationship edges to power flow
+
+Using the table above, we will create a function to convert relationship edges to power flow.
 
 ```{r}
-ssfec_influential_init_centralities <- ssfec_influential_candidates %>%
-  mutate(eigen_score = centrality_eigen())
+#| file: helpers/convert_edges_to_power_flow.R
 ```
+
+```{r, include = FALSE}
+#| echo: false
+convert_edges_to_power_flow <- source("helpers/convert_edges_to_power_flow.R", local = knitr::knit_global())$value
+```
+
+Let us check the resulting edges table. We are expecting that all edge types would have the same number, expect for *FamilyRelationship*, which is expected to **double**.
 
 ::: panel-tabset
-##### Graph
-
-Then, let us plot with the consideration of the eigen scores.
+### Relationship
 
 ```{r}
-#| code-fold: true
-#| code-summary: 'Show ggraph code'
-set.seed(911)
-g <- ggraph(ssfec_influential_init_centralities, layout = "nicely") +
-  geom_point_interactive(
-    aes(
-      x = x, y = y, data_id = id,
-      tooltip = paste0(id, " (", num, ")"),
-      color = focus, shape = shape,
-      size = eigen_score
-    ),
-    show.legend = FALSE
-    )+
-  geom_node_text(
-    aes(label = num),
-    family = FONT_FAMILY,
-    size = 2,
-    color = 'white'
-  ) +
-  geom_edge_link(
-    aes(label = subtype),
-    arrow = arrow(type = "closed", length = unit(0.01, "npc")),
-    end_cap = circle(4, "mm"),
-    start_cap = circle(4, "mm"),
-    angle_calc = "along",
-    label_dodge = unit(0.02, "npc"),
-    label_size = 2,
-    family = FONT_FAMILY
-  ) +
-  scale_color_manual(values = c(MUTED_COLOR, PRIMARY_COLOR)) +
-  scale_size_continuous(range=c(5, 15)) +
-  
-  # Style graph
-  unset_graph_style() +
-  theme_graph(base_family = FONT_FAMILY, plot_margin = margin(0)) +
-  plot_annotation(title = "SouthSeafood Express Corp's Sphere of Influence",
-                  subtitle = "Highlighted are the candidates for influential nodes in the network",
-                  caption = "*Hover on the nodes to see their names*") &
-  theme(
-    text = element_text(family = FONT_FAMILY),
-    plot.title = element_text(face = "bold", size = rel(1.2)),
-    plot.subtitle = element_markdown(color = "grey50", size = rel(0.9)),
-    plot.caption = element_markdown(color = "grey50", size = rel(0.75))
-  )
-
-# Add interactive elements
-tooltip_css = paste0(
-  "background-color:black;color:white;font-family:",
-  FONT_FAMILY,
-  ";padding:4px;"
-)
-
-girafe(                                  
-  ggobj = g,                             
-  width_svg = 6,                         
-  height_svg = 6*0.618,
-  options = list(
-    opts_tooltip(css = tooltip_css)
-  )
-)
+supernetwork %>%
+  activate(edges) %>% as.data.frame() %>%
+  group_by(supertype, subtype) %>%
+  summarize(count = n()) %>%
+  arrange(-count) %>%
+  kable()
 ```
 
-##### Centrality Table
+### Power
 
 ```{r}
-#| code-fold: true
-#| code-summary: 'Show table code'
-ssfec_influential_init_centralities %>%
-  activate(nodes) %>%
-  arrange(-eigen_score) %>%
-  select(id, num, supertype, subtype, eigen_score) %>%
+supernetwork %>%
+  convert_graph_to_power_flow() %>%
+  activate(edges) %>% as.data.frame() %>%
+  group_by(supertype, subtype) %>%
+  summarize(count = n()) %>%
+  arrange(-count) %>%
   kable()
 ```
 :::
 
-**4 out of 5** of are candidate nodes have the highest eigenvector centrality values in our network. Because of this, there is a high likelihood that this metric fits our context.
+## 5.5 Converting relationship graphs to power flow
 
-However, as we are looking to answer *"which companies benefited from SouthSeafood Express Corp legal troubles"*, the result of this metric is contradicting as **Tainamarine Fishing Co** has lower score than **SouthSeafood Express Corp**, while **AguaLeska Transit N.V.**.
-
-These 2 companies should be benefiting from **SouthSeafood Express Corp.**
-
-We will compare this result after we build the resource flow.
-
-### 4.3.3 Building the resource flow edges
-
-#### 4.3.3.1 Where do resources flow in each relationship type?
-
-To model the resource flow, we need to set the following:
-
--   Arrow direction - direction of the resource flow
-
--   Weight - The higher this is, more the resource flow
-
-Take note that the models are **subjective** and we can adjust the values accordingly.
-
-::: panel-tabset
-##### Shareholdership
-
-**Current**: Shareholder -\> Company, weight: 1
-
-**Proposed**: Shareholder \<- Company, weight: 2
-
-**Rationale**: Although shareholders in a company may not necessarily benefit from the resources of a company (the Benificial Owner does), they are important decision makers in the company so they have some form of control over the company resources.
-
-##### BeneficialOwnership
-
-**Current**: BeneficialOwner -\> Company, weight: 1
-
-**Proposed**: BeneficialOwner \<- Company, weight: 3
-
-**Rationale**: BeneficialOwners are the ultimate decision makers and the main beneficiary of their company. Hence, they have higher control of the resources over Shareholders.
-
-##### FamilyRelationship
-
-**Current**: Person1 -\> Person2, weight: 1
-
-**Proposed**: Person1 \<-\> Person2, weight: 1
-
-**Rationale**: Assuming the family has a good relationship, they share resources so they benefit from each others' resources. The influence of a family member on another member can be an important factor in the network as they may influence the decision-making for the companies their family own. For simplicity, let's assume that family members only share resources.
-
-##### WorksFor
-
-**Current**: Employee -\> Employer, weight: 1
-
-**Proposed**: Employee -\> Employer, weight: 2
-
-**Rationale**: Employee answers to the employer and work on the instruction of the employer.
-:::
-
-#### 4.3.3.2 Generating resource flow
-
-Based on the considerations above, we will generate edges representing the resource flow from the edges dataframes. We will define functions for this.
-
-::: panel-tabset
-##### Convert edges
+Using the edge converter, we will generate a new `tbl_graph` with the power flow edges.
 
 ```{r}
-#| file: convert_edges_to_resource_flow.R
+#| file: helpers/convert_graph_to_power_flow.R
 ```
 
 ```{r, include = FALSE}
 #| echo: false
-convert_edges_to_resource_flow <- source("convert_edges_to_resource_flow.R", local = knitr::knit_global())$value
+convert_graph_to_power_flow <- source("helpers/convert_graph_to_power_flow.R", local = knitr::knit_global())$value
 ```
 
-##### Convert graph
+## 5.6 Plotting the power graph
+
+Similar to [4.2 Plotting the subnetworks], we will look at 3 subnetworks related to *SouthSeafood Express Corp*.
+
+We will use `plot_fishing_power()` to plot the relationship graph of the network.
 
 ```{r}
-#| file: convert_graph_to_resource_flow.R
+#| code-fold: true
+#| code-summary: 'Show the code for plot_fishing_power()'
+#| file: helpers/plot_fishing_power.R
 ```
 
 ```{r, include = FALSE}
 #| echo: false
-convert_graph_to_resource_flow <- source("convert_graph_to_resource_flow.R", local = knitr::knit_global())$value
-```
-:::
-
-#### 4.3.3.3 Plotting the resource graph
-
-```{r}
-ssfec_influence_resource <- convert_graph_to_resource_flow(ssfec_influential_init_centralities)
+plot_fishing_power <- source("helpers/plot_fishing_power.R", local = knitr::knit_global())$value
 ```
 
 ::: panel-tabset
-##### Resource Graph
+### Direct Neighbors
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Show ggraph code'
-set.seed(911)
-g <- ggraph(ssfec_influence_resource, layout = "nicely") +
-  geom_point_interactive(
-    aes(
-      x = x, y = y, data_id = id,
-      tooltip = paste0(id, " (", num, ")"),
-      color = focus, shape = shape
-    ),
-    size = 7.5,
-    show.legend = FALSE
-    )+
-  geom_node_text(
-    aes(label = num),
-    family = FONT_FAMILY,
-    size = 2,
-    color = 'white'
-  ) +
-  geom_edge_link(
-    aes(label = subtype),
-    arrow = arrow(type = "closed", length = unit(0.01, "npc")),
-    end_cap = circle(4, "mm"),
-    start_cap = circle(4, "mm"),
-    angle_calc = "along",
-    label_dodge = unit(0.02, "npc"),
-    label_size = 2,
-    family = FONT_FAMILY
-  ) +
-  scale_color_manual(values = c(MUTED_COLOR, PRIMARY_COLOR)) +
-  
-  # Style graph
-  unset_graph_style() +
-  theme_graph(base_family = FONT_FAMILY, plot_margin = margin(0)) +
-  plot_annotation(title = "SouthSeafood Express Corp's Sphere of Influence",
-                  subtitle = "Entities with 3 degrees of separation from SouthSeafood Express Corp",
-                  caption = "*Hover on the nodes to see their names*") &
-  theme(
-    text = element_text(family = FONT_FAMILY),
-    plot.title = element_text(face = "bold", size = rel(1.2)),
-    plot.subtitle = element_markdown(color = "grey50", size = rel(0.9)),
-    plot.caption = element_markdown(color = "grey50", size = rel(0.75))
+#| code-summary: 'Show the code'
+supernetwork %>%
+  extract_subnetwork(node_name = "SouthSeafood Express Corp", distance = 1) %>%
+  convert_graph_to_power_flow() %>%
+  plot_fishing_power(
+    title = "SouthSeafood Express Corp's Sphere of Influence",
+    subtitle = "Entities with 3 degrees of separation from **SouthSeafood Express Corp**. This is where the influence of the<br />company is noticeable."
   )
-
-# Add interactive elements
-tooltip_css = paste0(
-  "background-color:black;color:white;font-family:",
-  FONT_FAMILY,
-  ";padding:4px;"
-)
-
-girafe(                                  
-  ggobj = g,                             
-  width_svg = 6,                         
-  height_svg = 6*0.618,
-  options = list(
-    opts_tooltip(css = tooltip_css)
-  )
-)
 ```
 
-##### Original Graph
+### Sphere of Influence
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Show ggraph code'
-set.seed(911)
-g <- ggraph(ssfec_influential_init_centralities, layout = "nicely") +
-  geom_point_interactive(
-    aes(
-      x = x, y = y, data_id = id,
-      tooltip = paste0(id, " (", num, ")"),
-      color = focus, shape = shape
-    ),
-    size = 7.5,
-    show.legend = FALSE
-    )+
-  geom_node_text(
-    aes(label = num),
-    family = FONT_FAMILY,
-    size = 2,
-    color = 'white'
-  ) +
-  geom_edge_link(
-    aes(label = subtype),
-    arrow = arrow(type = "closed", length = unit(0.01, "npc")),
-    end_cap = circle(4, "mm"),
-    start_cap = circle(4, "mm"),
-    angle_calc = "along",
-    label_dodge = unit(0.02, "npc"),
-    label_size = 2,
-    family = FONT_FAMILY
-  ) +
-  scale_color_manual(values = c(MUTED_COLOR, PRIMARY_COLOR)) +
-  
-  # Style graph
-  unset_graph_style() +
-  theme_graph(base_family = FONT_FAMILY, plot_margin = margin(0)) +
-  plot_annotation(title = "SouthSeafood Express Corp's Sphere of Influence",
-                  subtitle = "Entities with 3 degrees of separation from SouthSeafood Express Corp",
-                  caption = "*Hover on the nodes to see their names*") &
-  theme(
-    text = element_text(family = FONT_FAMILY),
-    plot.title = element_text(face = "bold", size = rel(1.2)),
-    plot.subtitle = element_markdown(color = "grey50", size = rel(0.9)),
-    plot.caption = element_markdown(color = "grey50", size = rel(0.75))
+#| code-summary: 'Show the code'
+supernetwork %>%
+  extract_subnetwork(node_name = "SouthSeafood Express Corp", distance = 3) %>%
+  convert_graph_to_power_flow() %>%
+  plot_fishing_power(
+    layout = "linear",
+    circular = TRUE,
+    node_size = 12,
+    arrow_margin = 5.5,
+    title = "SouthSeafood Express Corp's Direct Neighbors",
+    subtitle = "Two other fishing companies, <span style='color:blue;'>**AguaLeska Transit N.V.**</span> and <span style='color:blue;'>**Tainamarine Fishing Co**</span> hold shares in<br />SouthSeafood Express Corp. They are posed to benefit the most from the company's illegal fishing activities."
   )
-
-# Add interactive elements
-tooltip_css = paste0(
-  "background-color:black;color:white;font-family:",
-  FONT_FAMILY,
-  ";padding:4px;"
-)
-
-girafe(                                  
-  ggobj = g,                             
-  width_svg = 6,                         
-  height_svg = 6*0.618,
-  options = list(
-    opts_tooltip(css = tooltip_css)
-  )
-)
 ```
+
+### Connected Network
 :::
-
-The resource graph now represents the flow of resource, which can help us trace who benefits from a node's activities. We can now recompute the centralities and the resource flow.
-
-# References
-
-<https://blogs.cornell.edu/info2040/2015/10/19/three-degrees-of-influence-how-far-can-you-reach-people/>
-
-<https://www.strategy-business.com/article/10218>
-
-<https://www.youtube.com/watch?v=-kiKUYM9Qq8>
-
-<https://pi.math.cornell.edu/~mec/Winter2009/RalucaRemus/Lecture4/lecture4.html>
-
-<https://vod.video.cornell.edu/media/32+-+Introduction+to+Eigenvalues+and+Eigenvectors+Session+32/1_fi5tfhbm/114208531>
