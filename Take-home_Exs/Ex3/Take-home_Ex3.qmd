@@ -55,6 +55,22 @@ glimpse(mc3_data)
 
 It contains graph data, where nodes can be accessed via `nodes` and edges via `links`. This dataset has a lot of columns but we will only filter the relevant data during wrangling..
 
+## 2.3 Loading Functions
+
+Functions used in this document have been defined in separate `.R` files due a recurring [bug](https://github.com/rstudio/rstudio/issues/14652) in the latest version of RStudio.
+
+This leads to the Quarto document not able to run any code chunks and save changes, even after restart. Each of the functions will be explained as they are encountered in this document
+
+```{r}
+to_initials <- source("helpers/to_initials.R", local = knitr::knit_global())$value
+extract_subnetwork <- source("helpers/extract_subnetwork.R", local = knitr::knit_global())$value
+plot_fishing_relationships <- source("helpers/plot_fishing_relationships.R", local = knitr::knit_global())$value
+convert_edges_to_power_flow <- source("helpers/convert_edges_to_power_flow.R", local = knitr::knit_global())$value
+convert_graph_to_power_flow <- source("helpers/convert_graph_to_power_flow.R", local = knitr::knit_global())$value
+plot_fishing_power <- source("helpers/plot_fishing_power.R", local = knitr::knit_global())$value
+plot_centrality <- source("helpers/plot_centrality.R", local = knitr::knit_global())$value
+```
+
 # 3 Data Wrangling
 
 ## 3.1 Extracting Graph Elements
@@ -144,11 +160,6 @@ Lastly, we will assign alias to each node as an alternative label to the names (
 #| file: helpers/to_initials.R
 ```
 
-```{r, include = FALSE}
-#| echo: false
-to_initials <- source("helpers/to_initials.R", local = knitr::knit_global())$value
-```
-
 ```{r}
 mc3_nodes_clean <- mc3_nodes_lite %>%
   mutate(
@@ -231,7 +242,7 @@ rm(mc3_edges_raw, mc3_edges_lite, mc3_edges_clean)
 rm(to_initials)
 ```
 
-# 4 Extracting subnetworks
+# 4 Extracting Subnetworks
 
 ## 4.1 Extracting for ease of analysis
 
@@ -255,11 +266,6 @@ We will use the following functions:
 ```{r}
 #| file: helpers/extract_subnetwork.R
 ```
-
-```{r, include = FALSE}
-#| echo: false
-extract_subnetwork <- source("helpers/extract_subnetwork.R", local = knitr::knit_global())$value
-```
 :::
 
 ## 4.2 Plotting the subnetworks
@@ -276,11 +282,6 @@ We will use `plot_fishing_relationships()` to plot the relationship graph of the
 #| code-fold: true
 #| code-summary: 'Show the code for plot_fishing_relationships()'
 #| file: helpers/plot_fishing_relationships.R
-```
-
-```{r, include = FALSE}
-#| echo: false
-plot_fishing_relationships <- source("helpers/plot_fishing_relationships.R", local = knitr::knit_global())$value
 ```
 
 ::: {.callout-tip collapse="true" appearance="simple"}
@@ -306,7 +307,7 @@ extract_subnetwork(
   circular = TRUE,
   node_size = 12,
   arrow_margin = 5.5,
-  title = "SouthSeafood Express Corp's Direct Neighbors",
+  title = "Relationship Graph: SouthSeafood Express Corp's Direct Neighbors",
   subtitle = "Two other fishing companies, <span style='color:blue;'>**AguaLeska Transit N.V.**</span> and <span style='color:blue;'>**Tainamarine Fishing Co**</span> hold shares in<br />SouthSeafood Express Corp. They are posed to benefit the most from the company's illegal fishing activities."
 )
 ```
@@ -329,7 +330,7 @@ extract_subnetwork(
   node_name="SouthSeafood Express Corp",
   distance=3
 ) %>% plot_fishing_relationships(
-  title = "SouthSeafood Express Corp's Sphere of Influence",
+  title = "Relationship Graph: SouthSeafood Express Corp's Sphere of Influence",
   subtitle = "Entities with 3 degrees of separation from **SouthSeafood Express Corp**. This is where the influence of the<br />company is noticeable."
 )
 ```
@@ -359,7 +360,7 @@ extract_subnetwork(
 ) %>% plot_fishing_relationships(
   node_size = 5,
   arrow_margin = 2,
-  title = "SouthSeafood Express Corp's Full Network",
+  title = "Relationship Graph: SouthSeafood Express Corp's Full Network",
   subtitle = "This shows the full view of the network connected to SouthSeafood Express Corp in any way."
 )
 ```
@@ -395,38 +396,126 @@ For the purpose of our analysis, we will score each relationship flow according 
 
 We will use the total as the weights for each edge. Lastly, we will rename the relationship to prevent confusion in case of direction reversal.
 
-## 5.3 Score table
+## 5.3 Score tables
 
-+-------------------------+--------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------+
-|                         | BeneficialOwner                                                                                                          | Shareholdership                                                                                                                               | WorksFor                                                                         | FamilyRelationship                                                                                        |
-+=========================+==========================================================================================================================+===============================================================================================================================================+==================================================================================+===========================================================================================================+
-| Current **From**        | Owner                                                                                                                    | Shareholder                                                                                                                                   | Employee                                                                         | Person 1                                                                                                  |
-+-------------------------+--------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------+
-| Current **To**          | Company                                                                                                                  | Company                                                                                                                                       | Employer                                                                         | Person 2                                                                                                  |
-+-------------------------+--------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------+
-| New **From\             | Company                                                                                                                  | Company                                                                                                                                       | Employee                                                                         | Person 2 (additional)                                                                                     |
-| **(Lower power)         |                                                                                                                          |                                                                                                                                               |                                                                                  |                                                                                                           |
-+-------------------------+--------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------+
-| New **To\               | Owner                                                                                                                    | Shareholder                                                                                                                                   | Employer                                                                         | Person 2                                                                                                  |
-| **(Higher power)        |                                                                                                                          |                                                                                                                                               |                                                                                  |                                                                                                           |
-|                         |                                                                                                                          |                                                                                                                                               |                                                                                  | (additional)                                                                                              |
-+-------------------------+--------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------+
-| New **subtype**         | OwnedBy                                                                                                                  | HasShareholder                                                                                                                                | WorksFor                                                                         | FamilyRelationship                                                                                        |
-+-------------------------+--------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------+
-| Beneficiary             | 1 + 1                                                                                                                    | 1                                                                                                                                             | 0                                                                                | 1                                                                                                         |
-+-------------------------+--------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------+
-| Decision-maker          | 2 + 1                                                                                                                    | 2                                                                                                                                             | 1                                                                                | 0                                                                                                         |
-+-------------------------+--------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------+
-| Influential (on person) | 0                                                                                                                        | 0                                                                                                                                             | 1                                                                                | 1                                                                                                         |
-+-------------------------+--------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------+
-| **Total**               | **5**                                                                                                                    | **3**                                                                                                                                         | **2**                                                                            | **2**                                                                                                     |
-+-------------------------+--------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------+
-| Rationale               | Beneficial owners benefit from the resources of the company.                                                             | Shareholders may receive proceeds from the profits of the company.                                                                            | Employees are contractually obligated to act in the interests of their employer. | Assuming that family members have a healthy relationship, they share resources and confide in each other. |
-|                         |                                                                                                                          |                                                                                                                                               |                                                                                  |                                                                                                           |
-|                         | While BeneficialOwners may or may not be Shareholders in the same company, they hold the ultimate decision-making power. | They have some decision-making power within the company. However, it is the Beneficial Owner that ultimately gets the final say in decisions. | Employers also decide what their employees do.                                   | Due to this, they have power over each other.                                                             |
-+-------------------------+--------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------+
+::: panel-tabset
+### BeneficialOwner
 
-::: {.callout-important appearance="simple"}
+Beneficial owners benefit from the resources of the company.
+
+While BeneficialOwners may or may not be Shareholders in the same company, they hold the ultimate decision-making power.
+
++-------------------------+------------------------------------------------+
+| Current **From**        | Owner                                          |
++-------------------------+------------------------------------------------+
+| Current **To**          | Company                                        |
++-------------------------+------------------------------------------------+
+| New **From\             | Company                                        |
+| **(Lower power)         |                                                |
++-------------------------+------------------------------------------------+
+| New **To\               | Owner                                          |
+| **(Higher power)        |                                                |
++-------------------------+------------------------------------------------+
+| New **subtype**         | OwnedBy                                        |
++-------------------------+------------------------------------------------+
+| Beneficiary             | 1 + 1                                          |
++-------------------------+------------------------------------------------+
+| Decision-maker          | 2 + 1                                          |
++-------------------------+------------------------------------------------+
+| Influential (on person) | 0                                              |
++-------------------------+------------------------------------------------+
+| **Total**               | **5**                                          |
++-------------------------+------------------------------------------------+
+
+### Shareholdership
+
+Shareholders may receive proceeds from the profits of the company.
+
+They have some decision-making power within the company. However, it is the Beneficial Owner that ultimately gets the final say in decisions.
+
++-------------------------+------------------------------------------------+
+|                         | Shareholdership                                |
++=========================+================================================+
+| Current **From**        | Shareholder                                    |
++-------------------------+------------------------------------------------+
+| Current **To**          | Company                                        |
++-------------------------+------------------------------------------------+
+| New **From\             | Company                                        |
+| **(Lower power)         |                                                |
++-------------------------+------------------------------------------------+
+| New **To\               | Shareholder                                    |
+| **(Higher power)        |                                                |
++-------------------------+------------------------------------------------+
+| New **subtype**         | HasShareholder                                 |
++-------------------------+------------------------------------------------+
+| Beneficiary             | 1                                              |
++-------------------------+------------------------------------------------+
+| Decision-maker          | 2                                              |
++-------------------------+------------------------------------------------+
+| Influential (on person) | 0                                              |
++-------------------------+------------------------------------------------+
+| **Total**               | **3**                                          |
++-------------------------+------------------------------------------------+
+
+### WorksFor
+
+Employees are contractually obligated to act in the interests of their employer.
+
+Employers also influence what their employees do in the business.
+
++-------------------------+------------------------------------------------+
+| Current **From**        | Owner                                          |
++-------------------------+------------------------------------------------+
+| Current **To**          | Company                                        |
++-------------------------+------------------------------------------------+
+| New **From\             | Company                                        |
+| **(Lower power)         |                                                |
++-------------------------+------------------------------------------------+
+| New **To\               | Owner                                          |
+| **(Higher power)        |                                                |
++-------------------------+------------------------------------------------+
+| New **subtype**         | OwnedBy                                        |
++-------------------------+------------------------------------------------+
+| Beneficiary             | 1 + 1                                          |
++-------------------------+------------------------------------------------+
+| Decision-maker          | 2 + 1                                          |
++-------------------------+------------------------------------------------+
+| Influential (on person) | 0                                              |
++-------------------------+------------------------------------------------+
+| **Total**               | **5**                                          |
++-------------------------+------------------------------------------------+
+
+### FamilyRelationship
+
+Assuming that family members have a healthy relationship, they share resources and confide in each other.
+
+Due to this, they have power over each other.
+
++-------------------------+------------------------------------------------+
+| Current **From**        | Person 1                                       |
++-------------------------+------------------------------------------------+
+| Current **To**          | Person 2                                       |
++-------------------------+------------------------------------------------+
+| New **From\             | Person 2 (additional)                          |
+| **(Lower power)         |                                                |
++-------------------------+------------------------------------------------+
+| New **To\               | Person 2                                       |
+| **(Higher power)        |                                                |
+|                         | (additional)                                   |
++-------------------------+------------------------------------------------+
+| New **subtype**         | FamilyRelationship                             |
++-------------------------+------------------------------------------------+
+| Beneficiary             | 1                                              |
++-------------------------+------------------------------------------------+
+| Decision-maker          | 0                                              |
++-------------------------+------------------------------------------------+
+| Influential (on person) | 1                                              |
++-------------------------+------------------------------------------------+
+| **Total**               | **2**                                          |
++-------------------------+------------------------------------------------+
+:::
+
+::: {.callout-caution appearance="simple"}
 These scores are subjective and based on general assumptions. We also lack the information to model the power dynamics accurately.
 :::
 
@@ -436,11 +525,6 @@ Using the table above, we will create a function to convert relationship edges t
 
 ```{r}
 #| file: helpers/convert_edges_to_power_flow.R
-```
-
-```{r, include = FALSE}
-#| echo: false
-convert_edges_to_power_flow <- source("helpers/convert_edges_to_power_flow.R", local = knitr::knit_global())$value
 ```
 
 Let us check the resulting edges table. We are expecting that all edge types would have the same number, expect for *FamilyRelationship*, which is expected to **double**.
@@ -478,11 +562,6 @@ Using the edge converter, we will generate a new `tbl_graph` with the power flow
 #| file: helpers/convert_graph_to_power_flow.R
 ```
 
-```{r, include = FALSE}
-#| echo: false
-convert_graph_to_power_flow <- source("helpers/convert_graph_to_power_flow.R", local = knitr::knit_global())$value
-```
-
 ## 5.6 Plotting the power graph
 
 Similar to [4.2 Plotting the subnetworks], we will look at 3 subnetworks related to *SouthSeafood Express Corp*.
@@ -495,11 +574,6 @@ We will use `plot_fishing_power()` to plot the relationship graph of the network
 #| file: helpers/plot_fishing_power.R
 ```
 
-```{r, include = FALSE}
-#| echo: false
-plot_fishing_power <- source("helpers/plot_fishing_power.R", local = knitr::knit_global())$value
-```
-
 ::: panel-tabset
 ### Direct Neighbors
 
@@ -510,10 +584,20 @@ supernetwork %>%
   extract_subnetwork(node_name = "SouthSeafood Express Corp", distance = 1) %>%
   convert_graph_to_power_flow() %>%
   plot_fishing_power(
-    title = "SouthSeafood Express Corp's Sphere of Influence",
-    subtitle = "Entities with 3 degrees of separation from **SouthSeafood Express Corp**. This is where the influence of the<br />company is noticeable."
+    layout = "linear",
+    circular = TRUE,
+    node_size = 12,
+    arrow_margin = 5.5,
+    title = "Power Graph: SouthSeafood Express Corp's Direct Neighbors",
+    subtitle = "Two other fishing companies, <span style='color:blue;'>**AguaLeska Transit N.V.**</span> and <span style='color:blue;'>**Tainamarine Fishing Co**</span> hold shares in<br />SouthSeafood Express Corp. They are posed to benefit the most from the company's illegal fishing activities."
   )
 ```
+
+::: callout-tip
+#### Insights
+
+By making adjustments to the edges, we can better see that *SouthSeafood Express Corp* answers to its shareholders, **AguaLeska Transit N.V.** and **Tainamarine Fishing Co**.
+:::
 
 ### Sphere of Influence
 
@@ -524,14 +608,268 @@ supernetwork %>%
   extract_subnetwork(node_name = "SouthSeafood Express Corp", distance = 3) %>%
   convert_graph_to_power_flow() %>%
   plot_fishing_power(
-    layout = "linear",
-    circular = TRUE,
-    node_size = 12,
-    arrow_margin = 5.5,
-    title = "SouthSeafood Express Corp's Direct Neighbors",
-    subtitle = "Two other fishing companies, <span style='color:blue;'>**AguaLeska Transit N.V.**</span> and <span style='color:blue;'>**Tainamarine Fishing Co**</span> hold shares in<br />SouthSeafood Express Corp. They are posed to benefit the most from the company's illegal fishing activities."
+    title = "Power Graph: SouthSeafood Express Corp's Sphere of Influence",
+    subtitle = "Entities with 3 degrees of separation from **SouthSeafood Express Corp**. This is where the influence of the<br />company is noticeable."
+  )
+```
+
+::: callout-tip
+#### Insights
+
+In this plot, we can more clearly see that **StichtingMarine Shipping Company** is a hub that gathering resources from other nodes.
+
+However, the flow does not stop there as the power further flows to its shareholders and owners, **SavanetaCreek Solutions N.V.**, **Liam Conti**, and **Fintan Park.** Some power may trickle down to **Nadia Conti**, as Liam's family member.
+
+Although it does not change our insight from the relationship graph. These influence of these five nodes is much clearer with the power graph.
+:::
+
+### Connected Network
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+supernetwork %>%
+  extract_subnetwork(node_name = "SouthSeafood Express Corp") %>%
+  convert_graph_to_power_flow() %>%
+  plot_fishing_power(
+    node_size = 5,
+    arrow_margin = 2,
+    title = "Power Graph: SouthSeafood Express Corp's Full Network",
+    subtitle = "This shows the full view of the network connected to SouthSeafood Express Corp in any way."
+  )
+```
+
+::: callout-tip
+#### Insights
+
+With the power graph, it is much easier to notice the most powerful entities in the network.
+
+For example, **Lemuel Conti** has many arrows pointing in, which indicates power over many other nodes.
+
+Another powerful node is **GvardeyskAmerica Shipping Plc**, which is a hub that has power over other nodes. Tracing the arrows reveal that the power flow ends with **Fabio Conti**.
+
+Although not liked as family members, it is highly llikely that **Liam Conti**, **Lemuel Conti**, and **Fabio Conti** are part of a clan that controls is part of the fishing business network.
+:::
+:::
+
+# 6 Measures of Centrality
+
+We defined the influential entities as having 2 types:
+
+**Type 1:** They have the most power
+
+**Type 2:** They have the ability to connect entities and be a power broker.
+
+## 6.1 Appropriate measures of centrality
+
+::: panel-tabset
+### Most Powerful
+
+To identify the most powerful nodes/entities in the network, we will use **page rank** centrality. Originally developed by Google, this is used in ranking web pages. The principle is that *the more incoming edges a node has, the more influential it is*.
+
+This measure for centrality is useful in this context as in our power graph, the node where the power flow stops is the most powerful node.
+
+The main candidates for these are the **BeneficialOwners** and **Shareholders**.
+
+### Power Brokers
+
+To identify the power brokers, we will use **betweenness** centrality.
+
+Power Brokers must be nodes with **both incoming and outgoing edges**, so that it can connect a more powerful node to a less powerful node. Hence, having a large number of edges connected to a node is not enough (which the degree centrality offers). This is because if a node only has 1 kind, it won't be able to connect to other nodes to keep the flow going.
+:::
+
+## 6.2 Calculating centrality
+
+We will again use the networks of *SouthSeafood Express Corp* to check how these centrality measures play in the network.
+
+We will use the power graphs of *Sphere of Influence* and the *Connected Network*.
+
+::: panel-tabset
+### Sphere of Influence
+
+```{r}
+sfec_sphere_of_influence_power <- supernetwork %>%
+  extract_subnetwork(node_name = "SouthSeafood Express Corp", distance = 3) %>%
+  convert_graph_to_power_flow() %>%
+  mutate(
+    pagerank_score = centrality_pagerank(weights = E(.)$weight),
+    betweenness_score = centrality_betweenness(weights = E(.)$weight, normalized = TRUE)
   )
 ```
 
 ### Connected Network
+
+```{r}
+sfec_connected_network_power <- supernetwork %>%
+  extract_subnetwork(node_name = "SouthSeafood Express Corp") %>%
+  convert_graph_to_power_flow() %>%
+  mutate(
+    pagerank_score = centrality_pagerank(weights = E(.)$weight),
+    betweenness_score = centrality_betweenness(weights = E(.)$weight, normalized = TRUE)
+  )
+```
 :::
+
+## 6.3 Identifying the most powerful nodes
+
+We will use `plot_centrality` to visualize
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code for plot_centrality()'
+#| file: helpers/plot_centrality.R
+```
+
+### 6.3.1 Sphere of Influence
+
+::: panel-tabset
+#### Graph
+
+```{r}
+sfec_sphere_of_influence_power %>%
+  plot_centrality(
+    "pagerank",
+    title = "Most Powerful Entities in SouthSeafood Express Corp's Sphere of Influence",
+    subtitle = "A higher value of **pagerank centrality** means the entity has higher power and benefits from the network."
+  )
+```
+
+#### Table
+
+```{r}
+sfec_sphere_of_influence_power %>%
+  activate(nodes) %>%
+  as.data.frame() %>%
+  arrange(-pagerank_score) %>%
+  select(name, alias, supertype, subtype, pagerank_score) %>%
+  kable()
+```
+:::
+
+::: callout-tip
+#### Insights
+
+Applying the pagerank centrality confirms our observations that **Liam Conti** and **Fintan Park** are part of the powerful entities within *SouthSeafood Express Corp's* Sphere of Influence.
+
+Furthermore, based on our model, **Nadia Conti** also is one of the most entities with the network by being related to **Liam Conti**.
+
+**StichtingMarine Shipping Company**, which is owned by **Liam Conti** and where **Fintan Park** holds shares in, is the most powerful organization as it controls various companies through other entities.
+
+It can be said that whoever controls this company has the most power in the network.
+:::
+
+### 6.3.2 Connected Network
+
+::: panel-tabset
+#### Graph
+
+```{r}
+sfec_connected_network_power %>%
+  plot_centrality(
+    "pagerank",
+    title = "Most Powerful Entities in SouthSeafood Express Corp's Connected Network",
+    subtitle = "A higher value of **pagerank centrality** means the entity has higher power and benefits from the network."
+  )
+```
+
+#### Table
+
+```{r}
+sfec_connected_network_power %>%
+  activate(nodes) %>%
+  as.data.frame() %>%
+  arrange(-pagerank_score) %>%
+  select(name, alias, supertype, subtype, pagerank_score) %>%
+  kable()
+```
+:::
+
+::: callout-tip
+#### Insights
+
+Members of the **Conti Clan** are the most powerful people in the network, with **Lena Conti-Park** being the most powerful.
+
+She seems to be the wife of **Fintan Park**, which makes him part of the clan also.
+
+This further confirms our hypothesis and observations that the **Conti Clan** controls this part of the fishing business network.
+:::
+
+## 6.4 Identifiying the power brokers
+
+### 6.4.1 Sphere of Influence
+
+::: panel-tabset
+#### Graph
+
+```{r}
+sfec_sphere_of_influence_power %>%
+  plot_centrality(
+    "betweenness",
+    title = "The Power Brokers in SouthSeafood Express Corp's Sphere of Influence",
+    subtitle = "A higher value of **betweenness centrality** means the entity is more capable of connecting entities."
+  )
+```
+
+#### Table
+
+```{r}
+sfec_sphere_of_influence_power %>%
+  activate(nodes) %>%
+  as.data.frame() %>%
+  arrange(-betweenness_score) %>%
+  select(name, alias, supertype, subtype, betweenness_score) %>%
+  kable()
+```
+:::
+
+::: callout-tip
+#### Insights
+
+The power brokers in this network are the companies that acts as *middleman* between a lower power entity to a lower one.
+
+The most notable is **StichtingMarine Shipping Company**, where the Conti Clan members, **Liam Conti and Fintan Park**, hold shares in and Liam owns.
+
+This fishing company becomes their way to consolidate the power and resources within the system.
+:::
+
+### 6.4.2 Connected Network
+
+::: panel-tabset
+#### Graph
+
+```{r}
+sfec_connected_network_power %>%
+  plot_centrality(
+    "betweenness",
+    title = "The Power Brokers in SouthSeafood Express Corp's Connected Network",
+    subtitle = "A higher value of **betweenness centrality** means the entity is more capable of connecting entities."
+  )
+```
+
+#### Table
+
+```{r}
+sfec_connected_network_power %>%
+  activate(nodes) %>%
+  as.data.frame() %>%
+  arrange(-betweenness_score) %>%
+  select(name, alias, supertype, subtype, betweenness_score) %>%
+  kable()
+```
+:::
+
+::: callout-tip
+#### Insights
+
+Similar to the smaller network, the power brokers in the bigger network are the companies owned by **Conti Clan** members. These companies transfer the power and resources from the wider network to them.
+
+These are **StichtingMarine Shipping Company**, **GvardeyskAmerica Shipping Plc**, **NamRiver Transit A/S**, **Namorna Transit Ltd**.
+:::
+
+# 7 Power Flow
+
+# References
+
+<https://blogs.cornell.edu/info2040/2015/10/19/three-degrees-of-influence-how-far-can-you-reach-people/>
+
+<https://www.strategy-business.com/article/10218>
