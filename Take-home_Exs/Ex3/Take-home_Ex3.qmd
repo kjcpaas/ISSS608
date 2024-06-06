@@ -37,15 +37,6 @@ pacman::p_load(
 )
 ```
 
-We will also set some values to have consistency throughout all graphs. This is also so that we don't have to search and replace all instances of these
-
-```{r}
-FONT_FAMILY = "Roboto Condensed"
-PRIMARY_COLOR = "blue"
-MUTED_COLOR = "grey50"
-DEFAULT_SEED = 911 # For reproduceability
-```
-
 ## 2.2 Loading Data
 
 ```{r}
@@ -55,21 +46,137 @@ glimpse(mc3_data)
 
 It contains graph data, where nodes can be accessed via `nodes` and edges via `links`. This dataset has a lot of columns but we will only filter the relevant data during wrangling..
 
-## 2.3 Loading Functions
+## 2.3. Defining common variables
 
-Functions used in this document have been defined in separate `.R` files due a recurring [bug](https://github.com/rstudio/rstudio/issues/14652) in the latest version of RStudio.
+We will also set some values to have consistency throughout all graphs. This is also so that we only need to change them in one place
 
-This leads to the Quarto document not able to run any code chunks and save changes, even after restart. Each of the functions will be explained as they are encountered in this document
+::: panel-tabset
+### Styles
+
+We are going to define styles for plotting our different kind of graphs. This is to provide consistency and reduce mistakes when changing how plots are rendered.
 
 ```{r}
-to_initials <- source("helpers/to_initials.R", local = knitr::knit_global())$value
-extract_subnetwork <- source("helpers/extract_subnetwork.R", local = knitr::knit_global())$value
-plot_fishing_relationships <- source("helpers/plot_fishing_relationships.R", local = knitr::knit_global())$value
-convert_edges_to_power_flow <- source("helpers/convert_edges_to_power_flow.R", local = knitr::knit_global())$value
-convert_graph_to_power_flow <- source("helpers/convert_graph_to_power_flow.R", local = knitr::knit_global())$value
-plot_fishing_power <- source("helpers/plot_fishing_power.R", local = knitr::knit_global())$value
-plot_centrality <- source("helpers/plot_centrality.R", local = knitr::knit_global())$value
+STYLES = list(
+  font_family = "Roboto Condensed",
+  # Colors
+  primary_color = "blue",
+  primary_light_color = "cornflowerblue",
+  secondary_color = "darkorange",
+  secondary_light_color = "peachpuff",
+  muted_color = "grey50",
+  normal_text_color = "grey50",
+  # Graph
+  node_size = 7.5,
+  arrow_margin = 3.2,
+  arrow_style = arrow(type = "closed", length = unit(2, "pt")),
+  base_edge_thickness = 0.2,
+  # Panel
+  panel_border_color = "grey50",
+  panel_border_thickness = 0.5,
+  # Texts
+  node_label_size = 2,
+  node_label_dark = "black",
+  node_label_light = "white",
+
+  default_caption = "Hover on the nodes to see their full names",
+  # Interactive elemnents
+  tooltip_css = paste0(
+    "background-color:black;color:white;",
+    "font-family:Roboto Condensed;font-size:10pt;",
+    "padding:4px;text-align:center;"
+  ),
+  svg_width = 6,
+  svg_height = 6 * 0.618
+)
 ```
+
+### Theme Elements
+
+Common theme elements, another `theme()` definition can be used if these elements need to be overriden.
+
+```{r}
+COMMON_THEME = theme(
+  text = element_text(family = STYLES$font_family),
+  plot.title = element_markdown(
+    face = "bold",
+    color = STYLES$primary_color,
+    size = unit(10, "pt")
+  ),
+  plot.subtitle = element_markdown(color = STYLES$normal_text_color, size = unit(8, "pt")),
+  ,
+  plot.caption = element_markdown(
+    color = STYLES$normal_text_color,
+    size = unit(6, "pt"),
+    hjust = 0
+  ),
+  plot.margin = margin(2, 0, 0, 0, unit = "pt"),
+  
+  # Legend styles
+  legend.position = "right",
+  legend.location = "plot",
+  legend.title = element_markdown(
+    size = unit(8, "pt"),
+    face = "bold",
+    color = "grey30"
+  ),
+  legend.text = element_text(size = unit(6, "pt"), vjust = 0.45),
+  legend.box.spacing = unit(4, "pt"),
+  legend.margin = margin(0),
+  legend.spacing.y = unit(8, "pt"),
+  legend.key.size = unit(12, "pt"),
+  
+  panel.border = element_rect(
+    color = STYLES$panel_border_color,
+    fill = NA,
+    linewidth = STYLES$panel_border_thickness
+  )
+)
+```
+
+### Mappings
+
+```{r}
+MAPPINGS = list(
+  # Available shapes: https://www.datanovia.com/en/blog/ggplot-point-shapes-best-tips/
+  node_supertype_to_shape = c(
+    "Person" = 17, # Triangle
+    "Organization" = 16 # Circle
+  ),
+  # Color schemes
+  # Colorblind pallettes from https://davidmathlogic.com/colorblind
+  node_subtype_to_color = c(
+    "Person" = "#44AA99",
+    "CEO" = "#117733",
+    "Company" = "#DDCC77",
+    "FishingCompany" = "#332288",
+    "LogisticsCompany" = "#88CCEE",
+    "FinancialCompany" = "#AA4499",
+    "NGO" = "#CC6677",
+    "NewsCompany" = "#882255"
+  ),
+  edge_relationship_subtype_to_color = c(
+    "WorksFor" = "#D81B60",
+    "Shareholdership" = "#FFC107",
+    "BeneficialOwnership" = "#004D40",
+    "FamilyRelationship" = "#1E88E5"
+  ),
+  edge_power_subtype_to_color = c(
+    "WorksFor" = "#D81B60",
+    "HasShareholder" = "#FFC107",
+    "OwnedBy" = "#004D40",
+    "FamilyRelationship" = "#1E88E5"
+  )
+)
+```
+
+### Other configurations
+
+```{r}
+CONFIGS = list(
+  default_seed = 911 # For reproduceability
+)
+```
+:::
 
 # 3 Data Wrangling
 
@@ -158,6 +265,11 @@ Lastly, we will assign alias to each node as an alternative label to the names (
 
 ```{r}
 #| file: helpers/to_initials.R
+```
+
+```{r}
+#| echo: false
+to_initials <- source("helpers/to_initials.R", local = knitr::knit_global())$value
 ```
 
 ```{r}
@@ -266,6 +378,11 @@ We will use the following functions:
 ```{r}
 #| file: helpers/extract_subnetwork.R
 ```
+
+```{r}
+#| echo: false
+extract_subnetwork <- source("helpers/extract_subnetwork.R", local = knitr::knit_global())$value
+```
 :::
 
 ## 4.2 Plotting the subnetworks
@@ -282,6 +399,11 @@ We will use `plot_fishing_relationships()` to plot the relationship graph of the
 #| code-fold: true
 #| code-summary: 'Show the code for plot_fishing_relationships()'
 #| file: helpers/plot_fishing_relationships.R
+```
+
+```{r}
+#| echo: false
+plot_fishing_relationships <- source("helpers/plot_fishing_relationships.R", local = knitr::knit_global())$value
 ```
 
 ::: {.callout-tip collapse="true" appearance="simple"}
@@ -405,27 +527,27 @@ Beneficial owners benefit from the resources of the company.
 
 While BeneficialOwners may or may not be Shareholders in the same company, they hold the ultimate decision-making power.
 
-+-------------------------+------------------------------------------------+
-| Current **From**        | Owner                                          |
-+-------------------------+------------------------------------------------+
-| Current **To**          | Company                                        |
-+-------------------------+------------------------------------------------+
-| New **From\             | Company                                        |
-| **(Lower power)         |                                                |
-+-------------------------+------------------------------------------------+
-| New **To\               | Owner                                          |
-| **(Higher power)        |                                                |
-+-------------------------+------------------------------------------------+
-| New **subtype**         | OwnedBy                                        |
-+-------------------------+------------------------------------------------+
-| Beneficiary             | 1 + 1                                          |
-+-------------------------+------------------------------------------------+
-| Decision-maker          | 2 + 1                                          |
-+-------------------------+------------------------------------------------+
-| Influential (on person) | 0                                              |
-+-------------------------+------------------------------------------------+
-| **Total**               | **5**                                          |
-+-------------------------+------------------------------------------------+
++-------------------------+--------------------------------------------+
+| Current **From**        | Owner                                      |
++-------------------------+--------------------------------------------+
+| Current **To**          | Company                                    |
++-------------------------+--------------------------------------------+
+| New **From\             | Company                                    |
+| **(Lower power)         |                                            |
++-------------------------+--------------------------------------------+
+| New **To\               | Owner                                      |
+| **(Higher power)        |                                            |
++-------------------------+--------------------------------------------+
+| New **subtype**         | OwnedBy                                    |
++-------------------------+--------------------------------------------+
+| Beneficiary             | 1 + 1                                      |
++-------------------------+--------------------------------------------+
+| Decision-maker          | 2 + 1                                      |
++-------------------------+--------------------------------------------+
+| Influential (on person) | 0                                          |
++-------------------------+--------------------------------------------+
+| **Total**               | **5**                                      |
++-------------------------+--------------------------------------------+
 
 ### Shareholdership
 
@@ -433,29 +555,29 @@ Shareholders may receive proceeds from the profits of the company.
 
 They have some decision-making power within the company. However, it is the Beneficial Owner that ultimately gets the final say in decisions.
 
-+-------------------------+------------------------------------------------+
-|                         | Shareholdership                                |
-+=========================+================================================+
-| Current **From**        | Shareholder                                    |
-+-------------------------+------------------------------------------------+
-| Current **To**          | Company                                        |
-+-------------------------+------------------------------------------------+
-| New **From\             | Company                                        |
-| **(Lower power)         |                                                |
-+-------------------------+------------------------------------------------+
-| New **To\               | Shareholder                                    |
-| **(Higher power)        |                                                |
-+-------------------------+------------------------------------------------+
-| New **subtype**         | HasShareholder                                 |
-+-------------------------+------------------------------------------------+
-| Beneficiary             | 1                                              |
-+-------------------------+------------------------------------------------+
-| Decision-maker          | 2                                              |
-+-------------------------+------------------------------------------------+
-| Influential (on person) | 0                                              |
-+-------------------------+------------------------------------------------+
-| **Total**               | **3**                                          |
-+-------------------------+------------------------------------------------+
++-------------------------+--------------------------------------------+
+|                         | Shareholdership                            |
++=========================+============================================+
+| Current **From**        | Shareholder                                |
++-------------------------+--------------------------------------------+
+| Current **To**          | Company                                    |
++-------------------------+--------------------------------------------+
+| New **From\             | Company                                    |
+| **(Lower power)         |                                            |
++-------------------------+--------------------------------------------+
+| New **To\               | Shareholder                                |
+| **(Higher power)        |                                            |
++-------------------------+--------------------------------------------+
+| New **subtype**         | HasShareholder                             |
++-------------------------+--------------------------------------------+
+| Beneficiary             | 1                                          |
++-------------------------+--------------------------------------------+
+| Decision-maker          | 2                                          |
++-------------------------+--------------------------------------------+
+| Influential (on person) | 0                                          |
++-------------------------+--------------------------------------------+
+| **Total**               | **3**                                      |
++-------------------------+--------------------------------------------+
 
 ### WorksFor
 
@@ -463,27 +585,27 @@ Employees are contractually obligated to act in the interests of their employer.
 
 Employers also influence what their employees do in the business.
 
-+-------------------------+------------------------------------------------+
-| Current **From**        | Owner                                          |
-+-------------------------+------------------------------------------------+
-| Current **To**          | Company                                        |
-+-------------------------+------------------------------------------------+
-| New **From\             | Company                                        |
-| **(Lower power)         |                                                |
-+-------------------------+------------------------------------------------+
-| New **To\               | Owner                                          |
-| **(Higher power)        |                                                |
-+-------------------------+------------------------------------------------+
-| New **subtype**         | OwnedBy                                        |
-+-------------------------+------------------------------------------------+
-| Beneficiary             | 1 + 1                                          |
-+-------------------------+------------------------------------------------+
-| Decision-maker          | 2 + 1                                          |
-+-------------------------+------------------------------------------------+
-| Influential (on person) | 0                                              |
-+-------------------------+------------------------------------------------+
-| **Total**               | **5**                                          |
-+-------------------------+------------------------------------------------+
++-------------------------+--------------------------------------------+
+| Current **From**        | Owner                                      |
++-------------------------+--------------------------------------------+
+| Current **To**          | Company                                    |
++-------------------------+--------------------------------------------+
+| New **From\             | Company                                    |
+| **(Lower power)         |                                            |
++-------------------------+--------------------------------------------+
+| New **To\               | Owner                                      |
+| **(Higher power)        |                                            |
++-------------------------+--------------------------------------------+
+| New **subtype**         | OwnedBy                                    |
++-------------------------+--------------------------------------------+
+| Beneficiary             | 1 + 1                                      |
++-------------------------+--------------------------------------------+
+| Decision-maker          | 2 + 1                                      |
++-------------------------+--------------------------------------------+
+| Influential (on person) | 0                                          |
++-------------------------+--------------------------------------------+
+| **Total**               | **5**                                      |
++-------------------------+--------------------------------------------+
 
 ### FamilyRelationship
 
@@ -491,28 +613,28 @@ Assuming that family members have a healthy relationship, they share resources a
 
 Due to this, they have power over each other.
 
-+-------------------------+------------------------------------------------+
-| Current **From**        | Person 1                                       |
-+-------------------------+------------------------------------------------+
-| Current **To**          | Person 2                                       |
-+-------------------------+------------------------------------------------+
-| New **From\             | Person 2 (additional)                          |
-| **(Lower power)         |                                                |
-+-------------------------+------------------------------------------------+
-| New **To\               | Person 2                                       |
-| **(Higher power)        |                                                |
-|                         | (additional)                                   |
-+-------------------------+------------------------------------------------+
-| New **subtype**         | FamilyRelationship                             |
-+-------------------------+------------------------------------------------+
-| Beneficiary             | 1                                              |
-+-------------------------+------------------------------------------------+
-| Decision-maker          | 0                                              |
-+-------------------------+------------------------------------------------+
-| Influential (on person) | 1                                              |
-+-------------------------+------------------------------------------------+
-| **Total**               | **2**                                          |
-+-------------------------+------------------------------------------------+
++-------------------------+--------------------------------------------+
+| Current **From**        | Person 1                                   |
++-------------------------+--------------------------------------------+
+| Current **To**          | Person 2                                   |
++-------------------------+--------------------------------------------+
+| New **From\             | Person 2 (additional)                      |
+| **(Lower power)         |                                            |
++-------------------------+--------------------------------------------+
+| New **To\               | Person 2                                   |
+| **(Higher power)        |                                            |
+|                         | (additional)                               |
++-------------------------+--------------------------------------------+
+| New **subtype**         | FamilyRelationship                         |
++-------------------------+--------------------------------------------+
+| Beneficiary             | 1                                          |
++-------------------------+--------------------------------------------+
+| Decision-maker          | 0                                          |
++-------------------------+--------------------------------------------+
+| Influential (on person) | 1                                          |
++-------------------------+--------------------------------------------+
+| **Total**               | **2**                                      |
++-------------------------+--------------------------------------------+
 :::
 
 ::: {.callout-caution appearance="simple"}
@@ -527,6 +649,11 @@ Using the table above, we will create a function to convert relationship edges t
 #| file: helpers/convert_edges_to_power_flow.R
 ```
 
+```{r}
+#| echo: false
+convert_edges_to_power_flow <- source("helpers/convert_edges_to_power_flow.R", local = knitr::knit_global())$value
+```
+
 Let us check the resulting edges table. We are expecting that all edge types would have the same number, expect for *FamilyRelationship*, which is expected to **double**.
 
 ::: panel-tabset
@@ -534,7 +661,7 @@ Let us check the resulting edges table. We are expecting that all edge types wou
 
 ```{r}
 supernetwork %>%
-  activate(edges) %>% as.data.frame() %>%
+  as_data_frame(what = "edges") %>%
   group_by(supertype, subtype) %>%
   summarize(count = n()) %>%
   arrange(-count) %>%
@@ -545,8 +672,8 @@ supernetwork %>%
 
 ```{r}
 supernetwork %>%
-  convert_graph_to_power_flow() %>%
-  activate(edges) %>% as.data.frame() %>%
+  as_data_frame(what = "edges") %>%
+  convert_edges_to_power_flow() %>%
   group_by(supertype, subtype) %>%
   summarize(count = n()) %>%
   arrange(-count) %>%
@@ -562,6 +689,11 @@ Using the edge converter, we will generate a new `tbl_graph` with the power flow
 #| file: helpers/convert_graph_to_power_flow.R
 ```
 
+```{r}
+#| echo: false
+convert_graph_to_power_flow <- source("helpers/convert_graph_to_power_flow.R", local = knitr::knit_global())$value
+```
+
 ## 5.6 Plotting the power graph
 
 Similar to [4.2 Plotting the subnetworks], we will look at 3 subnetworks related to *SouthSeafood Express Corp*.
@@ -572,6 +704,11 @@ We will use `plot_fishing_power()` to plot the relationship graph of the network
 #| code-fold: true
 #| code-summary: 'Show the code for plot_fishing_power()'
 #| file: helpers/plot_fishing_power.R
+```
+
+```{r}
+#| echo: false
+plot_fishing_power <- source("helpers/plot_fishing_power.R", local = knitr::knit_global())$value
 ```
 
 ::: panel-tabset
@@ -712,12 +849,17 @@ sfec_connected_network_power <- supernetwork %>%
 
 ## 6.3 Identifying the most powerful nodes
 
-We will use `plot_centrality` to visualize
+We will use `plot_centrality` to identify the most powerful nodes by visualizing the **pagerank centrality** of the nodes.
 
 ```{r}
 #| code-fold: true
 #| code-summary: 'Show the code for plot_centrality()'
 #| file: helpers/plot_centrality.R
+```
+
+```{r}
+#| echo: false
+plot_centrality <- source("helpers/plot_centrality.R", local = knitr::knit_global())$value
 ```
 
 ### 6.3.1 Sphere of Influence
@@ -738,10 +880,9 @@ sfec_sphere_of_influence_power %>%
 
 ```{r}
 sfec_sphere_of_influence_power %>%
-  activate(nodes) %>%
-  as.data.frame() %>%
+  as_data_frame(what = "vertices") %>%
   arrange(-pagerank_score) %>%
-  select(name, alias, supertype, subtype, pagerank_score) %>%
+  select(alias, pagerank_score, supertype, subtype) %>%
   kable()
 ```
 :::
@@ -776,10 +917,9 @@ sfec_connected_network_power %>%
 
 ```{r}
 sfec_connected_network_power %>%
-  activate(nodes) %>%
-  as.data.frame() %>%
+  as_data_frame(what = "vertices") %>%
   arrange(-pagerank_score) %>%
-  select(name, alias, supertype, subtype, pagerank_score) %>%
+  select(alias, pagerank_score, supertype, subtype) %>%
   kable()
 ```
 :::
@@ -814,10 +954,9 @@ sfec_sphere_of_influence_power %>%
 
 ```{r}
 sfec_sphere_of_influence_power %>%
-  activate(nodes) %>%
-  as.data.frame() %>%
+  as_data_frame(what = "vertices") %>%
   arrange(-betweenness_score) %>%
-  select(name, alias, supertype, subtype, betweenness_score) %>%
+  select(alias, betweenness_score, supertype, subtype) %>%
   kable()
 ```
 :::
@@ -850,10 +989,9 @@ sfec_connected_network_power %>%
 
 ```{r}
 sfec_connected_network_power %>%
-  activate(nodes) %>%
-  as.data.frame() %>%
+  as_data_frame(what = "vertices") %>%
   arrange(-betweenness_score) %>%
-  select(name, alias, supertype, subtype, betweenness_score) %>%
+  select(alias, betweenness_score, supertype, subtype) %>%
   kable()
 ```
 :::
