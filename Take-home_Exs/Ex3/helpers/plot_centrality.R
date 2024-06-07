@@ -9,7 +9,7 @@ plot_centrality <- function(graph,
                             # Texts
                             title = NULL,
                             subtitle = NULL,
-                            caption = STYLES$default_caption,
+                            caption = paste("*Bigger and brighter nodes are more influential.", STYLES$default_caption),
                             # Plot styling
                             arrow_margin = STYLES$arrow_margin / 2,
                             edge_thickness = STYLES$base_edge_thickness,
@@ -23,7 +23,7 @@ plot_centrality <- function(graph,
   
   centrality_col <- paste0(centrality, "_score")
   nodes <- graph %>% activate(nodes) %>% as.data.frame()
-  score_boundary <- nodes[[centrality_col]] %>% quantile(probs = 0.75)
+  score_boundary <- (nodes[[centrality_col]] %>% max()) * 0.6
   
   edges <- graph %>% activate(edges) %>% as.data.frame()
   max_weight <- edges$weight %>% max()
@@ -36,14 +36,15 @@ plot_centrality <- function(graph,
         x = x,
         y = y,
         data_id = name,
-        tooltip = sprintf("%s(%s)<br/>Score:%0.5f", name, subtype, .data[[centrality_col]]),
+        tooltip = sprintf("%s (%s)<br/>Score: %0.5f", name, subtype, .data[[centrality_col]]),
         # To show people as triangle, organizations as circle
         # See scale_shape_manual code below
         shape = supertype,
         # Get centrality measures from a column
-        color = .data[[centrality_col]],
+        fill = .data[[centrality_col]],
         size = .data[[centrality_col]],
-      )
+      ),
+      color = STYLES$node_border_color
     ) +
     geom_node_text(
       aes(label = alias),
@@ -70,7 +71,7 @@ plot_centrality <- function(graph,
     scale_edge_color_manual(values = MAPPINGS$edge_power_subtype_to_color) +
     
     # Centrality visualization
-    scale_color_gradient(
+    scale_fill_gradient(
       high = ifelse(
         centrality == "pagerank",
         STYLES$primary_color,
@@ -92,7 +93,7 @@ plot_centrality <- function(graph,
     
     # Change legend names
     labs(
-      color = ifelse(
+      fill = ifelse(
         centrality == "pagerank",
         "PageRank Score",
         "Betweenness Score"
@@ -107,9 +108,16 @@ plot_centrality <- function(graph,
     
     # Style legend keys
     guides(
-      shape = guide_legend(override.aes = list(size = 3, color = STYLES$primary_color), order = 1),
+      shape = guide_legend(
+        override.aes = list(
+          size = 3,
+          color = STYLES$node_border_color,
+          fill = STYLES$primary_color
+        ),
+        order = 1
+      ),
       edge_color = guide_legend(order = 2),
-      color = guide_colorbar(order = 3)
+      fill = guide_colorbar(order = 3)
     ) +
     
     # Style graph

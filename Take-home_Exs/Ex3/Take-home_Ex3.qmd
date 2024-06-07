@@ -60,13 +60,16 @@ STYLES = list(
   font_family = "Roboto Condensed",
   # Colors
   primary_color = "blue",
-  primary_light_color = "cornflowerblue",
+  #primary_light_color = "#e6e6ff",
+  primary_light_color = "white",
   secondary_color = "darkorange",
-  secondary_light_color = "peachpuff",
+  secondary_light_color = "white",
   muted_color = "grey50",
+  title_color = "grey25",
   normal_text_color = "grey50",
   # Graph
   node_size = 7.5,
+  node_border_color = "grey25",
   arrow_margin = 3.2,
   arrow_style = arrow(type = "closed", length = unit(2, "pt")),
   base_edge_thickness = 0.2,
@@ -78,7 +81,7 @@ STYLES = list(
   node_label_dark = "black",
   node_label_light = "white",
 
-  default_caption = "Hover on the nodes to see their full names",
+  default_caption = "Hover on the nodes to see more details.",
   # Interactive elemnents
   tooltip_css = paste0(
     "background-color:black;color:white;",
@@ -92,36 +95,33 @@ STYLES = list(
 
 ### Theme Elements
 
-Common theme elements, another `theme()` definition can be used if these elements need to be overriden.
+Common theme elements, another `theme()` definition can be used if these elements need to be overridden.
 
 ```{r}
 COMMON_THEME = theme(
-  text = element_text(family = STYLES$font_family),
+  text = element_text(family = STYLES$font_family, color = STYLES$normal_text_color),
   plot.title = element_markdown(
+    color = STYLES$title_color,
     face = "bold",
-    color = STYLES$primary_color,
     size = unit(10, "pt")
   ),
-  plot.subtitle = element_markdown(color = STYLES$normal_text_color, size = unit(8, "pt")),
-  ,
-  plot.caption = element_markdown(
-    color = STYLES$normal_text_color,
-    size = unit(6, "pt"),
-    hjust = 0
-  ),
+  plot.subtitle = element_markdown(size = unit(8, "pt")),
+  plot.caption = element_markdown(size = unit(6, "pt"), hjust = 0),
   plot.margin = margin(2, 0, 0, 0, unit = "pt"),
   
   # Legend styles
   legend.position = "right",
   legend.location = "plot",
+  legend.justification = "top",
   legend.title = element_markdown(
-    size = unit(8, "pt"),
+    color = STYLES$title_color,
     face = "bold",
-    color = "grey30"
+    size = unit(8, "pt")
   ),
-  legend.text = element_text(size = unit(6, "pt"), vjust = 0.45),
+  legend.text = element_text(size = unit(6, "pt"), vjust = 0.5),
   legend.box.spacing = unit(4, "pt"),
   legend.margin = margin(0),
+  legend.spacing.x = unit(2, "pt"),
   legend.spacing.y = unit(8, "pt"),
   legend.key.size = unit(12, "pt"),
   
@@ -139,8 +139,8 @@ COMMON_THEME = theme(
 MAPPINGS = list(
   # Available shapes: https://www.datanovia.com/en/blog/ggplot-point-shapes-best-tips/
   node_supertype_to_shape = c(
-    "Person" = 17, # Triangle
-    "Organization" = 16 # Circle
+    "Person" = 24, # Triangle
+    "Organization" = 21 # Circle
   ),
   # Color schemes
   # Colorblind pallettes from https://davidmathlogic.com/colorblind
@@ -261,7 +261,7 @@ With the considerations above, we will shape the data needed for our graph visua
 
 For nodes, we will also assign a shape for visualization depending on *supertype.* For people, we will use 📐, while we use 🔴 for organizations.
 
-Lastly, we will assign alias to each node as an alternative label to the names (as they are long). This will be generated using initials of the name.
+Lastly, we will assign alias to each node as an alternative label to the names (as they are long). This will be generated using the first 4 initials of the name
 
 ```{r}
 #| file: helpers/to_initials.R
@@ -527,27 +527,31 @@ Beneficial owners benefit from the resources of the company.
 
 While BeneficialOwners may or may not be Shareholders in the same company, they hold the ultimate decision-making power.
 
-+-------------------------+--------------------------------------------+
-| Current **From**        | Owner                                      |
-+-------------------------+--------------------------------------------+
-| Current **To**          | Company                                    |
-+-------------------------+--------------------------------------------+
-| New **From\             | Company                                    |
-| **(Lower power)         |                                            |
-+-------------------------+--------------------------------------------+
-| New **To\               | Owner                                      |
-| **(Higher power)        |                                            |
-+-------------------------+--------------------------------------------+
-| New **subtype**         | OwnedBy                                    |
-+-------------------------+--------------------------------------------+
-| Beneficiary             | 1 + 1                                      |
-+-------------------------+--------------------------------------------+
-| Decision-maker          | 2 + 1                                      |
-+-------------------------+--------------------------------------------+
-| Influential (on person) | 0                                          |
-+-------------------------+--------------------------------------------+
-| **Total**               | **5**                                      |
-+-------------------------+--------------------------------------------+
+Current From
+
++-------------------------+-------------------------------------+
+| Current **From**        | Owner                               |
++-------------------------+-------------------------------------+
+| Current **To**          | Company                             |
++-------------------------+-------------------------------------+
+| New **From\             | Company                             |
+| **(Lower power)         |                                     |
++-------------------------+-------------------------------------+
+| New **To\               | Owner                               |
+| **(Higher power)        |                                     |
++-------------------------+-------------------------------------+
+| New **subtype**         | OwnedBy                             |
++-------------------------+-------------------------------------+
+| Beneficiary             | 1 + 1                               |
++-------------------------+-------------------------------------+
+| Decision-maker          | 2 + 1                               |
++-------------------------+-------------------------------------+
+| Influential (on person) | 0                                   |
++-------------------------+-------------------------------------+
+| **Total**               | **5**                               |
++-------------------------+-------------------------------------+
+
+: Owner
 
 ### Shareholdership
 
@@ -555,29 +559,27 @@ Shareholders may receive proceeds from the profits of the company.
 
 They have some decision-making power within the company. However, it is the Beneficial Owner that ultimately gets the final say in decisions.
 
-+-------------------------+--------------------------------------------+
-|                         | Shareholdership                            |
-+=========================+============================================+
-| Current **From**        | Shareholder                                |
-+-------------------------+--------------------------------------------+
-| Current **To**          | Company                                    |
-+-------------------------+--------------------------------------------+
-| New **From\             | Company                                    |
-| **(Lower power)         |                                            |
-+-------------------------+--------------------------------------------+
-| New **To\               | Shareholder                                |
-| **(Higher power)        |                                            |
-+-------------------------+--------------------------------------------+
-| New **subtype**         | HasShareholder                             |
-+-------------------------+--------------------------------------------+
-| Beneficiary             | 1                                          |
-+-------------------------+--------------------------------------------+
-| Decision-maker          | 2                                          |
-+-------------------------+--------------------------------------------+
-| Influential (on person) | 0                                          |
-+-------------------------+--------------------------------------------+
-| **Total**               | **3**                                      |
-+-------------------------+--------------------------------------------+
++-------------------------+-------------------------------------+
+| Current **From**        | Shareholder                         |
++-------------------------+-------------------------------------+
+| Current **To**          | Company                             |
++-------------------------+-------------------------------------+
+| New **From\             | Company                             |
+| **(Lower power)         |                                     |
++-------------------------+-------------------------------------+
+| New **To\               | Shareholder                         |
+| **(Higher power)        |                                     |
++-------------------------+-------------------------------------+
+| New **subtype**         | HasShareholder                      |
++-------------------------+-------------------------------------+
+| Beneficiary             | 1                                   |
++-------------------------+-------------------------------------+
+| Decision-maker          | 2                                   |
++-------------------------+-------------------------------------+
+| Influential (on person) | 0                                   |
++-------------------------+-------------------------------------+
+| **Total**               | **3**                               |
++-------------------------+-------------------------------------+
 
 ### WorksFor
 
@@ -585,27 +587,27 @@ Employees are contractually obligated to act in the interests of their employer.
 
 Employers also influence what their employees do in the business.
 
-+-------------------------+--------------------------------------------+
-| Current **From**        | Owner                                      |
-+-------------------------+--------------------------------------------+
-| Current **To**          | Company                                    |
-+-------------------------+--------------------------------------------+
-| New **From\             | Company                                    |
-| **(Lower power)         |                                            |
-+-------------------------+--------------------------------------------+
-| New **To\               | Owner                                      |
-| **(Higher power)        |                                            |
-+-------------------------+--------------------------------------------+
-| New **subtype**         | OwnedBy                                    |
-+-------------------------+--------------------------------------------+
-| Beneficiary             | 1 + 1                                      |
-+-------------------------+--------------------------------------------+
-| Decision-maker          | 2 + 1                                      |
-+-------------------------+--------------------------------------------+
-| Influential (on person) | 0                                          |
-+-------------------------+--------------------------------------------+
-| **Total**               | **5**                                      |
-+-------------------------+--------------------------------------------+
++-------------------------+-------------------------------------+
+| Current **From**        | Owner                               |
++-------------------------+-------------------------------------+
+| Current **To**          | Company                             |
++-------------------------+-------------------------------------+
+| New **From\             | Company                             |
+| **(Lower power)         |                                     |
++-------------------------+-------------------------------------+
+| New **To\               | Owner                               |
+| **(Higher power)        |                                     |
++-------------------------+-------------------------------------+
+| New **subtype**         | OwnedBy                             |
++-------------------------+-------------------------------------+
+| Beneficiary             | 1 + 1                               |
++-------------------------+-------------------------------------+
+| Decision-maker          | 2 + 1                               |
++-------------------------+-------------------------------------+
+| Influential (on person) | 0                                   |
++-------------------------+-------------------------------------+
+| **Total**               | **5**                               |
++-------------------------+-------------------------------------+
 
 ### FamilyRelationship
 
@@ -613,28 +615,28 @@ Assuming that family members have a healthy relationship, they share resources a
 
 Due to this, they have power over each other.
 
-+-------------------------+--------------------------------------------+
-| Current **From**        | Person 1                                   |
-+-------------------------+--------------------------------------------+
-| Current **To**          | Person 2                                   |
-+-------------------------+--------------------------------------------+
-| New **From\             | Person 2 (additional)                      |
-| **(Lower power)         |                                            |
-+-------------------------+--------------------------------------------+
-| New **To\               | Person 2                                   |
-| **(Higher power)        |                                            |
-|                         | (additional)                               |
-+-------------------------+--------------------------------------------+
-| New **subtype**         | FamilyRelationship                         |
-+-------------------------+--------------------------------------------+
-| Beneficiary             | 1                                          |
-+-------------------------+--------------------------------------------+
-| Decision-maker          | 0                                          |
-+-------------------------+--------------------------------------------+
-| Influential (on person) | 1                                          |
-+-------------------------+--------------------------------------------+
-| **Total**               | **2**                                      |
-+-------------------------+--------------------------------------------+
++-------------------------+-------------------------------------+
+| Current **From**        | Person 1                            |
++-------------------------+-------------------------------------+
+| Current **To**          | Person 2                            |
++-------------------------+-------------------------------------+
+| New **From\             | Person 2 (additional)               |
+| **(Lower power)         |                                     |
++-------------------------+-------------------------------------+
+| New **To\               | Person 2                            |
+| **(Higher power)        |                                     |
+|                         | (additional)                        |
++-------------------------+-------------------------------------+
+| New **subtype**         | FamilyRelationship                  |
++-------------------------+-------------------------------------+
+| Beneficiary             | 1                                   |
++-------------------------+-------------------------------------+
+| Decision-maker          | 0                                   |
++-------------------------+-------------------------------------+
+| Influential (on person) | 1                                   |
++-------------------------+-------------------------------------+
+| **Total**               | **2**                               |
++-------------------------+-------------------------------------+
 :::
 
 ::: {.callout-caution appearance="simple"}
@@ -1002,6 +1004,64 @@ sfec_connected_network_power %>%
 Similar to the smaller network, the power brokers in the bigger network are the companies owned by **Conti Clan** members. These companies transfer the power and resources from the wider network to them.
 
 These are **StichtingMarine Shipping Company**, **GvardeyskAmerica Shipping Plc**, **NamRiver Transit A/S**, **Namorna Transit Ltd**.
+:::
+
+## 6.5 Curious case of Sanaa El-Amin
+
+Consider the influential entities within **Sanaa El-Amin**'s sphere of influence. She is also within *SouthSeafood Express Corp*'s connected network.
+
+```{r}
+sea_sphere_of_influence_power <- supernetwork %>%
+  extract_subnetwork(node_name = "Sanaa El-Amin", distance = 3) %>%
+  convert_graph_to_power_flow() %>%
+  mutate(
+    pagerank_score = centrality_pagerank(weights = E(.)$weight),
+    betweenness_score = centrality_betweenness(weights = E(.)$weight, normalized = TRUE)
+  )
+```
+
+::: panel-tabset
+### Most Powerful
+
+```{r}
+sea_sphere_of_influence_power %>%
+  plot_centrality(
+    "pagerank",
+    title = "The Power Brokers in Sanaa El-Amin's Sphere of Influence",
+    subtitle = "A higher value of **betweenness centrality** means the entity is more capable of connecting entities."
+  )
+```
+
+### Power Brokers
+
+```{r}
+sea_sphere_of_influence_power %>%
+  plot_centrality(
+    "betweenness",
+    title = "The Power Brokers in Sanaa El-Amin's Sphere of Influence",
+    subtitle = "A higher value of **betweenness centrality** means the entity is more capable of connecting entities."
+  )
+```
+:::
+
+**Sanaa El-Amin** is **not influential**, according to the metrics that we set but she works with a lot of companies in the network. This includes **GvardeyskAmerica Shipping Plc** , **NamRiver Transit A/S**, and **StichtingMarine Shipping Company**, which are the strongest *power brokers* in the network.
+
+It can imply that she is an expert in the industry so various companies hire her (perhaps as a consultant). Although she does not own any companies, nor hold shares in any, she may hold some influence in the network as **influential companies depend on her services**.
+
+### 6.5.1 Measures of centrality to identify this influence
+
+Possible measures of centrality that can identify her influence could be **eigenvector centrality**. In eigenvector centrality, the principle *the more influential your neighbors are, the more influential you are.* This can be interpreted such that her association with influential companies also gives her influence.
+
+Other measures of centrality that can identify this particular are **hub centrality** (due to her direct connection with influential nodes) and **degree centrality** (due to the number of outgoing edges).
+
+::: callout-tip
+#### Do we update the power model?
+
+Despite this observation, we will **not** update the power model, nor add another measure of centrality to our visualizations.
+
+This is because we acknowledged that the model we created in [5.3 Score tables] is imperfect and we lack information to model the power dynamics in the network accurately.
+
+However, it is enough that we learn that our model will **not identify** all influential people in the network, and can even mis-identify some entities as influential.
 :::
 
 # 7 Power Flow
