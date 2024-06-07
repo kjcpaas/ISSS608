@@ -1,0 +1,142 @@
+---
+title: "Hands-on Exercise 8B: Visualising Geospatial Point Data"
+author: "Kristine Joy Paas"
+date: "7 June 2024"
+date-modified: "last-modified"
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+  freeze: true
+---
+
+# 1 Overview
+
+This hands-on exercise covers [Chapter 22: Visualising Geospatial Point Data](https://r4va.netlify.app/chap22).
+
+In this exercise, I learned:
+
+-   To import an aspatial data file into R.
+
+-   To convert it into simple point feature data frame and at the same time, to assign an appropriate projection reference to the newly create simple point feature data frame.
+
+-   To plot interactive proportional symbol maps.
+
+# 2 Getting Started
+
+## 2.1 Loading the required packages
+
+For this exercise we will use the following R packages:
+
+-   **sf**: for processing geospatial data
+
+-   **tidyverse**: data analytics tools for r
+
+-   **tmap**: for generating maps
+
+```{r}
+pacman::p_load(sf, tmap, tidyverse)
+```
+
+## 2.2 Importing data
+
+The data set use for this hands-on exercise is called *SGPools_svy21*. The data is in csv file format.
+
+```{r}
+sgpools <- read_csv("data/aspatial/SGPools_svy21.csv")
+head(sgpools)
+```
+
+It contains a list SG Pools outlets, and their corresponding geospatial data (**XCOORD**, **YCOORD**) that we can use to plot them in a map.
+
+# 3 Data Wrangling
+
+To work with `sf` we need to convert this data to the appropriate type:
+
+```{r}
+sgpools_sf <- st_as_sf(sgpools, 
+                       coords = c("XCOORD", "YCOORD"),
+                       crs= 3414)
+```
+
+-   `coords`: specify which columns the coordinate information are in
+
+-   `crs`: to provide the coordinates system in epsg format. [EPSG: 3414](https://epsg.io/3414) is Singapore SVY21 Projected Coordinate System. You can search for other country’s epsg code by refering to [epsg.io](https://epsg.io/).
+
+```{r}
+head(sgpools_sf)
+```
+
+This contains a `geometry` column which contains the geospatial representation of the provided coordinates. In this case. there are `point` data.
+
+# 4 Drawing Proportional Symbol Map
+
+To create an interactive proportional symbol map in R, the view mode of tmap will be used.
+
+The code churn below will turn on the interactive mode of tmap.
+
+```{r}
+tmap_mode("view")
+```
+
+## 4.1 Plotting an interactive point symbol map
+
+```{r}
+tm_shape(sgpools_sf)+
+tm_bubbles(col = "red",
+           size = 1,
+           border.col = "black",
+           border.lwd = 1)
+```
+
+## 4.2 Proportional point sizes
+
+The bubbles in the map above have the same sizes. Let's make the bubbles bigger the higher the winnings are.
+
+```{r}
+tm_shape(sgpools_sf)+
+tm_bubbles(col = "red",
+           size = "Gp1Gp2 Winnings",
+           border.col = "black",
+           border.lwd = 1)
+```
+
+## 4.3 Assign colors
+
+The proportional symbol map can be further improved by using the colour visual attribute. In the code chunks below, *OUTLET_TYPE* variable is used as the colour attribute variable.
+
+```{r}
+tm_shape(sgpools_sf)+
+tm_bubbles(col = "OUTLET TYPE", 
+          size = "Gp1Gp2 Winnings",
+          border.col = "black",
+          border.lwd = 1)
+```
+
+## 4.4 Adding facets
+
+The argument *sync* in *tm_facets()* can be used to produce multiple maps with synchronised zoom and pan settings.
+
+```{r}
+tm_shape(sgpools_sf) +
+  tm_bubbles(col = "OUTLET TYPE", 
+          size = "Gp1Gp2 Winnings",
+          border.col = "black",
+          border.lwd = 1) +
+  tm_facets(by= "OUTLET TYPE",
+            nrow = 1,
+            sync = TRUE)
+```
+
+Switch back to non-interactive mode
+
+```{r}
+tmap_mode("plot")
+```
+
+# 5 Reflections
+
+During ISSS624, I rarely use interactive plots as it was using up a lot for resources. However, doing it the non-interactive way was more tedious as I had to do additional wrangling of the map use in the background (in this case, Singapore map).
+
+However, the interactive map has a lot of features that I like (e.g. synchronized facets) so I'll try to use it more.

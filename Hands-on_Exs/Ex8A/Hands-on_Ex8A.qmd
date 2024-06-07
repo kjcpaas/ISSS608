@@ -1,0 +1,36 @@
+---
+title: "Hands-on Exercise 8A: Choropleth Mapping with R"
+author: "Kristine Joy Paas"
+date: "7 June 2024"
+date-modified: "last-modified"
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+  freeze: true
+---
+
+# 1 Overview
+
+This hands-on exercise covers [Chapter 21: Choropleth Mapping with R](https://r4va.netlify.app/chap21).
+
+::: callout-note
+## ISSS624 Geospatial Analytics Applications
+
+As I took ISSS624 during the Nov term, this is just a refresher for me. I revised using my previous work.
+
+Please refer to my previous work in this chapter: <https://isss624-kjcpaas.netlify.app/hands-on_ex1/hands-on_ex1b>
+
+The notes I have here are more of additional learnings.
+:::
+
+# 2 Reflections
+
+During ISSS624, I worked with R for the first time so my learning was split towards learning R and learning about geospatial visualization with `tmap`.
+
+During that class I was just following the code examples, reading the documentations a bit but I didn't have an understanding of Grammar of Graphics.
+
+The interface of `tmap` is also quite different to `ggplot2`, especially around themes that I already familiarized myself in,
+
+This time around, I will try to improve on my previous work using the learnings from this class.
