@@ -3,8 +3,6 @@ plot_centrality <- function(graph,
                             # pagerank: for most powerful nodes
                             # betweeness: for power brokers
                             centrality,
-                            # Name of nodes to emphasize
-                            emphasize_nodes = c(),
                             # Layout options
                             layout = "nicely",
                             circular = FALSE,
@@ -46,17 +44,7 @@ plot_centrality <- function(graph,
         fill = .data[[centrality_col]],
         size = .data[[centrality_col]],
       ),
-      # Thicken border if emphasized
-      color = ifelse(
-        nodes$name %in% emphasize_nodes,
-        STYLES$node_emphasized_border_color,
-        STYLES$node_border_color
-      ),
-      stroke = ifelse(
-        nodes$name %in% emphasize_nodes,
-        STYLES$node_emphasized_border_stroke,
-        STYLES$node_border_stroke
-      ),
+      color = STYLES$node_border_color
     ) +
     geom_node_text(
       aes(label = alias),
@@ -67,8 +55,7 @@ plot_centrality <- function(graph,
         nodes[[centrality_col]] < score_boundary,
         STYLES$node_label_dark,
         STYLES$node_label_light
-      ),
-      fontface = ifelse(nodes$name %in% emphasize_nodes, "bold", "plain"),
+      )
     ) +
     
     # Render edges. Use geom_edge fan so edges along the same path don't overlap
@@ -124,6 +111,7 @@ plot_centrality <- function(graph,
       shape = guide_legend(
         override.aes = list(
           size = 3,
+          color = STYLES$node_border_color,
           fill = STYLES$primary_color
         ),
         order = 1

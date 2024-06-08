@@ -1,5 +1,6 @@
 plot_fishing_power <- function(graph,
-                               # The network to plot
+                               # Name of nodes to emphasize
+                               emphasize_nodes = c(),
                                # Layout options
                                layout = "nicely",
                                circular = FALSE,
@@ -14,7 +15,8 @@ plot_fishing_power <- function(graph,
                                # Seed
                                seed_num = CONFIGS$default_seed) {
   set.seed(seed_num)
-  edges <- graph %>% activate(edges) %>% as.data.frame()
+  nodes <- as_data_frame(graph, what = "vertices")
+  edges <- as_data_frame(graph, what = "edges")
   max_weight <- edges$weight %>% max()
   min_weight <- edges$weight %>% min()
   g <- ggraph(graph, layout = layout, circular = circular) +
@@ -31,13 +33,24 @@ plot_fishing_power <- function(graph,
         shape = supertype,
       ),
       size = node_size,
-      color = STYLES$node_border_color
+      # Thicken border if emphasized
+      color = ifelse(
+        nodes$name %in% emphasize_nodes,
+        STYLES$node_emphasized_border_color,
+        STYLES$node_border_color
+      ),
+      stroke = ifelse(
+        nodes$name %in% emphasize_nodes,
+        STYLES$node_emphasized_border_stroke,
+        STYLES$node_border_stroke
+      ),
     ) +
     geom_node_text(
       aes(label = alias),
       family = STYLES$font_family,
       size = STYLES$node_label_size,
-      color = STYLES$node_label_light
+      color = STYLES$node_label_light,
+      fontface = ifelse(nodes$name %in% emphasize_nodes, "bold", "plain"),
     ) +
     
     # Render edges. Use geom_edge fan so edges along the same path don't overlap
@@ -73,7 +86,6 @@ plot_fishing_power <- function(graph,
       shape = guide_legend(
         override.aes = list(
           size = 3,
-          color = STYLES$node_border_color,
           fill = STYLES$primary_color
         ),
         order = 1
