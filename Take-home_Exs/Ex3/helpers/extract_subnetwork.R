@@ -1,5 +1,5 @@
 extract_subnetwork <- function(graph, node_name, distance=NULL) {
-  node <- which(V(supernetwork)$name == node_name)
+  node <- which(V(graph)$name == node_name)
   distance <- ifelse(is.null(distance), length(graph), distance)
   vertices <- ego(graph, nodes = node, order = distance)[[1]]
   igraph_subgraph <- induced_subgraph(graph, vids = vertices)

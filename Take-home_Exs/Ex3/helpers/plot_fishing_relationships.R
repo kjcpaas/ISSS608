@@ -1,6 +1,8 @@
 plot_fishing_relationships <- function(graph,
                                        # Name of nodes to emphasize
                                        emphasize_nodes = c(),
+                                       # Date where to get the snapshot
+                                       datestring = NULL,
                                        # Layout options
                                        layout = "nicely",
                                        circular = FALSE,
@@ -15,6 +17,8 @@ plot_fishing_relationships <- function(graph,
                                        seed_num = CONFIGS$default_seed) {
   set.seed(seed_num)
   
+  date <- NULL
+  if(!is.null(datestring)) { date <- as_date(datestring) }
   nodes <- as_data_frame(graph, what = "vertices")
   
   g <- ggraph(graph, layout = layout, circular = circular) +
@@ -53,7 +57,18 @@ plot_fishing_relationships <- function(graph,
     
     # Render edges. Use geom_edge fan so edges along the same path don't overlap
     geom_edge_fan(
-      aes(color = subtype),
+      aes(
+        color = subtype,
+        # Will identify if the edge is active at this date, if not do not display
+        # Ideally this should be in a function but I can't figure out how to make it work inside aes
+        # Logic is same as is extract_network_snapshot.R
+        filter = ifelse(is.null(date) | is.na(start_date), TRUE,
+          ifelse(start_date <= date & (is.na(end_date) | end_date > date),
+                 TRUE,
+                 FALSE
+                 )
+        )
+      ),
       strength = 0.5,
       arrow = STYLES$arrow_style,
       end_cap = circle(arrow_margin, "mm"),
@@ -76,10 +91,7 @@ plot_fishing_relationships <- function(graph,
     # Style legend keys
     guides(
       shape = guide_legend(
-        override.aes = list(
-          size = 3,
-          fill = STYLES$primary_color
-        ),
+        override.aes = list(size = 3, fill = STYLES$primary_color),
         order = 1
       ),
       fill = guide_legend(

@@ -13,9 +13,31 @@ execute:
 
 # 1 Overview
 
--   MC3 intro
+In this exercise, we will be tacking [Mini-case 3](https://vast-challenge.github.io/2024/MC3.html) of [VAST Challenge 2024](https://vast-challenge.github.io/2024/index.html).
 
--   Analyze power flow
+We will answer **Questions 3 and 4** from the mini-challenge:
+
+> 3.  Develop a visual approach to examine inferences. Infer how the influence of a company changes through time. Can you infer ownership or influence that a network may have?
+>
+> 4.  Identify the network associated with SouthSeafood Express Corp and visualize how this network and competing businesses change as a result of their illegal fishing behavior. Which companies benefited from SouthSeafood Express Corp legal troubles? Are there other suspicious transactions that may be related to illegal fishing? Provide visual evidence for your conclusions.
+
+## 1.1 The data
+
+We will use the dataset provided by VAST Challenge. It is a network data that contains nodes that represent the different entities in the fishing business industry, and edges which represent the relationships between different entities.
+
+## 1.2 Methodology
+
+To answer this questions, we will investigate the changes in the fishing business community through time. We will do this by creating **animations of the network through time**.
+
+Secondly, we will identify the influential entities in the network. We will do this by first visually inspecting the network and making inferences.
+
+Lastly, we will use measures of centrality to verify our inferences.
+
+For the purposes of this exercise we will define 2 types of influential entity:
+
+-   Power holders - Those who hold the most power and beneficiary of resources in the network. We will use **pagerank** centrality to identify power holders
+
+-   Power brokers - Those who facilitate the transfer of power/resources from a less powerful entity to another. We will use **betweenness centrality** to identify power brokers
 
 # 2 Setup
 
@@ -28,7 +50,7 @@ pacman::p_load(
   tidyverse,
   ggraph,
   tidygraph,
-  visNetwork,
+  lubridate,
   patchwork,
   ggtext,
   knitr,
@@ -185,7 +207,7 @@ CONFIGS = list(
 
 ## 3.1 Extracting Graph Elements
 
-For simplicity, we will only extract the columns that are needed to do graph analysis. We will also *ignore* the time elements for now so we will not be including them in the analysis.
+We need to do time and network analysis so we will only include the columns needed to do these analysis.
 
 ::: panel-tabset
 ### Nodes
@@ -224,8 +246,12 @@ We will only retain the following columns:
 
 -   `type` - to identify the type of the relationship
 
+-   `start_date` - to identify when the relationship started
+
+-   `end_date` - to identify when the relationship ended
+
 ```{r}
-mc3_edges_lite <- mc3_edges_raw %>% select(source, target, type)
+mc3_edges_lite <- mc3_edges_raw %>% select(source, target, type, start_date, end_date)
 ```
 :::
 
@@ -316,10 +342,13 @@ mc3_edges_clean <- mc3_edges_lite %>%
       "Ownership",
       ifelse(grepl("Relationship", type), "Relationship", "Employment")
     ),
-    subtype = strsplit(type, ".", fixed = TRUE) %>% sapply(tail, n = 1)
+    subtype = strsplit(type, ".", fixed = TRUE) %>% sapply(tail, n = 1),
+    # Convert date strings to datetime
+    start_date = as_datetime(start_date),
+    end_date = as_datetime(end_date)
   ) %>%
   filter(from != to) %>%
-  group_by(from, to, supertype, subtype) %>%
+  group_by(from, to, supertype, subtype, start_date, end_date) %>%
   summarize(weight = n())
 
 kable(head(mc3_edges_clean))
@@ -342,14 +371,18 @@ We will prepare the supernetwork from the nodes and edges we prepared.
 
 ```{r}
 supernetwork = tbl_graph(edges = mc3_edges_clean,
-                         nodes = mc3_nodes_clean,
-                         directed = TRUE)
+                             nodes = mc3_nodes_clean,
+                             directed = TRUE)
 ```
 
 We call this a supernetwork as this covers the entire network of entities within the fishing business community.
 
 ```{r}
 #| echo: false
+# Save environment
+saveRDS(mc3_nodes_clean, "data/rds/mc3_nodes_clean.rds")
+saveRDS(mc3_edges_clean, "data/rds/mc3_nodes_edges.rds")
+saveRDS(supernetwork, "data/rds/supernetwork.rds")
 # Clean up environment
 rm(mc3_data)
 rm(mc3_nodes_raw, mc3_nodes_lite, mc3_nodes_clean)
@@ -357,7 +390,7 @@ rm(mc3_edges_raw, mc3_edges_lite, mc3_edges_clean)
 rm(to_initials)
 ```
 
-# 4 Extracting Subnetworks
+# 4 Extracting subnetworks
 
 ## 4.1 Extracting for ease of analysis
 
@@ -417,6 +450,12 @@ We call this the *Relationship Graph* as the provided graph shows the different 
 Later, we will tackle how to generate the *Power Graph* which will represent the power and flow of resources within the network.
 :::
 
+::: callout-important
+### No time component yet
+
+In this part, we just want to make a basic visualization so we can see earlier if we have processed the data appropriate for analysis.
+:::
+
 ::: panel-tabset
 ### Direct Neighbors
 
@@ -443,7 +482,7 @@ extract_subnetwork(
 
 As shareholders, **AguaLeska Transit N.V.** and **Tainamarine Fishing Co** have big influence on where the resources of *SouthSeafood Express Corp* go.
 
-In this case, most of it will most likely opposite of the arrow direction, i.e. benefitting the shareholders.
+In this case, most of it will most likely opposite of the arrow direction, i.e. benefiting the shareholders.
 :::
 
 ### Sphere of Influence
@@ -516,21 +555,185 @@ extract_subnetwork(
 
 With this sheer number of nodes, it is hard to easily infer any relationships aside from general estimate of how many of each entity and the type of relationships present in the system.
 
-We should consider using other tools that provide more interactivity, like `visNetwork`.
+To more easily make inferences about the network, we need to do 2 things:
 
-Later on, we will explore different centralities to help infer which entities are most influential in the network.
+-   Narrow down the relationships through time so we can make sense of the transactions in the network
+
+-   Use appropriate measures of centrality based on what we have in the [1.2 Methodology]
 :::
 :::
 
-# 5 Generating Power Graph
+# 5 Investigating network changes
+
+The plots we generated so far ignored the time component. However, the fishing business network is dynamic and changes through time.
+
+We need to visualize these changes.
+
+## 5.1 Extracting snapshots
+
+The base of this analysis is to capture a snapshot of a relationship in time.
+
+We will define a 2 functions to enable this:
+
+-   extract this network, which accepts a graph and date of the snapshot.
+
+-   figure out if an edge is active at that point in time
+
+```{r}
+#| file: helpers/extract_network_snapshot.R
+```
+
+```{r}
+extract_network_snapshot <- source("helpers/extract_network_snapshot.R", local = knitr::knit_global())$value
+```
+
+## 5.2 Change in SouthSeafood Express Corp network
+
+Let us look at the relationships of *SouthSeafood Express Corp.*
+
+```{r}
+supernetwork %>%
+  as_data_frame(what = "edges") %>%
+  filter(from == "SouthSeafood Express Corp" | to == "SouthSeafood Express Corp") %>%
+  kable()
+```
+
+This indicates a **Transfer of Shareholdership** from *AguaLeska Transit N.V.* to *Tainamarine Fishing Co* on **2035-05-25.**
+
+We will visualize relationships based on this date using 2 approaches:
+
+1.  Using `extract_network_snapshot()` to filter the active edges at that point in time, or
+2.  Making use of `filter` aesthetic in `geom_edge_fan` to hide the inactive edges
+
+### 5.2.1 By filtering our edges using extract_network_snapshot()
+
+::: panel-tabset
+#### Before 2035-05-25
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+extract_subnetwork(
+  supernetwork,
+  node_name="SouthSeafood Express Corp"
+) %>%
+  extract_network_snapshot("2035-05-24") %>%
+  plot_fishing_relationships(
+  emphasize_nodes = c("SouthSeafood Express Corp",
+                      "Tainamarine Fishing Co",
+                      "AguaLeska Transit N.V.",
+                      "StichtingMarine Shipping Company"),
+  node_size = 5,
+  arrow_margin = 2,
+  title = "Relationship Graph: SouthSeafood Express Corp's Full Network (May 24, 2035)",
+  subtitle = "This shows the full view of the network around SouthSeafood Express Corp in any way **after** the transfer of<br />shareholdership from <span style='color:blue;'>**AguaLeska Transit N.V.**</span> to <span style='color:blue;'>**Tainamarine Fishing Co**</span>."
+)
+```
+
+#### From 2035-05-25
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+extract_subnetwork(
+  supernetwork,
+  node_name="SouthSeafood Express Corp"
+) %>%
+  extract_network_snapshot("2035-05-25") %>%
+  plot_fishing_relationships(
+  emphasize_nodes = c("SouthSeafood Express Corp",
+                      "Tainamarine Fishing Co",
+                      "AguaLeska Transit N.V.",
+                      "StichtingMarine Shipping Company"),
+  node_size = 5,
+  arrow_margin = 2,
+  title = "Relationship Graph: SouthSeafood Express Corp's Full Network (May 25, 2035)",
+  subtitle = "This shows the full view of the network around SouthSeafood Express Corp in any way **after** the transfer of<br />shareholdership from <span style='color:blue;'>**AguaLeska Transit N.V.**</span> to <span style='color:blue;'>**Tainamarine Fishing Co**</span>."
+)
+```
+:::
+
+This visualization is difficult to compare as the layout changed due to the different edges.
+
+### 5.2.2 By hiding inactive edges
+
+::: panel-tabset
+#### Before 2035-05-25
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+extract_subnetwork(
+  supernetwork,
+  node_name="SouthSeafood Express Corp"
+) %>%
+  plot_fishing_relationships(
+  datestring = "2035-05-24",
+  emphasize_nodes = c("SouthSeafood Express Corp",
+                      "Tainamarine Fishing Co",
+                      "AguaLeska Transit N.V.",
+                      "StichtingMarine Shipping Company"),
+  node_size = 5,
+  arrow_margin = 2,
+  title = "Relationship Graph: SouthSeafood Express Corp's Full Network (May 24, 2035)",
+  subtitle = "This shows the full view of the network around SouthSeafood Express Corp in any way **before** the transfer of<br />shareholdership from <span style='color:blue;'>**AguaLeska Transit N.V.**</span> to <span style='color:blue;'>**Tainamarine Fishing Co**</span>."
+)
+```
+
+#### From 2035-05-25
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+extract_subnetwork(
+  supernetwork,
+  node_name="SouthSeafood Express Corp"
+) %>%
+  plot_fishing_relationships(
+  datestring = "2035-05-25",
+  emphasize_nodes = c("SouthSeafood Express Corp",
+                      "Tainamarine Fishing Co",
+                      "AguaLeska Transit N.V.",
+                      "StichtingMarine Shipping Company"),
+  node_size = 5,
+  arrow_margin = 2,
+  title = "Relationship Graph: SouthSeafood Express Corp's Full Network (May 25, 2035)",
+  subtitle = "This shows the full view of the network around SouthSeafood Express Corp in any way **after** the transfer of<br />shareholdership from <span style='color:blue;'>**AguaLeska Transit N.V.**</span> to <span style='color:blue;'>**Tainamarine Fishing Co**</span>."
+)
+```
+:::
+
+The layout is intact, making it easier to identify which relationships changed.
+
+::: callout-tip
+## Insights
+
+The change of shareholders put *SouthSeafood Express Corp* farther away (distance of 2 to 4) from *StichtingMarine Shipping Company,* a company owned by **Liam Conti** and **Fintan Park.** This puts *StichtingMarine Shipping Company* **outside of SouthSeafood Express Corp's sphere of influence**.
+
+This can be an effort to **distance the owners** from *SouthSeafood Express Corp*'*s* illegal activity, especially as it is put under the non-fishing company branch of *StichtingMarine Shipping Company* (under *Namorna Transit Ltd* and *V. Miesel Shipping*).
+:::
+
+### 5.2.3 Visualization Decision - Hide inactive edges
+
+We will hide inactive edges so that the nodes don't move upon re-rendering, and makes it easy to compare.
+
+::: {.callout-note appearance="simple"}
+#### About animations
+
+Animations for network plots don't seem to be fully supported by both `plotly` (`geom_edge_line` and `geom_edge_fan` are not rendered) and `gganimate` (does not accept `ggraph` plot)
+
+Instead of animations, we will just use Quarto's **tabset** to show the changes. For the project, we can use Shiny's functions to simulate animations.
+:::
+
+# 6 Generating Power Graph
 
 To figure out who are the most influential or greatest beneficiaries within the network, we have to look at the power dynamics in each relationship.
 
-## 5.1 Direction
+## 6.1 Direction
 
 As we want to investigate the flow of power and resources, the direction will be from the **less powerful to more powerful** entity.
 
-## 5.2 Weights
+## 6.2 Weights
 
 For the purpose of our analysis, we will score each relationship flow according to the following:
 
@@ -542,7 +745,7 @@ For the purpose of our analysis, we will score each relationship flow according 
 
 We will use the total as the weights for each edge. Lastly, we will rename the relationship to prevent confusion in case of direction reversal.
 
-## 5.3 Score tables
+## 6.3 Score tables
 
 ::: panel-tabset
 ### BeneficialOwner
@@ -553,27 +756,27 @@ While BeneficialOwners may or may not be Shareholders in the same company, they 
 
 Current From
 
-+-------------------------+-----------------------------------+
-| Current **From**        | Owner                             |
-+-------------------------+-----------------------------------+
-| Current **To**          | Company                           |
-+-------------------------+-----------------------------------+
-| New **From\             | Company                           |
-| **(Lower power)         |                                   |
-+-------------------------+-----------------------------------+
-| New **To\               | Owner                             |
-| **(Higher power)        |                                   |
-+-------------------------+-----------------------------------+
-| New **subtype**         | OwnedBy                           |
-+-------------------------+-----------------------------------+
-| Beneficiary             | 1 + 1                             |
-+-------------------------+-----------------------------------+
-| Decision-maker          | 2 + 1                             |
-+-------------------------+-----------------------------------+
-| Influential (on person) | 0                                 |
-+-------------------------+-----------------------------------+
-| **Total**               | **5**                             |
-+-------------------------+-----------------------------------+
++-------------------------+------------------------------+
+| Current **From**        | Owner                        |
++-------------------------+------------------------------+
+| Current **To**          | Company                      |
++-------------------------+------------------------------+
+| New **From\             | Company                      |
+| **(Lower power)         |                              |
++-------------------------+------------------------------+
+| New **To\               | Owner                        |
+| **(Higher power)        |                              |
++-------------------------+------------------------------+
+| New **subtype**         | OwnedBy                      |
++-------------------------+------------------------------+
+| Beneficiary             | 1 + 1                        |
++-------------------------+------------------------------+
+| Decision-maker          | 2 + 1                        |
++-------------------------+------------------------------+
+| Influential (on person) | 0                            |
++-------------------------+------------------------------+
+| **Total**               | **5**                        |
++-------------------------+------------------------------+
 
 : Owner
 
@@ -583,27 +786,27 @@ Shareholders may receive proceeds from the profits of the company.
 
 They have some decision-making power within the company. However, it is the Beneficial Owner that ultimately gets the final say in decisions.
 
-+-------------------------+-----------------------------------+
-| Current **From**        | Shareholder                       |
-+-------------------------+-----------------------------------+
-| Current **To**          | Company                           |
-+-------------------------+-----------------------------------+
-| New **From\             | Company                           |
-| **(Lower power)         |                                   |
-+-------------------------+-----------------------------------+
-| New **To\               | Shareholder                       |
-| **(Higher power)        |                                   |
-+-------------------------+-----------------------------------+
-| New **subtype**         | HasShareholder                    |
-+-------------------------+-----------------------------------+
-| Beneficiary             | 1                                 |
-+-------------------------+-----------------------------------+
-| Decision-maker          | 2                                 |
-+-------------------------+-----------------------------------+
-| Influential (on person) | 0                                 |
-+-------------------------+-----------------------------------+
-| **Total**               | **3**                             |
-+-------------------------+-----------------------------------+
++-------------------------+------------------------------+
+| Current **From**        | Shareholder                  |
++-------------------------+------------------------------+
+| Current **To**          | Company                      |
++-------------------------+------------------------------+
+| New **From\             | Company                      |
+| **(Lower power)         |                              |
++-------------------------+------------------------------+
+| New **To\               | Shareholder                  |
+| **(Higher power)        |                              |
++-------------------------+------------------------------+
+| New **subtype**         | HasShareholder               |
++-------------------------+------------------------------+
+| Beneficiary             | 1                            |
++-------------------------+------------------------------+
+| Decision-maker          | 2                            |
++-------------------------+------------------------------+
+| Influential (on person) | 0                            |
++-------------------------+------------------------------+
+| **Total**               | **3**                        |
++-------------------------+------------------------------+
 
 ### WorksFor
 
@@ -611,27 +814,27 @@ Employees are contractually obligated to act in the interests of their employer.
 
 Employers also influence what their employees do in the business.
 
-+-------------------------+-----------------------------------+
-| Current **From**        | Owner                             |
-+-------------------------+-----------------------------------+
-| Current **To**          | Company                           |
-+-------------------------+-----------------------------------+
-| New **From\             | Company                           |
-| **(Lower power)         |                                   |
-+-------------------------+-----------------------------------+
-| New **To\               | Owner                             |
-| **(Higher power)        |                                   |
-+-------------------------+-----------------------------------+
-| New **subtype**         | OwnedBy                           |
-+-------------------------+-----------------------------------+
-| Beneficiary             | 1 + 1                             |
-+-------------------------+-----------------------------------+
-| Decision-maker          | 2 + 1                             |
-+-------------------------+-----------------------------------+
-| Influential (on person) | 0                                 |
-+-------------------------+-----------------------------------+
-| **Total**               | **5**                             |
-+-------------------------+-----------------------------------+
++-------------------------+------------------------------+
+| Current **From**        | Owner                        |
++-------------------------+------------------------------+
+| Current **To**          | Company                      |
++-------------------------+------------------------------+
+| New **From\             | Company                      |
+| **(Lower power)         |                              |
++-------------------------+------------------------------+
+| New **To\               | Owner                        |
+| **(Higher power)        |                              |
++-------------------------+------------------------------+
+| New **subtype**         | OwnedBy                      |
++-------------------------+------------------------------+
+| Beneficiary             | 1 + 1                        |
++-------------------------+------------------------------+
+| Decision-maker          | 2 + 1                        |
++-------------------------+------------------------------+
+| Influential (on person) | 0                            |
++-------------------------+------------------------------+
+| **Total**               | **5**                        |
++-------------------------+------------------------------+
 
 ### FamilyRelationship
 
@@ -639,35 +842,35 @@ Assuming that family members have a healthy relationship, they share resources a
 
 Due to this, they have power over each other.
 
-+-------------------------+-----------------------------------+
-| Current **From**        | Person 1                          |
-+-------------------------+-----------------------------------+
-| Current **To**          | Person 2                          |
-+-------------------------+-----------------------------------+
-| New **From\             | Person 2 (additional)             |
-| **(Lower power)         |                                   |
-+-------------------------+-----------------------------------+
-| New **To\               | Person 2                          |
-| **(Higher power)        |                                   |
-|                         | (additional)                      |
-+-------------------------+-----------------------------------+
-| New **subtype**         | FamilyRelationship                |
-+-------------------------+-----------------------------------+
-| Beneficiary             | 1                                 |
-+-------------------------+-----------------------------------+
-| Decision-maker          | 0                                 |
-+-------------------------+-----------------------------------+
-| Influential (on person) | 1                                 |
-+-------------------------+-----------------------------------+
-| **Total**               | **2**                             |
-+-------------------------+-----------------------------------+
++-------------------------+------------------------------+
+| Current **From**        | Person 1                     |
++-------------------------+------------------------------+
+| Current **To**          | Person 2                     |
++-------------------------+------------------------------+
+| New **From\             | Person 2 (additional)        |
+| **(Lower power)         |                              |
++-------------------------+------------------------------+
+| New **To\               | Person 2                     |
+| **(Higher power)        |                              |
+|                         | (additional)                 |
++-------------------------+------------------------------+
+| New **subtype**         | FamilyRelationship           |
++-------------------------+------------------------------+
+| Beneficiary             | 1                            |
++-------------------------+------------------------------+
+| Decision-maker          | 0                            |
++-------------------------+------------------------------+
+| Influential (on person) | 1                            |
++-------------------------+------------------------------+
+| **Total**               | **2**                        |
++-------------------------+------------------------------+
 :::
 
 ::: {.callout-caution appearance="simple"}
 These scores are subjective and based on general assumptions. We also lack the information to model the power dynamics accurately.
 :::
 
-## 5.4 Converting relationship edges to power flow
+## 6.4 Converting relationship edges to power flow
 
 Using the table above, we will create a function to convert relationship edges to power flow.
 
@@ -707,7 +910,7 @@ supernetwork %>%
 ```
 :::
 
-## 5.5 Converting relationship graphs to power flow
+## 6.5 Converting relationship graphs to power flow
 
 Using the edge converter, we will generate a new `tbl_graph` with the power flow edges.
 
@@ -720,9 +923,9 @@ Using the edge converter, we will generate a new `tbl_graph` with the power flow
 convert_graph_to_power_flow <- source("helpers/convert_graph_to_power_flow.R", local = knitr::knit_global())$value
 ```
 
-## 5.6 Plotting the power graph
+## 6.6 Plotting the power graph
 
-Similar to [4.2 Plotting the subnetworks], we will look at 3 subnetworks related to *SouthSeafood Express Corp*.
+Similar to \[4.3 Plotting the subnetworks\], we will look at 3 subnetworks related to *SouthSeafood Express Corp*.
 
 We will use `plot_fishing_power()` to plot the relationship graph of the network.
 
@@ -779,7 +982,7 @@ supernetwork %>%
     "Fintan Park",
     "Nadia Conti"
     ),
-    title = "Power Graph: SouthSeafood Express Corp's Sphere of Influence",
+    title = "Power Graph: SouthSeafood Express Corp's Sphere of Influence (June 2024)",
     subtitle = "Entities with 3 degrees of separation from **SouthSeafood Express Corp**. This is where the influence of the<br />company is noticeable."
   )
 ```
@@ -812,7 +1015,7 @@ supernetwork %>%
     ),
     node_size = 5,
     arrow_margin = 2,
-    title = "Power Graph: SouthSeafood Express Corp's Full Network",
+    title = "Power Graph: SouthSeafood Express Corp's Full Network (June 2024)",
     subtitle = "This shows the full view of the network connected to SouthSeafood Express Corp in any way."
   )
 ```
@@ -832,7 +1035,7 @@ However, the analysis at this point is still subjective as it depends on which c
 :::
 :::
 
-# 6 Measures of Centrality
+# 7 Measures of Centrality
 
 We defined the influential entities as having 2 types:
 
@@ -840,7 +1043,7 @@ We defined the influential entities as having 2 types:
 
 **Type 2:** They have the ability to connect entities and be a power broker.
 
-## 6.1 Appropriate measures of centrality
+## 7.1 Appropriate measures of centrality
 
 ::: panel-tabset
 ### Most Powerful
@@ -858,7 +1061,7 @@ To identify the power brokers, we will use **betweenness** centrality.
 Power Brokers must be nodes with **both incoming and outgoing edges**, so that it can connect a more powerful node to a less powerful node. Hence, having a large number of edges connected to a node is not enough (which the degree centrality offers). This is because if a node only has 1 kind, it won't be able to connect to other nodes to keep the flow going.
 :::
 
-## 6.2 Calculating centrality
+## 7.2 Calculating centrality
 
 We will again use the networks of *SouthSeafood Express Corp* to check how these centrality measures play in the network.
 
@@ -890,7 +1093,7 @@ sfec_connected_network_power <- supernetwork %>%
 ```
 :::
 
-## 6.3 Identifying the most powerful nodes
+## 7.3 Identifying the most powerful nodes
 
 We will use `plot_centrality` to identify the most powerful nodes by visualizing the **pagerank centrality** of the nodes.
 
@@ -905,7 +1108,7 @@ We will use `plot_centrality` to identify the most powerful nodes by visualizing
 plot_centrality <- source("helpers/plot_centrality.R", local = knitr::knit_global())$value
 ```
 
-### 6.3.1 Sphere of Influence
+### 7.3.1 Sphere of Influence
 
 ::: panel-tabset
 #### Graph
@@ -914,7 +1117,7 @@ plot_centrality <- source("helpers/plot_centrality.R", local = knitr::knit_globa
 sfec_sphere_of_influence_power %>%
   plot_centrality(
     "pagerank",
-    title = "Most Powerful Entities in SouthSeafood Express Corp's Sphere of Influence",
+    title = "Most Powerful Nodes: SouthSeafood Express Corp's Sphere of Influence (June 2024)",
     subtitle = "A higher value of **pagerank centrality** means the entity has higher power and benefits from the network."
   )
 ```
@@ -942,7 +1145,7 @@ Furthermore, based on our model, **Nadia Conti** also is one of the most entitie
 It can be said that whoever controls this company has the most power in the network.
 :::
 
-### 6.3.2 Connected Network
+### 7.3.2 Connected Network
 
 ::: panel-tabset
 #### Graph
@@ -951,7 +1154,7 @@ It can be said that whoever controls this company has the most power in the netw
 sfec_connected_network_power %>%
   plot_centrality(
     "pagerank",
-    title = "Most Powerful Entities in SouthSeafood Express Corp's Connected Network",
+    title = "Most Powerful Nodes: SouthSeafood Express Corp's Connected Network (June 2024)",
     subtitle = "A higher value of **pagerank centrality** means the entity has higher power and benefits from the network."
   )
 ```
@@ -977,9 +1180,9 @@ She seems to be the wife of **Fintan Park**, which makes him part of the clan al
 Although she was **not identified** when we were visually inspecting the power plots, using *pagerank* centrality identies her as the most powerful person in the network. This further confirms our hypothesis and observations that the **Conti Clan** controls this part of the fishing business network.
 :::
 
-## 6.4 Identifiying the power brokers
+## 7.4 Identifiying the power brokers
 
-### 6.4.1 Sphere of Influence
+### 7.4.1 Sphere of Influence
 
 ::: panel-tabset
 #### Graph
@@ -988,7 +1191,7 @@ Although she was **not identified** when we were visually inspecting the power p
 sfec_sphere_of_influence_power %>%
   plot_centrality(
     "betweenness",
-    title = "The Power Brokers in SouthSeafood Express Corp's Sphere of Influence",
+    title = "Power Brokers: SouthSeafood Express Corp's Sphere of Influence (June 2024)",
     subtitle = "A higher value of **betweenness centrality** means the entity is more capable of connecting entities."
   )
 ```
@@ -1014,7 +1217,7 @@ The most notable is **StichtingMarine Shipping Company**, where the Conti Clan m
 This fishing company becomes their way to consolidate the power and resources within the system.
 :::
 
-### 6.4.2 Connected Network
+### 7.4.2 Connected Network
 
 ::: panel-tabset
 #### Graph
@@ -1023,7 +1226,7 @@ This fishing company becomes their way to consolidate the power and resources wi
 sfec_connected_network_power %>%
   plot_centrality(
     "betweenness",
-    title = "The Power Brokers in SouthSeafood Express Corp's Connected Network",
+    title = "Power Brokers: SouthSeafood Express Corp's Connected Network",
     subtitle = "A higher value of **betweenness centrality** means the entity is more capable of connecting entities."
   )
 ```
@@ -1047,7 +1250,7 @@ Similar to the smaller network, the power brokers in the bigger network are the 
 These are **StichtingMarine Shipping Company**, **GvardeyskAmerica Shipping Plc**, **NamRiver Transit A/S**, **Namorna Transit Ltd**.
 :::
 
-## 6.5 Curious case of Sanaa El-Amin
+## 7.5 Curious case of Sanaa El-Amin
 
 Consider the influential entities within **Sanaa El-Amin**'s sphere of influence. She is also within *SouthSeafood Express Corp*'s connected network.
 
@@ -1069,7 +1272,7 @@ sea_sphere_of_influence_power %>%
   plot_centrality(
     "pagerank",
     emphasize_nodes = c("Sanaa El-Amin"),
-    title = "The Power Brokers in Sanaa El-Amin's Sphere of Influence",
+    title = "Power Brokers: Sanaa El-Amin's Sphere of Influence (June 2024)",
     subtitle = "A higher value of **betweenness centrality** means the entity is more capable of connecting entities."
   )
 ```
@@ -1081,7 +1284,7 @@ sea_sphere_of_influence_power %>%
   plot_centrality(
     "betweenness",
     emphasize_nodes = c("Sanaa El-Amin"),
-    title = "The Power Brokers in Sanaa El-Amin's Sphere of Influence",
+    title = "Power Brokers: Sanaa El-Amin's Sphere of Influence (June 2024)",
     subtitle = "A higher value of **betweenness centrality** means the entity is more capable of connecting entities."
   )
 ```
@@ -1091,7 +1294,7 @@ sea_sphere_of_influence_power %>%
 
 It can imply that she is an expert in the industry so various companies hire her (perhaps as a consultant). Although she does not own any companies, nor hold shares in any, she may hold some influence in the network as **influential companies depend on her services**.
 
-### 6.5.1 Measures of centrality to identify this influence
+### 7.5.1 Measures of centrality to identify this influence
 
 Possible measures of centrality that can identify her influence could be **eigenvector centrality**. In eigenvector centrality, the principle *the more influential your neighbors are, the more influential you are.* This can be interpreted such that her association with influential companies also gives her influence.
 
@@ -1102,7 +1305,7 @@ Other measures of centrality that can identify this particular are **hub central
 
 Despite this observation, we will **not** update the power model, nor add another measure of centrality to our visualizations.
 
-This is because we acknowledged that the model we created in [5.3 Score tables] is imperfect and we lack information to model the power dynamics in the network accurately.
+This is because we acknowledged that the model we created in \[5.3 Score tables\] is imperfect and we lack information to model the power dynamics in the network accurately.
 
 However, it is enough that we learn that our model will **not identify** all influential people in the network, and can even misidentify some entities as influential.
 :::

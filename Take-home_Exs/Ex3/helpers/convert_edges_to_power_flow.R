@@ -6,7 +6,7 @@ convert_edges_to_power_flow <- function(edges) {
   family <- edges %>% filter(subtype == "FamilyRelationship") %>% mutate(weight = 2)
   family_rev <- family %>%
     mutate(temp = from, from = to, to = temp) %>%
-    select(from, to, supertype, subtype, weight)
+    select(from, to, supertype, subtype, start_date, end_date, weight)
   
   # Shareholder <- Company, weight: 2
   shareholder <- edges %>% filter(subtype == "Shareholdership") %>%
@@ -18,7 +18,7 @@ convert_edges_to_power_flow <- function(edges) {
       # Rename to prevent confusion due to reversed arrows
       subtype = "HasShareholder",
     ) %>%
-    select(from, to, supertype, subtype, weight)
+    select(from, to, supertype, subtype, start_date, end_date, weight)
   
   # BeneficialOwner <- Company, weight: 3
   owner <- edges %>% filter(subtype == "BeneficialOwnership") %>%
@@ -30,7 +30,7 @@ convert_edges_to_power_flow <- function(edges) {
       # Rename to prevent confusion due to reversed arrows
       subtype = "OwnedBy",
     ) %>%
-    select(from, to, supertype, subtype, weight)
+    select(from, to, supertype, subtype, start_date, end_date, weight)
   
   works_for %>%
     rbind(family) %>%
