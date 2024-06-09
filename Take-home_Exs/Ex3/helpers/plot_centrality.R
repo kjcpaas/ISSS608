@@ -1,10 +1,12 @@
 plot_centrality <- function(graph,
-                            # Centrality measure, can be
+                            # Column containing centrality measure, can be
                             # pagerank: for most powerful nodes
                             # betweeness: for power brokers
-                            centrality,
+                            centrality_col,
                             # Name of nodes to emphasize
                             emphasize_nodes = c(),
+                            # Date where to get the snapshot
+                            datestring = NULL,
                             # Layout options
                             layout = "nicely",
                             circular = FALSE,
@@ -19,11 +21,21 @@ plot_centrality <- function(graph,
                             seed_num = CONFIGS$default_seed) {
   set.seed(seed_num)
   
-  if (!(centrality %in% c("pagerank", "betweenness"))) {
+  centrality_type = NULL
+  
+  if (endsWith(centrality_col, "pagerank")) {
+    centrality_type = "pagerank"
+  } else if (endsWith(centrality_col, "betweenness")) {
+    centrality_type = "betweenness"
+  }
+  
+  if (!(centrality_type %in% c("pagerank", "betweenness"))) {
     stop("Only pagerank and betweenness centralities are relevant in our analysis")
   }
   
-  centrality_col <- paste0(centrality, "_score")
+  date <- NULL
+  if(!is.null(datestring)) { date <- as_date(datestring) }
+  
   nodes <- as_data_frame(graph, what = "vertices")
   score_boundary <- (nodes[[centrality_col]] %>% max()) * 0.6
   
@@ -73,7 +85,16 @@ plot_centrality <- function(graph,
     
     # Render edges. Use geom_edge fan so edges along the same path don't overlap
     geom_edge_fan(
-      aes(color = subtype, edge_width = weight),
+      aes(color = subtype, edge_width = weight,
+          # Will identify if the edge is active at this date, if not do not display
+          # Ideally this should be in a function but I can't figure out how to make it work inside aes
+          # Logic is same as is extract_network_snapshot.R
+          filter = ifelse(is.null(date) | is.na(start_date), TRUE,
+                          ifelse(start_date <= date & (is.na(end_date) | end_date > date),
+                                 TRUE,
+                                 FALSE
+                          )
+          )),
       strength = 0.5,
       arrow = STYLES$arrow_style,
       end_cap = circle(arrow_margin, "mm"),
@@ -86,12 +107,12 @@ plot_centrality <- function(graph,
     # Centrality visualization
     scale_fill_gradient(
       high = ifelse(
-        centrality == "pagerank",
+        centrality_type == "pagerank",
         STYLES$primary_color,
         STYLES$secondary_color
       ),
       low = ifelse(
-        centrality == "pagerank",
+        centrality_type == "pagerank",
         STYLES$primary_light_color,
         STYLES$secondary_light_color
       )
@@ -107,7 +128,7 @@ plot_centrality <- function(graph,
     # Change legend names
     labs(
       fill = ifelse(
-        centrality == "pagerank",
+        centrality_type == "pagerank",
         "PageRank Score",
         "Betweenness Score"
       ),

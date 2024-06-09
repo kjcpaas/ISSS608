@@ -1,4 +1,4 @@
-extract_graph_snapshot <- function(graph, datestring) {
+extract_network_snapshot <- function(graph, datestring) {
   date <- as_date(datestring)
   
   graph_nodes = as_data_frame(graph, what = "vertices")
