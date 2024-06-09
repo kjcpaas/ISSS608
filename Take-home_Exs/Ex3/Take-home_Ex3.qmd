@@ -1,5 +1,5 @@
 ---
-title: "Take Home Ex3: VAST Challenge 2024 Mini-Challenge 3 [WIP]"
+title: "Take Home Ex3: VAST Challenge 2024 Mini-Challenge 3"
 author: "Kristine Joy Paas"
 date: "22 May 2024"
 date-modified: "last-modified"
@@ -20,6 +20,8 @@ We will answer **Questions 3 and 4** from the mini-challenge:
 > 3.  Develop a visual approach to examine inferences. Infer how the influence of a company changes through time. Can you infer ownership or influence that a network may have?
 >
 > 4.  Identify the network associated with SouthSeafood Express Corp and visualize how this network and competing businesses change as a result of their illegal fishing behavior. Which companies benefited from SouthSeafood Express Corp legal troubles? Are there other suspicious transactions that may be related to illegal fishing? Provide visual evidence for your conclusions.
+
+If you want to skip through all the exploration and go straight to the answer, go to [9 Mini-Challenge 3].
 
 ## 1.1 The data
 
@@ -49,17 +51,41 @@ For the purposes of this exercise we will define 2 types of influential entity:
 
 ## 2.1 Loading Packages
 
+**Utility Tools**
+
+-   [jsonlite](https://cran.r-project.org/web/packages/jsonlite/index.html) - To parse JSON
+
+-   [tidyverse](https://www.tidyverse.org/) - Data science tools
+
+-   [ggtext](https://cran.r-project.org/web/packages/ggtext/index.html) - Tools for text formatting
+
+-   [knitr](https://cran.r-project.org/web/packages/knitr/index.html) - For better table displays
+
+-   [lubridate](https://cran.r-project.org/web/packages/lubridate/vignettes/lubridate.html) - For processing date and time
+
+**Graphing Tools**
+
+-   [patchwork](https://cran.r-project.org/web/packages/patchwork/index.html) - For combining `ggplot` plots
+
+-   [ggraph](https://ggraph.data-imaginist.com/) - For plotting network data
+
+-   [tidygraph](https://cran.r-project.org/web/packages/tidygraph/index.html) - For graph manipulations
+
+-   [igraph](https://cran.r-project.org/web/packages/igraph/index.html) - Contains functions for network analysis
+
+-   [ggiraph](https://cran.r-project.org/web/packages/ggiraph/index.html) - Interactive plots
+
 ```{r}
 #| label: setup
 pacman::p_load(
   jsonlite,
   tidyverse,
-  ggraph,
-  tidygraph,
-  lubridate,
-  patchwork,
   ggtext,
   knitr,
+  lubridate,
+  patchwork,
+  ggraph,
+  tidygraph,
   igraph,
   ggiraph
 )
@@ -204,7 +230,7 @@ MAPPINGS = list(
 
 ```{r}
 CONFIGS = list(
-  default_seed = 7253 # For reproduceability
+  default_seed = 4231 # For reproduceability
 )
 ```
 :::
@@ -766,27 +792,27 @@ While BeneficialOwners may or may not be Shareholders in the same company, they 
 
 Current From
 
-+-------------------------+------------------+
-| Current **From**        | Owner            |
-+-------------------------+------------------+
-| Current **To**          | Company          |
-+-------------------------+------------------+
-| New **From\             | Company          |
-| **(Lower power)         |                  |
-+-------------------------+------------------+
-| New **To\               | Owner            |
-| **(Higher power)        |                  |
-+-------------------------+------------------+
-| New **subtype**         | OwnedBy          |
-+-------------------------+------------------+
-| Beneficiary             | 1 + 1            |
-+-------------------------+------------------+
-| Decision-maker          | 2 + 1            |
-+-------------------------+------------------+
-| Influential (on person) | 0                |
-+-------------------------+------------------+
-| **Total**               | **5**            |
-+-------------------------+------------------+
++-------------------------+----------------+
+| Current **From**        | Owner          |
++-------------------------+----------------+
+| Current **To**          | Company        |
++-------------------------+----------------+
+| New **From\             | Company        |
+| **(Lower power)         |                |
++-------------------------+----------------+
+| New **To\               | Owner          |
+| **(Higher power)        |                |
++-------------------------+----------------+
+| New **subtype**         | OwnedBy        |
++-------------------------+----------------+
+| Beneficiary             | 1 + 1          |
++-------------------------+----------------+
+| Decision-maker          | 2 + 1          |
++-------------------------+----------------+
+| Influential (on person) | 0              |
++-------------------------+----------------+
+| **Total**               | **5**          |
++-------------------------+----------------+
 
 : Owner
 
@@ -796,27 +822,27 @@ Shareholders may receive proceeds from the profits of the company.
 
 They have some decision-making power within the company. However, it is the Beneficial Owner that ultimately gets the final say in decisions.
 
-+-------------------------+------------------+
-| Current **From**        | Shareholder      |
-+-------------------------+------------------+
-| Current **To**          | Company          |
-+-------------------------+------------------+
-| New **From\             | Company          |
-| **(Lower power)         |                  |
-+-------------------------+------------------+
-| New **To\               | Shareholder      |
-| **(Higher power)        |                  |
-+-------------------------+------------------+
-| New **subtype**         | HasShareholder   |
-+-------------------------+------------------+
-| Beneficiary             | 1                |
-+-------------------------+------------------+
-| Decision-maker          | 2                |
-+-------------------------+------------------+
-| Influential (on person) | 0                |
-+-------------------------+------------------+
-| **Total**               | **3**            |
-+-------------------------+------------------+
++-------------------------+----------------+
+| Current **From**        | Shareholder    |
++-------------------------+----------------+
+| Current **To**          | Company        |
++-------------------------+----------------+
+| New **From\             | Company        |
+| **(Lower power)         |                |
++-------------------------+----------------+
+| New **To\               | Shareholder    |
+| **(Higher power)        |                |
++-------------------------+----------------+
+| New **subtype**         | HasShareholder |
++-------------------------+----------------+
+| Beneficiary             | 1              |
++-------------------------+----------------+
+| Decision-maker          | 2              |
++-------------------------+----------------+
+| Influential (on person) | 0              |
++-------------------------+----------------+
+| **Total**               | **3**          |
++-------------------------+----------------+
 
 ### WorksFor
 
@@ -824,27 +850,27 @@ Employees are contractually obligated to act in the interests of their employer.
 
 Employers also influence what their employees do in the business.
 
-+-------------------------+------------------+
-| Current **From**        | Owner            |
-+-------------------------+------------------+
-| Current **To**          | Company          |
-+-------------------------+------------------+
-| New **From\             | Company          |
-| **(Lower power)         |                  |
-+-------------------------+------------------+
-| New **To\               | Owner            |
-| **(Higher power)        |                  |
-+-------------------------+------------------+
-| New **subtype**         | OwnedBy          |
-+-------------------------+------------------+
-| Beneficiary             | 1 + 1            |
-+-------------------------+------------------+
-| Decision-maker          | 2 + 1            |
-+-------------------------+------------------+
-| Influential (on person) | 0                |
-+-------------------------+------------------+
-| **Total**               | **5**            |
-+-------------------------+------------------+
++-------------------------+----------------+
+| Current **From**        | Owner          |
++-------------------------+----------------+
+| Current **To**          | Company        |
++-------------------------+----------------+
+| New **From\             | Company        |
+| **(Lower power)         |                |
++-------------------------+----------------+
+| New **To\               | Owner          |
+| **(Higher power)        |                |
++-------------------------+----------------+
+| New **subtype**         | OwnedBy        |
++-------------------------+----------------+
+| Beneficiary             | 1 + 1          |
++-------------------------+----------------+
+| Decision-maker          | 2 + 1          |
++-------------------------+----------------+
+| Influential (on person) | 0              |
++-------------------------+----------------+
+| **Total**               | **5**          |
++-------------------------+----------------+
 
 ### FamilyRelationship
 
@@ -1571,7 +1597,7 @@ These are **StichtingMarine Shipping Company**, **GvardeyskAmerica Shipping Plc*
 
 ## 8.5 Curious case of Sanaa El-Amin
 
-Consider **Sanaa El-Amin**, and entity within *SouthSeafood Express Corp*'s connected network (snapshot after the shareholder change).
+Consider **Sanaa El-Amin**, an entity within *SouthSeafood Express Corp*'s connected network (snapshot after the shareholder change).
 
 ::: panel-tabset
 ### Power Holders
@@ -1623,10 +1649,829 @@ This is because we acknowledged that the model we created in [6.3 Score tables] 
 However, it is enough that we learn that our model will **not identify** all influential people in the network, and can even misidentify some entities as influential.
 :::
 
-# References
+# 9 Mini-Challenge 3
 
-<https://blogs.cornell.edu/info2040/2015/10/19/three-degrees-of-influence-how-far-can-you-reach-people/>
+We are going to answer these questions based on the insights we gained from previous visualizations.
 
-<https://www.strategy-business.com/article/10218>
+::: callout-tip
+## Lack of animations
+
+Original plan to answer this questions is by generating animations of the snapshots of the network.
+
+However, as we cannot do animations, we will work backwards by looking at suspicious events and plotting the graphs manually based on snapshots on those dates.
+:::
+
+## 9.1 Looking for suspicious dates
+
+As the suspicious transactions on *SouthSeafood Express Corp* happened on `2035-05-25`, we will look at relationships that started or ended from **2035**.
+
+```{r}
+date = as_date("2035-01-01")
+supernetwork %>%
+  extract_subnetwork(node_name="SouthSeafood Express Corp") %>%
+  as_data_frame(what = "edges") %>%
+  filter(start_date >= date | end_date >= date) %>%
+  arrange(start_date) %>%
+  kable()
+```
+
+Based from this list, the dates are:
+
+-   `2035-05-14` - Add a day before to see the state before the series of transactions
+
+-   `2035-05-15`
+
+-   `2035-05-18`
+
+-   `2035-05-20`
+
+-   `2035-05-25`
+
+-   `2035-05-31`
+
+-   `2035-06-02`
+
+-   `2035-06-10`
+
+-   `2035-11-15`
+
+## 9.2 Calculate measures of centrality
+
+::: panel-tabset
+### 2035-05-14
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+nodes_connected_0514 <- sfec_connected_network_power %>%
+  select(name, alias, supertype, subtype) %>%
+  extract_network_snapshot('2035-05-14') %>%
+  mutate(
+    pagerank = centrality_pagerank(weights = E(.)$weight),
+    betweenness = centrality_betweenness(weights = E(.)$weight, normalized = TRUE)
+  ) %>%
+  as_data_frame(what="vertices")
+
+nodes_connected_0514 %>% arrange(name) %>% select(-name) %>% kable()
+```
+
+### 2035-05-15
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+nodes_connected_0515 <- sfec_connected_network_power %>%
+  select(name, alias, supertype, subtype) %>%
+  extract_network_snapshot('2035-05-15') %>%
+  mutate(
+    pagerank = centrality_pagerank(weights = E(.)$weight),
+    betweenness = centrality_betweenness(weights = E(.)$weight, normalized = TRUE)
+  ) %>%
+  as_data_frame(what="vertices")
+
+nodes_connected_0515 %>% arrange(name) %>% select(-name) %>% kable()
+```
+
+### 2035-05-18
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+nodes_connected_0518 <- sfec_connected_network_power %>%
+  select(name, alias, supertype, subtype) %>%
+  extract_network_snapshot('2035-05-18') %>%
+  mutate(
+    pagerank = centrality_pagerank(weights = E(.)$weight),
+    betweenness = centrality_betweenness(weights = E(.)$weight, normalized = TRUE)
+  ) %>%
+  as_data_frame(what="vertices")
+
+nodes_connected_0518 %>% arrange(name) %>% select(-name) %>% kable()
+```
+
+### 2035-05-20
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+nodes_connected_0520 <- sfec_connected_network_power %>%
+  select(name, alias, supertype, subtype) %>%
+  extract_network_snapshot('2035-05-20') %>%
+  mutate(
+    pagerank = centrality_pagerank(weights = E(.)$weight),
+    betweenness = centrality_betweenness(weights = E(.)$weight, normalized = TRUE)
+  ) %>%
+  as_data_frame(what="vertices")
+
+nodes_connected_0520 %>% arrange(name) %>% select(-name) %>% kable()
+```
+
+### 2035-05-25
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+nodes_connected_0525 <- sfec_connected_network_power %>%
+  select(name, alias, supertype, subtype) %>%
+  extract_network_snapshot('2035-05-25') %>%
+  mutate(
+    pagerank = centrality_pagerank(weights = E(.)$weight),
+    betweenness = centrality_betweenness(weights = E(.)$weight, normalized = TRUE)
+  ) %>%
+  as_data_frame(what="vertices")
+
+nodes_connected_0525 %>% arrange(name) %>% select(-name) %>% kable()
+```
+
+### 2035-05-31
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+nodes_connected_0531 <- sfec_connected_network_power %>%
+  select(name, alias, supertype, subtype) %>%
+  extract_network_snapshot('2035-05-31') %>%
+  mutate(
+    pagerank = centrality_pagerank(weights = E(.)$weight),
+    betweenness = centrality_betweenness(weights = E(.)$weight, normalized = TRUE)
+  ) %>%
+  as_data_frame(what="vertices")
+
+nodes_connected_0531 %>% arrange(name) %>% select(-name) %>% kable()
+```
+
+### 2035-06-02
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+nodes_connected_0602 <- sfec_connected_network_power %>%
+  select(name, alias, supertype, subtype) %>%
+  extract_network_snapshot('2035-06-02') %>%
+  mutate(
+    pagerank = centrality_pagerank(weights = E(.)$weight),
+    betweenness = centrality_betweenness(weights = E(.)$weight, normalized = TRUE)
+  ) %>%
+  as_data_frame(what="vertices")
+
+nodes_connected_0602 %>% arrange(name) %>% select(-name) %>% kable()
+```
+
+### 2035-06-10
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+nodes_connected_0610 <- sfec_connected_network_power %>%
+  select(name, alias, supertype, subtype) %>%
+  extract_network_snapshot('2035-06-10') %>%
+  mutate(
+    pagerank = centrality_pagerank(weights = E(.)$weight),
+    betweenness = centrality_betweenness(weights = E(.)$weight, normalized = TRUE)
+  ) %>%
+  as_data_frame(what="vertices")
+
+nodes_connected_0610 %>% arrange(name) %>% select(-name) %>% kable()
+```
+
+### 2035-11-15
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+nodes_connected_1115 <- sfec_connected_network_power %>%
+  select(name, alias, supertype, subtype) %>%
+  extract_network_snapshot('2035-11-15') %>%
+  mutate(
+    pagerank = centrality_pagerank(weights = E(.)$weight),
+    betweenness = centrality_betweenness(weights = E(.)$weight, normalized = TRUE)
+  ) %>%
+  as_data_frame(what="vertices")
+
+nodes_connected_1115 %>% arrange(name) %>% select(-name) %>% kable()
+```
+:::
+
+We will combine everything in the template graph
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+sfec_connected_network_power <- sfec_connected_network_power %>%
+  select(name, alias, supertype, subtype) %>%
+  left_join(
+    nodes_connected_0514 %>% rename(
+      d_20350514.pagerank = pagerank,
+      d_20350514.betweenness = betweenness
+    )
+  ) %>%
+  left_join(
+    nodes_connected_0515 %>% rename(
+      d_20350515.pagerank = pagerank,
+      d_20350515.betweenness = betweenness
+    )
+  ) %>%
+  left_join(
+    nodes_connected_0518 %>% rename(
+      d_20350518.pagerank = pagerank,
+      d_20350518.betweenness = betweenness
+    )
+  ) %>%
+  left_join(
+    nodes_connected_0520 %>% rename(
+      d_20350520.pagerank = pagerank,
+      d_20350520.betweenness = betweenness
+    )
+  ) %>%
+  left_join(
+    nodes_connected_0525 %>% rename(
+      d_20350525.pagerank = pagerank,
+      d_20350525.betweenness = betweenness
+    )
+  ) %>%
+  left_join(
+    nodes_connected_0531 %>% rename(
+      d_20350531.pagerank = pagerank,
+      d_20350531.betweenness = betweenness
+    )
+  ) %>%
+  left_join(
+    nodes_connected_0602 %>% rename(
+      d_20350602.pagerank = pagerank,
+      d_20350602.betweenness = betweenness
+    )
+  ) %>%
+  left_join(
+    nodes_connected_0610 %>% rename(
+      d_20350610.pagerank = pagerank,
+      d_20350610.betweenness = betweenness
+    )
+  ) %>%
+  left_join(
+    nodes_connected_1115 %>% rename(
+      d_20351115.pagerank = pagerank,
+      d_20351115.betweenness = betweenness
+    )
+  )
+```
+
+## 9.3 Question 3
+
+> 3.  Develop a visual approach to examine inferences. Infer how the influence of a company changes through time. Can you infer ownership or influence that a network may have?
+
+We can figure out the influential entities in the network using the criteria we have for **Power Holders** and **Power Brokers**
+
+### 9.3.1 Power Holders
+
+::: panel-tabset
+#### 2035-05-14
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+sfec_connected_network_power %>%
+  plot_centrality(
+    centrality_col = "d_20350514.pagerank",
+    datestring = "2035-05-14",
+    title = "The Power Holders: SouthSeafood Express Corp's Sphere of Influence (May 14, 2035)",
+    subtitle = "A higher value of **pagerank centrality** means the entity has higher power and gets more benefits from the network.",
+    caption = "Bigger and brighter nodes are more influential. Hover on the nodes to see more details.")
+```
+
+#### 2035-05-15
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+sfec_connected_network_power %>%
+  plot_centrality(
+    centrality_col = "d_20350515.pagerank",
+    datestring = "2035-05-15",
+    title = "The Power Holders: SouthSeafood Express Corp's Sphere of Influence (May 15, 2035)",
+    subtitle = "A higher value of **pagerank centrality** means the entity has higher power and gets more benefits from the network.",
+    caption = "Bigger and brighter nodes are more influential. Hover on the nodes to see more details.")
+```
+
+#### 2035-05-18
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+sfec_connected_network_power %>%
+  plot_centrality(
+    centrality_col = "d_20350518.pagerank",
+    datestring = "2035-05-18",
+    title = "The Power Holders: SouthSeafood Express Corp's Sphere of Influence (May 18, 2035)",
+    subtitle = "A higher value of **pagerank centrality** means the entity has higher power and gets more benefits from the network.",
+    caption = "Bigger and brighter nodes are more influential. Hover on the nodes to see more details.")
+```
+
+#### 2035-05-20
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+sfec_connected_network_power %>%
+  plot_centrality(
+    centrality_col = "d_20350520.pagerank",
+    datestring = "2035-05-20",
+    title = "The Power Holders: SouthSeafood Express Corp's Sphere of Influence (May 20, 2035)",
+    subtitle = "A higher value of **pagerank centrality** means the entity has higher power and gets more benefits from the network.",
+    caption = "Bigger and brighter nodes are more influential. Hover on the nodes to see more details.")
+```
+
+#### 2035-05-25
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+sfec_connected_network_power %>%
+  plot_centrality(
+    centrality_col = "d_20350525.pagerank",
+    datestring = "2035-05-25",
+    title = "The Power Holders: SouthSeafood Express Corp's Sphere of Influence (May 25, 2035)",
+    subtitle = "A higher value of **pagerank centrality** means the entity has higher power and gets more benefits from the network.",
+    caption = "Bigger and brighter nodes are more influential. Hover on the nodes to see more details.")
+```
+
+#### 2035-05-31
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+sfec_connected_network_power %>%
+  plot_centrality(
+    centrality_col = "d_20350531.pagerank",
+    datestring = "2035-05-31",
+    title = "The Power Holders: SouthSeafood Express Corp's Sphere of Influence (May 31, 2035)",
+    subtitle = "A higher value of **pagerank centrality** means the entity has higher power and gets more benefits from the network.",
+    caption = "Bigger and brighter nodes are more influential. Hover on the nodes to see more details.")
+```
+
+#### 2035-06-02
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+sfec_connected_network_power %>%
+  plot_centrality(
+    centrality_col = "d_20350602.pagerank",
+    datestring = "2035-06-02",
+    title = "The Power Holders: SouthSeafood Express Corp's Sphere of Influence (June 2, 2035)",
+    subtitle = "A higher value of **pagerank centrality** means the entity has higher power and gets more benefits from the network.",
+    caption = "Bigger and brighter nodes are more influential. Hover on the nodes to see more details.")
+```
+
+#### 2035-06-10
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+sfec_connected_network_power %>%
+  plot_centrality(
+    centrality_col = "d_20350610.pagerank",
+    datestring = "2035-06-10",
+    title = "The Power Holders: SouthSeafood Express Corp's Sphere of Influence (June 10, 2035)",
+    subtitle = "A higher value of **pagerank centrality** means the entity has higher power and gets more benefits from the network.",
+    caption = "Bigger and brighter nodes are more influential. Hover on the nodes to see more details.")
+```
+
+#### 2035-11-15
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+sfec_connected_network_power %>%
+  plot_centrality(
+    centrality_col = "d_20351115.pagerank",
+    datestring = "2035-11-15",
+    title = "The Power Holders: SouthSeafood Express Corp's Sphere of Influence (November 15, 2035)",
+    subtitle = "A higher value of **pagerank centrality** means the entity has higher power and gets more benefits from the network.",
+    caption = "Bigger and brighter nodes are more influential. Hover on the nodes to see more details.")
+```
+:::
+
+::: callout-tip
+#### Insights
+
+As stated in [8.2 Power Holders - Connected Network], the power holders in the network have the highest value in **pagerank centrality** and in this context, those entities are the **Conti Clan** members and the companies closely associated with them.
+
+These entities are the ones pulling the strings of the network behind the scenes.
+
+After the actions of *LIam Conti*, there is s very little change in the power dynamics within the network. This could reflect the reality that already powerful people stay or get more powerful.
+
+However, there seems to be an important flaw in our model acknowledged in the Insights of [8.2 Power Holders - Connected Network] such that our model of family relations score much higher than business relations in this business network.
+:::
+
+### 9.3.1 Power Brokers
+
+::: panel-tabset
+#### 2035-05-14
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+sfec_connected_network_power %>%
+  plot_centrality(
+    centrality_col = "d_20350514.betweenness",
+    datestring = "2035-05-14",
+    title = "The Power Brokers: SouthSeafood Express Corp's Connected Network (May 14, 2035)",
+    subtitle = "A higher value of **betweenness centrality** means the entity is more capable of connecting entities.",
+    caption = "Bigger and brighter nodes are more influential. Hover on the nodes to see more details.")
+```
+
+#### 2035-05-15
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+sfec_connected_network_power %>%
+  plot_centrality(
+    centrality_col = "d_20350515.betweenness",
+    datestring = "2035-05-15",
+    title = "The Power Brokers: SouthSeafood Express Corp's Connected Network (May 15, 2035)",
+    subtitle = "A higher value of **betweenness centrality** means the entity is more capable of connecting entities.",
+    caption = "Bigger and brighter nodes are more influential. Hover on the nodes to see more details.")
+```
+
+#### 2035-05-18
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+sfec_connected_network_power %>%
+  plot_centrality(
+    centrality_col = "d_20350518.betweenness",
+    datestring = "2035-05-18",
+    title = "The Power Brokers: SouthSeafood Express Corp's Connected Network (May 18, 2035)",
+    subtitle = "A higher value of **betweenness centrality** means the entity is more capable of connecting entities.",
+    caption = "Bigger and brighter nodes are more influential. Hover on the nodes to see more details.")
+```
+
+#### 2035-05-20
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+sfec_connected_network_power %>%
+  plot_centrality(
+    centrality_col = "d_20350520.betweenness",
+    datestring = "2035-05-20",
+    title = "The Power Brokers: SouthSeafood Express Corp's Connected Network (May 20, 2035)",
+    subtitle = "A higher value of **betweenness centrality** means the entity is more capable of connecting entities.",
+    caption = "Bigger and brighter nodes are more influential. Hover on the nodes to see more details.")
+```
+
+#### 2035-05-25
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+sfec_connected_network_power %>%
+  plot_centrality(
+    centrality_col = "d_20350525.betweenness",
+    datestring = "2035-05-25",
+    title = "The Power Brokers: SouthSeafood Express Corp's Connected Network (May 25, 2035)",
+    subtitle = "A higher value of **betweenness centrality** means the entity is more capable of connecting entities.",
+    caption = "Bigger and brighter nodes are more influential. Hover on the nodes to see more details.")
+```
+
+#### 2035-05-31
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+sfec_connected_network_power %>%
+  plot_centrality(
+    centrality_col = "d_20350531.betweenness",
+    datestring = "2035-05-31",
+    title = "The Power Brokers: SouthSeafood Express Corp's Connected Network (May 31, 2035)",
+    subtitle = "A higher value of **betweenness centrality** means the entity is more capable of connecting entities.",
+    caption = "Bigger and brighter nodes are more influential. Hover on the nodes to see more details.")
+```
+
+#### 2035-06-02
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+sfec_connected_network_power %>%
+  plot_centrality(
+    centrality_col = "d_20350531.betweenness",
+    datestring = "2035-06-02",
+    title = "The Power Brokers: SouthSeafood Express Corp's Connected Network (June 2, 2035)",
+    subtitle = "A higher value of **betweenness centrality** means the entity is more capable of connecting entities.",
+    caption = "Bigger and brighter nodes are more influential. Hover on the nodes to see more details.")
+```
+
+#### 2035-06-10
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+sfec_connected_network_power %>%
+  plot_centrality(
+    centrality_col = "d_20350610.betweenness",
+    datestring = "2035-06-10",
+    title = "The Power Brokers: SouthSeafood Express Corp's Connected Network (June 10, 2035)",
+    subtitle = "A higher value of **betweenness centrality** means the entity is more capable of connecting entities.",
+    caption = "Bigger and brighter nodes are more influential. Hover on the nodes to see more details.")
+```
+
+#### 2035-11-15
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+sfec_connected_network_power %>%
+  plot_centrality(
+    centrality_col = "d_20351115.betweenness",
+    datestring = "2035-11-15",
+    title = "The Power Brokers: SouthSeafood Express Corp's Connected Network (November 15, 2035)",
+    subtitle = "A higher value of **betweenness centrality** means the entity is more capable of connecting entities.",
+    caption = "Bigger and brighter nodes are more influential. Hover on the nodes to see more details.")
+```
+:::
+
+::: callout-tip
+#### Insights
+
+Before *Liam Conti's* actions, *StichtingMarine Shipping Company* is not a strong power broker. However after distancing himself from *SouthSeafood Express Corp*, this became a very important node as the only way to access *SouthSeafood Express Corp* is through *StichtingMarine Shipping Company*.
+:::
+
+## 9.4 Question 4
+
+> 4.  Identify the network associated with SouthSeafood Express Corp and visualize how this network and competing businesses change as a result of their illegal fishing behavior. Which companies benefited from SouthSeafood Express Corp legal troubles? Are there other suspicious transactions that may be related to illegal fishing? Provide visual evidence for your conclusions.
+
+The previous question already covers the change in influence of entities. For this part, we will focus on the suspicious transactions.
+
+### 9.4.1 Transaction Timeline
+
+We will plot the relationship graph through time to see how the network changed. Each tab describes the transactions that happened on that day and the implications of those transactions.
+
+The dates are based on [9.1 Looking for suspicious dates].
+
+::: panel-tabset
+#### 2035-05-14
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+extract_subnetwork(
+  supernetwork,
+  node_name="SouthSeafood Express Corp"
+) %>% plot_fishing_relationships(
+  emphasize_nodes = c("SouthSeafood Express Corp"),
+  datestring = "2035-05-14",
+  node_size = 5,
+  arrow_margin = 2,
+  title = "Relationship Graph: SouthSeafood Express Corp's Full Network (May 14, 2035)",
+  subtitle = "This shows the full view of the network connected to SouthSeafood Express Corp in any way."
+)
+```
+
+-   *SouthSeafood Express Corp* is under *StichtingMarine Shipping Company* through *AguaLeska Transit N.V.*
+
+::: {.callout-tip appearance="simple"}
+By this time, *SouthSeafood Express Corp* illegal fishing activities have already been discovered, with the people responsible being at risk of penalties or other negative consequences.
+:::
+
+#### 2035-05-15
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+extract_subnetwork(
+  supernetwork,
+  node_name="SouthSeafood Express Corp"
+) %>% plot_fishing_relationships(
+  emphasize_nodes = c("Liam Conti", "AguaLeska Transit N.V."),
+  datestring = "2035-05-15",
+  node_size = 5,
+  arrow_margin = 2,
+  title = "Relationship Graph: SouthSeafood Express Corp's Full Network (May 15, 2035)",
+  subtitle = "This shows the full view of the network connected to SouthSeafood Express Corp in any way."
+)
+```
+
+-   *Liam Conti* **gives up shareholdership** of *AguaLeska Transit N.V.*
+
+::: {.callout-tip appearance="simple"}
+This first step for *Liam Conti* to distance himself from *SouthSeafood Express Corp* to lower the risk of him getting penalized for illegal fishing activities.
+:::
+
+#### 2035-05-18
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+extract_subnetwork(
+  supernetwork,
+  node_name="SouthSeafood Express Corp"
+) %>% plot_fishing_relationships(
+  emphasize_nodes = c(
+      "V. Miesel Shipping",
+      "Namorna Transit Ltd",
+      "StichtingMarine Shipping Company",
+      "Elise Hauser"
+    ),
+  datestring = "2035-05-18",
+  node_size = 5,
+  arrow_margin = 2,
+  title = "Relationship Graph: SouthSeafood Express Corp's Full Network (May 18, 2035)",
+  subtitle = "This shows the full view of the network connected to SouthSeafood Express Corp in any way."
+)
+```
+
+-   *Namorna Transit Ltd* established under *StichtingMarine Shipping Company*
+
+-   *V. Miesel Shipping* established *Namorna Transit Ltd*, with *Elise Hauser* as an employee to take care of the next actions.
+
+::: callout-tip
+These companies were established to further distance *Liam Conti* from the discovered illegal fishing activities.
+
+An employee, Elise Hauser, was hired to potentially be in charge of *V. Miesel Shipping* and take care of the next steps.
+:::
+
+#### 2035-05-20
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+extract_subnetwork(
+  supernetwork,
+  node_name="SouthSeafood Express Corp"
+) %>% plot_fishing_relationships(
+  emphasize_nodes = c("Tainamarine Fishing Co", "V. Miesel Shipping"),
+  datestring = "2035-05-20",
+  node_size = 5,
+  arrow_margin = 2,
+  title = "Relationship Graph: SouthSeafood Express Corp's Full Network (May 20, 2035)",
+  subtitle = "This shows the full view of the network connected to SouthSeafood Express Corp in any way."
+)
+```
+
+-   *Tainamarine Fishing Co* was established under *V. Miesel Shipping*
+
+::: {.callout-tip appearance="simple"}
+This transaction could have been executed by *Elise Hauser*.
+:::
+
+#### 2035-05-25
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+extract_subnetwork(
+  supernetwork,
+  node_name="SouthSeafood Express Corp"
+) %>% plot_fishing_relationships(
+  emphasize_nodes = c(
+    "SouthSeafood Express Corp",
+    "Tainamarine Fishing Co",
+    "AguaLeska Transit N.V."
+  ),
+  datestring = "2035-05-25",
+  node_size = 5,
+  arrow_margin = 2,
+  title = "Relationship Graph: SouthSeafood Express Corp's Full Network (May 25, 2035)",
+  subtitle = "This shows the full view of the network connected to SouthSeafood Express Corp in any way."
+)
+```
+
+-   *SouthSeafood Express Corp* had a transfer of shareholdership from *AguaLeska Transit N.V.* to *Tainamarine Fishing Co*
+
+::: {.callout-note appearance="simple"}
+This transaction puts *Liam Conti* and *StichtingMarine Shipping Company* outside of *SouthSeafood Express Corp's* Sphere of Influence as we have observed in [5.2.2 By hiding inactive edges].
+
+It could've put *Liam Conti* in a safer position against penalties.
+:::
+
+#### 2035-05-31
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+extract_subnetwork(
+  supernetwork,
+  node_name="SouthSeafood Express Corp"
+) %>% plot_fishing_relationships(
+  emphasize_nodes = c("The News Buoy", "Samuel Conti"),
+  datestring = "2035-05-31",
+  node_size = 5,
+  arrow_margin = 2,
+  title = "Relationship Graph: SouthSeafood Express Corp's Full Network (May 31, 2035)",
+  subtitle = "This shows the full view of the network connected to SouthSeafood Express Corp in any way."
+)
+```
+
+-   *Samuel Conti*, a **Conti Clan** member becomes a shareholder of *The News Buoy*, a News Company
+
+::: {.callout-tip appearance="simple"}
+Although not formally marked as related to *Liam Conti*, this transaction by *Samuel Conti* is suspicious as he is part of **Conti Clan**.
+
+This could be an effort to control the narrative and get good publicity for the Contis and their businesses.
+:::
+
+#### 2035-06-02
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+extract_subnetwork(
+  supernetwork,
+  node_name="SouthSeafood Express Corp"
+) %>% plot_fishing_relationships(
+  emphasize_nodes = c("StichtingMarine Shipping Company", "AguaLeska Transit N.V."),
+  datestring = "2035-06-02",
+  node_size = 5,
+  arrow_margin = 2,
+  title = "Relationship Graph: SouthSeafood Express Corp's Full Network (June 2, 2035)",
+  subtitle = "This shows the full view of the network connected to SouthSeafood Express Corp in any way."
+)
+```
+
+-   *AguaLeska Transit N.V.* becomes "orphaned" after *StichtingMarine Shipping Company* gives up its shareholdership.
+
+::: {.callout-note appearance="simple"}
+As *StichtingMarine Shipping Company* is a very important company for *Liam Conti*, it is important to get rid of close associations to *SouthSeafood Express Corp*.
+:::
+
+#### 2035-06-10
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+extract_subnetwork(
+  supernetwork,
+  node_name="SouthSeafood Express Corp"
+) %>% plot_fishing_relationships(
+  emphasize_nodes = c("StichtingMarine Shipping Company", "Liam Conti"),
+  datestring = "2035-06-10",
+  node_size = 5,
+  arrow_margin = 2,
+  title = "Relationship Graph: SouthSeafood Express Corp's Full Network (June 10, 2035)",
+  subtitle = "This shows the full view of the network connected to SouthSeafood Express Corp in any way."
+)
+```
+
+-   *Liam Conti* becomes a shareholder of *StichtingMarine Shipping Company*. This is on top of him being a beneficial owner.
+
+::: {.callout-tip appearance="simple"}
+This gives more power to *LIam Conti* on his most important company.
+:::
+
+#### 2035-11-15
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+extract_subnetwork(
+  supernetwork,
+  node_name="SouthSeafood Express Corp"
+) %>% plot_fishing_relationships(
+  emphasize_nodes = c("Harvey Janus", "SamakaDredgeTransport OJSC"),
+  datestring = "2035-11-15",
+  node_size = 5,
+  arrow_margin = 2,
+  title = "Relationship Graph: SouthSeafood Express Corp's Full Network (November 15, 2035)",
+  subtitle = "This shows the full view of the network connected to SouthSeafood Express Corp in any way."
+)
+```
+
+This event look irrelevant to the **Conti Clan**'s actions.
+:::
+
+### 9.4.2 Overall Insights
+
+The entities that benefit the most from *SouthSeafood Express Corp* illegal fishing activities are:
+
+-   AguaLeska Transit N.V.
+
+-   StichtingMarine Shipping Company
+
+-   Liam Conti
+
+We can see this from the network structure before *Liam Conti* distanced himself from *SouthSeafood Express Corp*.
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Show the code'
+extract_subnetwork(
+  supernetwork,
+  node_name="SouthSeafood Express Corp"
+) %>% plot_fishing_relationships(
+  emphasize_nodes = c("SouthSeafood Express Corp", "AguaLeska Transit N.V.", "StichtingMarine Shipping Company", "Liam Conti"),
+  datestring = "2035-05-14",
+  node_size = 5,
+  arrow_margin = 2,
+  title = "Relationship Graph: SouthSeafood Express Corp's Full Network (May 14, 2035)",
+  subtitle = "This shows the full view of the network connected to SouthSeafood Express Corp in any way."
+)
+```
+
+# 10 References
+
+*Three Degrees of Influence*. (2010, May 25). Strategy+business. <http://www.strategy-business.com/article/10218>
 
 Disney, A. (2020, January 14). *PageRank centrality & EigenCentrality*. Cambridge Intelligence. <https://cambridge-intelligence.com/eigencentrality-pagerank/>
