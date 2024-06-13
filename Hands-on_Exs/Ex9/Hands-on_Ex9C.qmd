@@ -1,0 +1,272 @@
+---
+title: "Hands-on Exercise 9C: Heatmap for Visualising and Analysing Multivariate Data"
+author: "Kristine Joy Paas"
+date: "13 June 2024"
+date-modified: "last-modified"
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+  freeze: true
+---
+
+# 1 Overview
+
+This hands-on exercise covers [Chapter 14: Heatmap for Visualising and Analysing Multivariate Data](https://r4va.netlify.app/chap14).
+
+In this exercise, I learned:
+
+-   how to create heatmaps
+
+# 2 Getting Started
+
+## 2.1 Loading the required packages
+
+For this exercise we will use the following R packages:
+
+```{r}
+pacman::p_load(seriation, dendextend, heatmaply, tidyverse)
+```
+
+## 2.2 Importing data
+
+We will the data of [World Happines 2018 report](https://worldhappiness.report/ed/2018/). The data set is downloaded from [here](https://s3.amazonaws.com/happiness-report/2018/WHR2018Chapter2OnlineData.xls). The original data set is in Microsoft Excel format. It has been extracted and saved in csv file called **WHData-2018.csv**.
+
+```{r}
+wh <- read_csv("data/WHData-2018.csv")
+
+glimpse(wh)
+```
+
+# 3 Data Preparation
+
+## 3.1 Changing row names to country names
+
+```{r}
+row.names(wh) <- wh$Country
+```
+
+## 3.2 Transforming data frame into a matrix
+
+```{r}
+wh1 <- dplyr::select(wh, c(3, 7:12))
+wh_matrix <- data.matrix(wh)
+```
+
+# 4 Static Heatmap
+
+In this section, we will **heatmap()** of *R Stats* package to plot heatmaps.
+
+## 4.1 *heatmap() of R Stats*
+
+```{r}
+wh_heatmap <- heatmap(wh_matrix,
+                      Rowv=NA, Colv=NA)
+```
+
+When *Rowv* and *Colv* are not `NA`, dendograms are plotted
+
+```{r}
+wh_heatmap <- heatmap(wh_matrix)
+```
+
+::: {.callout-tip appearance="minimal"}
+Red cells mean high values. Happiness Score by country relatively has high value compared to the other column variables, making them perceived as lower than they actually are.
+
+This is why we need to normalize.
+:::
+
+```{r}
+wh_heatmap <- heatmap(wh_matrix,
+                      scale="column",
+                      cexRow = 0.6, 
+                      cexCol = 0.8,
+                      margins = c(10, 4))
+```
+
+# 5 Creating interactive heatmap
+
+We will use **heatmaply** to generate interactive heatmaps.
+
+## 5.1 Working with heatmaply
+
+```{r}
+heatmaply(mtcars)
+```
+
+Let's also plot the Happiness interactive heatmap
+
+```{r}
+heatmaply(wh_matrix[, -c(1, 2, 4, 5)])
+```
+
+## 5.2 Data transformation
+
+### 5.2.1 Scaling method
+
+```{r}
+heatmaply(wh_matrix[, -c(1, 2, 4, 5)],
+          scale = "column")
+```
+
+### 5.2.2 Normalizing method
+
+This will transform based on 0 to 1 scale of a normal distribution
+
+```{r}
+heatmaply(normalize(wh_matrix[, -c(1, 2, 4, 5)]))
+```
+
+### 5.2.3 Percentizing
+
+This will rank the values and visualize based on percentile
+
+```{r}
+heatmaply(percentize(wh_matrix[, -c(1, 2, 4, 5)]))
+```
+
+## 5.3 Clustering Algorithm
+
+**heatmaply** supports a variety of hierarchical clustering algorithm. The main arguments provided are:
+
+-   *distfun*: function used to compute the distance (dissimilarity) between both rows and columns. Defaults to dist. The options “pearson”, “spearman” and “kendall” can be used to use correlation-based clustering, which uses as.dist(1 - cor(t(x))) as the distance metric (using the specified correlation method).
+
+-   *hclustfun*: function used to compute the hierarchical clustering when *Rowv* or *Colv* are not dendrograms. Defaults to *hclust*.
+
+-   *dist_method* default is NULL, which results in “euclidean” to be used. It can accept alternative character strings indicating the method to be passed to distfun. By default *distfun* is “dist”” hence this can be one of “euclidean”, “maximum”, “manhattan”, “canberra”, “binary” or “minkowski”.
+
+-   *hclust_method* default is NULL, which results in “complete” method to be used. It can accept alternative character strings indicating the method to be passed to *hclustfun*. By default hclustfun is hclust hence this can be one of “ward.D”, “ward.D2”, “single”, “complete”, “average” (= UPGMA), “mcquitty” (= WPGMA), “median” (= WPGMC) or “centroid” (= UPGMC).
+
+In general, a clustering model can be calibrated either manually or statistically.
+
+### 5.3.1 Manual Approach
+
+Plot using heirarchical clustering algorithm with “Euclidean distance” and “ward.D” method.
+
+```{r}
+heatmaply(normalize(wh_matrix[, -c(1, 2, 4, 5)]),
+          dist_method = "euclidean",
+          hclust_method = "ward.D")
+```
+
+### 5.3.2 Statistical Approach
+
+We will first determine the appropriate clustering method to use.
+
+```{r}
+wh_d <- dist(normalize(wh_matrix[, -c(1, 2, 4, 5)]), method = "euclidean")
+dend_expend(wh_d)[[3]]
+```
+
+::: {.callout-tip appearance="minimal"}
+We will use **average** because it has the **highest optimum value**.
+:::
+
+*find_k()* will be used to determine the optimal number of the cluster.
+
+```{r}
+wh_clust <- hclust(wh_d, method = "average")
+num_k <- find_k(wh_clust)
+plot(num_k)
+```
+
+::: {.callout-tip appearance="minimal"}
+**k = 3** gives the best value so we will use it
+:::
+
+```{r}
+heatmaply(normalize(wh_matrix[, -c(1, 2, 4, 5)]),
+          dist_method = "euclidean",
+          hclust_method = "average",
+          k_row = 3)
+```
+
+## 5.4 Seriation
+
+Seriation will give the optimal branch ordering of the dendogram. Hierarchical clustering only provides limitations in the ordering. If clustering them gives you ((A+B)+C) as a tree, you know that C can’t end up between A and B, but it doesn’t tell you which way to flip the A+B cluster.
+
+We will explore the different seriation algorithms
+
+::: panel-tabset
+### OLO
+
+```{r}
+heatmaply(normalize(wh_matrix[, -c(1, 2, 4, 5)]),
+          seriate = "OLO")
+```
+
+The *OLO* seriation algorithm has $O(n^4)$ complexity so it is slow.
+
+### GW
+
+Another option is “GW” (Gruvaeus and Wainer) which aims for the same goal as OLO but uses a potentially faster heuristic.
+
+```{r}
+heatmaply(normalize(wh_matrix[, -c(1, 2, 4, 5)]),
+          seriate = "GW")
+```
+
+### Mean
+
+The option “mean” gives the output we would get by default from heatmap functions in other packages such as gplots::heatmap.2.
+
+```{r}
+heatmaply(normalize(wh_matrix[, -c(1, 2, 4, 5)]),
+          seriate = "mean")
+```
+
+### None
+
+The *none* option does not perform any rotations in the dendogram.
+
+```{r}
+heatmaply(normalize(wh_matrix[, -c(1, 2, 4, 5)]),
+          seriate = "none")
+```
+:::
+
+# 6 Working with color palettes
+
+The default colour palette uses by **heatmaply** is *viridis*. heatmaply users, however, can use other colour palettes in order to improve the aestheticness and visual friendliness of the heatmap.
+
+Let's try another color palette.
+
+```{r}
+heatmaply(normalize(wh_matrix[, -c(1, 2, 4, 5)]),
+          seriate = "none",
+          colors = Blues)
+```
+
+# 7 Adding finishing touches
+
+We can improve the quality of the visualization by using *heatmaply*'s parameters.
+
+The following are used:
+
+-   *k_row* is used to produce 5 groups.
+-   *margins* is used to change the top margin to 60 and row margin to 200.
+-   *fontsizw_row* and *fontsize_col* are used to change the font size for row and column labels to 4.
+-   *main* is used to write the main title of the plot.
+-   *xlab* and *ylab* are used to write the x-axis and y-axis labels respectively.
+
+```{r}
+heatmaply(normalize(wh_matrix[, -c(1, 2, 4, 5)]),
+          Colv=NA,
+          seriate = "none",
+          colors = Blues,
+          k_row = 5,
+          margins = c(NA,200,60,NA),
+          fontsize_row = 4,
+          fontsize_col = 5,
+          main="World Happiness Score and Variables by Country, 2018 \nDataTransformation using Normalise Method",
+          xlab = "World Happiness Indicators",
+          ylab = "World Countries"
+          )
+```
+
+# 8 Reflections
+
+My impression of heatmaps are just a group of cells with different column representing a single value (e.g. weekly traffic graph).
+
+In this exercise I learned that we can use it to visualize multiple variables and also that dendograms are part of it.

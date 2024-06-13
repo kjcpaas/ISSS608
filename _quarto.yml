@@ -33,6 +33,16 @@ website:
             href: Hands-on_Exs/Ex8B/Hands-on_Ex8B.qmd
           - text: "8C: Analytical Mapping"
             href: Hands-on_Exs/Ex8C/Hands-on_Ex8C.qmd
+          - text: "9A: Creating Ternary Plot with R"
+            href: Hands-on_Exs/Ex9/Hands-on_Ex9A.qmd
+          - text: "9B: Visual Correlation Analysis"
+            href: Hands-on_Exs/Ex9/Hands-on_Ex9B.qmd
+          - text: "9C: Heatmap for Visualising and Analysing Multivariate Data"
+            href: Hands-on_Exs/Ex9/Hands-on_Ex9C.qmd
+          - text: "9D: Visual Multivariate Analysis with Parallel Coordinates Plot"
+            href: Hands-on_Exs/Ex9/Hands-on_Ex9D.qmd
+          - text: "9E: Treemap Visualisation with R"
+            href: Hands-on_Exs/Ex9/Hands-on_Ex9E.qmd
       - text: In-class Exercises
         menu:
           - text: "1: Introduction to Visual Analytics"
