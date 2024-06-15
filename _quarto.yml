@@ -57,6 +57,8 @@ website:
             href: In-class_Exs/Ex6A/In-class_Ex6A.qmd
           - text: "6B: Visualising and Analysing Network Data"
             href: In-class_Exs/Ex6B/In-class_Ex6B.qmd
+          - text: "9: Multivariate Analysis"
+            href: In-class_Exs/Ex9/In-class_Ex9.qmd
       - text: Take-home Exercises
         menu:
           - text: "1: Singapore Private Residential Property Market for 2024 Q1"

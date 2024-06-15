@@ -1,0 +1,89 @@
+---
+title: "In-class Exercise 9: Multivariate Analysis"
+author: "Kristine Joy Paas"
+date: "15 June 2024"
+date-modified: "last-modified"
+format: html
+execute: 
+  echo: true
+  eval: true
+  warning: false
+  freeze: true
+---
+
+# 1 Overview
+
+# 2 Getting Started
+
+```{r}
+pacman::p_load(scatterPlotMatrix, parallelPlot, cluster, factoextra, tidyverse)
+```
+
+# 3 Plotting Correlation Map
+
+```{r}
+wine <- read_csv("data/wine_quality.csv")
+```
+
+```{r}
+ggplot(data = wine,
+       aes(x = type)) +
+  geom_bar()
+```
+
+```{r}
+whitewine <- wine %>%
+  filter(type == "white") %>%
+  select(c(1:11))
+```
+
+```{r}
+scatterPlotMatrix(whitewine,
+                  corrPlotType = "Text",
+                  distribType = 1,
+                  width = 500,
+                  height = 500,
+                  rotateTitle = TRUE)
+```
+
+# 4 Plotting Ternary Chart
+
+::: {.callout-important appearance="simple"}
+The 3 variables in ternary plot must add up to the total, i.e. they represent the same thing
+:::
+
+# 5 Plotting Heatmap
+
+::: {.callout-important appearance="simple"}
+Heatmaps can be very inefficient when there are a lot of observations. For large number of observations, better use paralell plot.
+:::
+
+# 6 Plotting Parallel Plots
+
+```{r}
+set.seed(123)
+
+kmeans4 <- kmeans(whitewine, 4, nstart = 25)
+print(kmeans4)
+```
+
+```{r}
+fviz_cluster(kmeans4, data=whitewine)
+```
+
+```{r}
+whitewine <- whitewine %>%
+  mutate(Cluster = kmeans4$cluster)
+```
+
+```{r}
+whitewine$Cluster <- as_factor(whitewine$Cluster)
+```
+
+```{r}
+whitewine %>%
+  parallelPlot(refColumnDim = "Cluster",
+               width = 300,
+               height = 250,
+               rotateTitle = TRUE)
+```
