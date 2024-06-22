@@ -61,6 +61,8 @@ website:
             href: In-class_Exs/Ex6B/In-class_Ex6B.qmd
           - text: "9: Multivariate Analysis"
             href: In-class_Exs/Ex9/In-class_Ex9.qmd
+          - text: "10: My First Quarto Dashboard"
+            href: In-class_Exs/Ex10/In-class_Ex10.qmd
       - text: Take-home Exercises
         menu:
           - text: "1: Singapore Private Residential Property Market for 2024 Q1"

@@ -44,6 +44,18 @@ For the purpose of this study, we will import RDS file `CofeeChain.rds`.
 coffeechain <- read_rds("data/rds/CoffeeChain.rds")
 ```
 
+## 2.3 Exporting to CSV
+
+::: callout-important
+### .mdb not working on Mac
+
+As `.mdb` does not work on Mac, I exported the data to CSV to make it work with Tableau
+:::
+
+```{r}
+write.csv(coffeechain,"data/CoffeeChain.csv")
+```
+
 # 3 Plotting with ggplot
 
 ## 3.1 Bullet chart
